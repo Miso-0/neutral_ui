@@ -17,7 +17,14 @@ Future<void> pumpPure(
         textDirection: textDirection,
         child: PureTheme(
           data: theme ?? const ThemeData(),
-          child: Center(child: child),
+          child: Overlay(
+            key: UniqueKey(),
+            initialEntries: <OverlayEntry>[
+              OverlayEntry(
+                builder: (BuildContext context) => Center(child: child),
+              ),
+            ],
+          ),
         ),
       ),
     ),

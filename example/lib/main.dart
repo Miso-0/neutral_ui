@@ -106,6 +106,99 @@ ToggleStyle _toggle({bool radio = false, bool isSwitch = false}) => ToggleStyle(
   ),
 );
 
+MenuStyle _menuPanel({bool matchAnchorWidth = true}) => MenuStyle(
+  decoration: BoxDecoration(
+    color: const Color(0xFFFFFFFF),
+    borderRadius: BorderRadius.circular(14),
+    border: Border.all(color: _line),
+    boxShadow: const <BoxShadow>[
+      BoxShadow(color: Color(0x18142C2A), blurRadius: 24, offset: Offset(0, 8)),
+    ],
+  ),
+  padding: const EdgeInsets.all(6),
+  minimumSize: const Size(180, 0),
+  maximumSize: const Size(360, 280),
+  matchAnchorWidth: matchAnchorWidth,
+  edgePadding: const EdgeInsets.all(12),
+  offset: const Offset(0, 6),
+  clipBehavior: Clip.antiAlias,
+);
+
+ButtonStyle _menuItem() => _button().copyWith(
+  decoration: StateProperty<Decoration?>.resolveWith(
+    (InteractionState state) => BoxDecoration(
+      color: state.isFocused || state.isPressed
+          ? const Color(0xFFD5EAE0)
+          : state.isSelected
+          ? const Color(0xFFE4F1E7)
+          : state.isHovered
+          ? const Color(0xFFF0F5F0)
+          : const Color(0x00000000),
+      borderRadius: BorderRadius.circular(8),
+    ),
+  ),
+  padding: const StateProperty<EdgeInsetsGeometry?>.all(
+    EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+  ),
+  alignment: AlignmentDirectional.centerStart,
+);
+
+Decoration _dropdownSurface(InteractionState state) {
+  final bool active = state.isFocused || state.isSelected;
+  return BoxDecoration(
+    color: state.isDisabled
+        ? const Color(0xFFE3EAE4)
+        : state.isPressed
+        ? const Color(0xFFD5EAE0)
+        : active
+        ? const Color(0xFFE4F1E7)
+        : state.isHovered
+        ? const Color(0xFFF0F5F0)
+        : const Color(0xFFFFFFFF),
+    borderRadius: BorderRadius.circular(12),
+    border: Border.all(
+      color: state.isDisabled
+          ? _line
+          : active
+          ? _accent
+          : state.isHovered
+          ? _muted
+          : _line,
+      width: 2,
+    ),
+  );
+}
+
+DropdownStyle _dropdown() => DropdownStyle(
+  buttonStyle: _button().copyWith(
+    alignment: AlignmentDirectional.centerStart,
+    decoration: StateProperty<Decoration?>.resolveWith(_dropdownSurface),
+  ),
+  menuStyle: _menuPanel(),
+  itemStyle: _menuItem(),
+  icon: StateProperty<Widget?>.resolveWith(
+    (InteractionState state) => Text(state.isSelected ? '⌃' : '⌄'),
+  ),
+  selectedIndicator: StateProperty<Widget?>.resolveWith(
+    (InteractionState state) => SizedBox(
+      width: 16,
+      child: Text(
+        state.isSelected ? '✓' : '',
+        style: const TextStyle(color: _accent),
+      ),
+    ),
+  ),
+  textStyle: const StateProperty<TextStyle?>.all(
+    TextStyle(color: _ink, fontSize: 14),
+  ),
+  hintStyle: const StateProperty<TextStyle?>.all(
+    TextStyle(color: _muted, fontSize: 14),
+  ),
+  cursorColor: _accent,
+  selectionColor: const Color(0x40087F6D),
+  cursorWidth: 2,
+);
+
 ThemeData _theme() => ThemeData(
   elevatedButtonStyle: _button(solid: true),
   outlinedButtonStyle: _button(),
@@ -121,6 +214,24 @@ ThemeData _theme() => ThemeData(
   ),
   iconButtonStyle: _button().copyWith(
     padding: const StateProperty<EdgeInsetsGeometry?>.all(EdgeInsets.all(10)),
+  ),
+  dropdownButtonStyle: _dropdown(),
+  dropdownMenuStyle: _dropdown(),
+  popupMenuStyle: PopupMenuStyle(
+    buttonStyle: _button(),
+    menuStyle: _menuPanel(matchAnchorWidth: false),
+    itemStyle: _menuItem(),
+    checkIndicator: StateProperty<Widget?>.resolveWith(
+      (InteractionState state) => SizedBox(
+        width: 16,
+        child: Text(
+          state.isSelected ? '✓' : '',
+          style: const TextStyle(color: _accent),
+        ),
+      ),
+    ),
+    dividerDecoration: const BoxDecoration(color: _line),
+    dividerHeight: 1,
   ),
   checkboxStyle: _toggle(),
   switchStyle: _toggle(isSwitch: true),
@@ -205,8 +316,14 @@ class GalleryApp extends StatelessWidget {
       height: 1.4,
       fontFamily: 'Arial',
     ),
-    builder: (BuildContext context, Widget? child) =>
-        PureTheme(data: _theme(), child: const _Gallery()),
+    builder: (BuildContext context, Widget? child) => PureTheme(
+      data: _theme(),
+      child: Overlay(
+        initialEntries: <OverlayEntry>[
+          OverlayEntry(builder: (BuildContext context) => const _Gallery()),
+        ],
+      ),
+    ),
   );
 }
 
@@ -227,7 +344,39 @@ class _GalleryState extends State<_Gallery> {
   int? _groupRadio = 1;
   double _value = 0.42;
   double _discrete = 0.6;
+  double _decorationValue = 0.35;
+  bool _decorationSwitched = true;
   String _activity = 'Ready to interact';
+  String? _projectType;
+  String? _workspace = 'Personal';
+  Set<String> _disciplines = <String>{'Engineering'};
+  bool _pinned = true;
+
+  static const List<DropdownMenuEntry<String>> _cities =
+      <DropdownMenuEntry<String>>[
+        DropdownMenuEntry<String>(value: 'Cape Town', label: 'Cape Town'),
+        DropdownMenuEntry<String>(value: 'Johannesburg', label: 'Johannesburg'),
+        DropdownMenuEntry<String>(value: 'Durban', label: 'Durban'),
+        DropdownMenuEntry<String>(value: 'Pretoria', label: 'Pretoria'),
+        DropdownMenuEntry<String>(
+          value: 'Bloemfontein',
+          label: 'Bloemfontein',
+          enabled: false,
+        ),
+      ];
+  static const List<DropdownMenuEntry<String>> _languages =
+      <DropdownMenuEntry<String>>[
+        DropdownMenuEntry<String>(value: 'Dart', label: 'Dart'),
+        DropdownMenuEntry<String>(value: 'Flutter', label: 'Flutter'),
+        DropdownMenuEntry<String>(value: 'Swift', label: 'Swift'),
+        DropdownMenuEntry<String>(value: 'Kotlin', label: 'Kotlin'),
+      ];
+  static const List<DropdownMenuEntry<String>> _teams =
+      <DropdownMenuEntry<String>>[
+        DropdownMenuEntry<String>(value: 'Design', label: 'Design'),
+        DropdownMenuEntry<String>(value: 'Engineering', label: 'Engineering'),
+        DropdownMenuEntry<String>(value: 'Research', label: 'Research'),
+      ];
 
   void _record(String message) => setState(() {
     _activity = message;
@@ -268,6 +417,317 @@ class _GalleryState extends State<_Gallery> {
   Widget _label(String label, Widget control) => Row(
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[control, const SizedBox(width: 6), Text(label)],
+  );
+
+  Widget _menuDemo(String label, Widget child, {double width = 270}) =>
+      SizedBox(
+        width: width,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(label, style: const TextStyle(color: _muted, fontSize: 12)),
+            const SizedBox(height: 8),
+            child,
+          ],
+        ),
+      );
+
+  List<PopupMenuEntry<String>> _projectActions(
+    BuildContext context,
+  ) => <PopupMenuEntry<String>>[
+    const PopupMenuItem<String>(
+      value: 'duplicate',
+      leading: Text('+'),
+      child: Text('Duplicate project'),
+    ),
+    CheckedPopupMenuItem<String>(
+      value: 'pin',
+      checked: _pinned,
+      child: const Text('Pin to sidebar'),
+    ),
+    const PopupMenuDivider(),
+    const PopupMenuItem<String>(
+      value: 'archive',
+      enabled: false,
+      child: Text('Archive project'),
+    ),
+    const PopupMenuItem<String>(value: 'delete', child: Text('Delete project')),
+  ];
+
+  void _selectAction(String value) => setState(() {
+    if (value == 'pin') {
+      _pinned = !_pinned;
+    }
+    _activity = 'Project action: $value';
+  });
+
+  Widget _menus() => _section(
+    '06',
+    'Menus',
+    'Choose a value, type to filter or search, select several teams, or open project actions.',
+    <Widget>[
+      Wrap(
+        spacing: 22,
+        runSpacing: 22,
+        children: <Widget>[
+          _menuDemo(
+            'Classic select with a hint',
+            DropdownButton<String>(
+              key: const ValueKey<String>('classic-select'),
+              semanticLabel: 'Project type',
+              hint: const Text('Choose project type'),
+              value: _projectType,
+              items: const <DropdownMenuItem<String>>[
+                DropdownMenuItem<String>(
+                  value: 'Website',
+                  child: Text('Website'),
+                ),
+                DropdownMenuItem<String>(
+                  value: 'Mobile app',
+                  child: Text('Mobile app'),
+                ),
+                DropdownMenuItem<String>(
+                  value: 'Prototype',
+                  child: Text('Prototype'),
+                ),
+              ],
+              onChanged: (String? value) => setState(() {
+                _projectType = value;
+                _activity = 'Project type: $value';
+              }),
+            ),
+          ),
+          _menuDemo(
+            'Expanded select',
+            DropdownButton<String>(
+              key: const ValueKey<String>('expanded-select'),
+              semanticLabel: 'Workspace type',
+              isExpanded: true,
+              value: _workspace,
+              items: const <DropdownMenuItem<String>>[
+                DropdownMenuItem<String>(
+                  value: 'Personal',
+                  child: Text('Personal'),
+                ),
+                DropdownMenuItem<String>(
+                  value: 'Shared workspace',
+                  child: Text('Shared workspace'),
+                ),
+              ],
+              onChanged: (String? value) => setState(() {
+                _workspace = value;
+                _activity = 'Workspace: $value';
+              }),
+            ),
+          ),
+          _menuDemo(
+            'Disabled select',
+            DropdownButton<String>(
+              semanticLabel: 'Unavailable select',
+              disabledHint: const Text('No workspaces available'),
+              items: const <DropdownMenuItem<String>>[],
+              onChanged: null,
+            ),
+          ),
+          _menuDemo(
+            'Filter the list as you type',
+            DropdownMenu<String>(
+              key: const ValueKey<String>('filter-menu'),
+              semanticLabel: 'Filter cities',
+              hintText: 'Find a city',
+              width: 270,
+              requestFocusOnTap: true,
+              enableFilter: true,
+              dropdownMenuEntries: _cities,
+              onSelected: (String? value) => _record('City: $value'),
+            ),
+          ),
+          _menuDemo(
+            'Search highlights without filtering',
+            DropdownMenu<String>(
+              key: const ValueKey<String>('search-menu'),
+              semanticLabel: 'Search languages',
+              hintText: 'Find a language',
+              width: 270,
+              requestFocusOnTap: true,
+              dropdownMenuEntries: _languages,
+              onSelected: (String? value) => _record('Language: $value'),
+            ),
+          ),
+          _menuDemo(
+            'Multiple teams with selection chips',
+            DropdownMenu<String>.multiple(
+              key: const ValueKey<String>('multiple-menu'),
+              semanticLabel: 'Choose teams',
+              hintText: 'Add a team',
+              width: 560,
+              requestFocusOnTap: true,
+              enableFilter: true,
+              dropdownMenuEntries: _teams,
+              selected: _disciplines,
+              onSelectionChanged: (Set<String> values) => setState(() {
+                _disciplines = values;
+                _activity = 'Teams: ${values.join(', ')}';
+              }),
+              selectionBuilder:
+                  (
+                    BuildContext context,
+                    List<DropdownMenuEntry<String>> selectedEntries,
+                  ) => ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 250),
+                    child: Wrap(
+                      spacing: 4,
+                      runSpacing: 4,
+                      children: <Widget>[
+                        for (final DropdownMenuEntry<String> entry
+                            in selectedEntries)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 7,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE4F1E7),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              entry.label,
+                              style: const TextStyle(
+                                color: _accent,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+            ),
+            width: 560,
+          ),
+        ],
+      ),
+      const SizedBox(height: 22),
+      Wrap(
+        spacing: 22,
+        runSpacing: 16,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: <Widget>[
+          _label(
+            'Icon trigger / over',
+            PopupMenuButton<String>(
+              key: const ValueKey<String>('popup-over'),
+              tooltip: 'Project actions over',
+              semanticLabel: 'Project actions',
+              icon: const Text('•••'),
+              position: PopupMenuPosition.over,
+              itemBuilder: _projectActions,
+              onSelected: _selectAction,
+              onCanceled: () => _record('Project menu dismissed'),
+            ),
+          ),
+          PopupMenuButton<String>(
+            key: const ValueKey<String>('popup-under'),
+            semanticLabel: 'Project actions below',
+            position: PopupMenuPosition.under,
+            offset: const Offset(0, 8),
+            itemBuilder: _projectActions,
+            onSelected: _selectAction,
+            child: const Text('Project actions below ⌄'),
+          ),
+        ],
+      ),
+    ],
+  );
+
+  Widget _decorations() => _section(
+    '07',
+    'Decorations',
+    'Pass a BoxDecoration directly for a surface that stays consistent in every interaction state.',
+    <Widget>[
+      ElevatedButton(
+        key: const ValueKey<String>('decorated-button'),
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: <Color>[Color(0xFF087F6D), Color(0xFF20594F)],
+          ),
+          borderRadius: BorderRadius.all(Radius.circular(20)),
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: Color(0x26087F6D),
+              blurRadius: 12,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        onPressed: () => _record('Decorated button activated'),
+        child: const Text('A gradient, directly'),
+      ),
+      const SizedBox(height: 18),
+      ListTile(
+        key: const ValueKey<String>('decorated-tile'),
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/decoration_pattern.png'),
+            repeat: ImageRepeat.repeat,
+          ),
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+          border: Border.fromBorderSide(BorderSide(color: _line)),
+        ),
+        title: const Text('A little texture'),
+        subtitle: const Text('An asset image in a widget-level decoration.'),
+        trailing: const Text('→'),
+        onTap: () => _record('Decorated tile activated'),
+      ),
+      const SizedBox(height: 18),
+      Row(
+        children: <Widget>[
+          const Text('Custom track and thumb'),
+          const Spacer(),
+          Text(
+            '${(_decorationValue * 100).round()}%',
+            key: const ValueKey<String>('decorated-slider-value'),
+            style: const TextStyle(color: _accent),
+          ),
+        ],
+      ),
+      Slider(
+        key: const ValueKey<String>('decorated-slider'),
+        value: _decorationValue,
+        trackDecoration: const BoxDecoration(
+          color: Color(0xFFE6D9BC),
+          borderRadius: BorderRadius.all(Radius.circular(6)),
+        ),
+        thumbDecoration: const BoxDecoration(
+          color: Color(0xFFF3D694),
+          shape: BoxShape.circle,
+          border: Border.fromBorderSide(BorderSide(color: _ink, width: 2)),
+        ),
+        style: const SliderStyle(
+          trackHeight: StateProperty<double?>.all(8),
+          thumbSize: StateProperty<Size?>.all(Size(24, 24)),
+        ),
+        onChanged: (double value) => setState(() {
+          _decorationValue = value;
+        }),
+      ),
+      const SizedBox(height: 10),
+      _label(
+        'A constant thumb, in either position',
+        Switch(
+          key: const ValueKey<String>('decorated-switch'),
+          value: _decorationSwitched,
+          semanticLabel: 'Decorated switch',
+          thumbDecoration: const BoxDecoration(
+            color: Color(0xFFF3D694),
+            shape: BoxShape.circle,
+            border: Border.fromBorderSide(BorderSide(color: _ink)),
+          ),
+          onChanged: (bool value) => setState(() {
+            _decorationSwitched = value;
+          }),
+        ),
+      ),
+    ],
   );
 
   @override
@@ -688,6 +1148,10 @@ class _GalleryState extends State<_Gallery> {
                     ],
                   ),
                   const SizedBox(height: 18),
+                  _menus(),
+                  const SizedBox(height: 18),
+                  _decorations(),
+                  const SizedBox(height: 18),
                   InteractionDetector(
                     onTap: () =>
                         _record('Custom interaction surface activated'),
@@ -735,7 +1199,7 @@ class _GalleryState extends State<_Gallery> {
                   ),
                   const SizedBox(height: 24),
                   const Text(
-                    'PureUI 0.1 / Flutter widgets, your visual language.',
+                    'PureUI 0.3 / Flutter widgets, your visual language.',
                     style: TextStyle(color: _muted, fontSize: 12),
                   ),
                 ],

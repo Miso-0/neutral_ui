@@ -152,6 +152,71 @@ void main() {
     shouldNotify: (SliderTheme current, SliderTheme old) =>
         current.updateShouldNotify(old),
   );
+  _componentThemeTests<DropdownStyle, DropdownButtonTheme>(
+    name: 'DropdownButtonTheme',
+    base: const DropdownStyle(buttonStyle: ButtonStyle(spacing: 4)),
+    partial: const DropdownStyle(
+      buttonStyle: ButtonStyle(alignment: Alignment.bottomRight),
+      menuStyle: MenuStyle(padding: EdgeInsets.all(3)),
+    ),
+    combined: const DropdownStyle(
+      buttonStyle: ButtonStyle(spacing: 4, alignment: Alignment.bottomRight),
+      menuStyle: MenuStyle(padding: EdgeInsets.all(3)),
+    ),
+    global: ({required DropdownStyle data}) =>
+        ThemeData(dropdownButtonStyle: data),
+    create: ({required DropdownStyle data, required Widget child}) =>
+        DropdownButtonTheme(data: data, child: child),
+    merge: ({required DropdownStyle data, required Widget child}) =>
+        DropdownButtonTheme.merge(data: data, child: child),
+    of: DropdownButtonTheme.of,
+    maybeOf: DropdownButtonTheme.maybeOf,
+    shouldNotify: (DropdownButtonTheme current, DropdownButtonTheme old) =>
+        current.updateShouldNotify(old),
+  );
+  _componentThemeTests<DropdownStyle, DropdownMenuTheme>(
+    name: 'DropdownMenuTheme',
+    base: const DropdownStyle(buttonStyle: ButtonStyle(spacing: 4)),
+    partial: const DropdownStyle(
+      buttonStyle: ButtonStyle(alignment: Alignment.bottomRight),
+      menuStyle: MenuStyle(padding: EdgeInsets.all(3)),
+    ),
+    combined: const DropdownStyle(
+      buttonStyle: ButtonStyle(spacing: 4, alignment: Alignment.bottomRight),
+      menuStyle: MenuStyle(padding: EdgeInsets.all(3)),
+    ),
+    global: ({required DropdownStyle data}) =>
+        ThemeData(dropdownMenuStyle: data),
+    create: ({required DropdownStyle data, required Widget child}) =>
+        DropdownMenuTheme(data: data, child: child),
+    merge: ({required DropdownStyle data, required Widget child}) =>
+        DropdownMenuTheme.merge(data: data, child: child),
+    of: DropdownMenuTheme.of,
+    maybeOf: DropdownMenuTheme.maybeOf,
+    shouldNotify: (DropdownMenuTheme current, DropdownMenuTheme old) =>
+        current.updateShouldNotify(old),
+  );
+  _componentThemeTests<PopupMenuStyle, PopupMenuTheme>(
+    name: 'PopupMenuTheme',
+    base: const PopupMenuStyle(buttonStyle: ButtonStyle(spacing: 4)),
+    partial: const PopupMenuStyle(
+      buttonStyle: ButtonStyle(alignment: Alignment.bottomRight),
+      menuStyle: MenuStyle(padding: EdgeInsets.all(3)),
+    ),
+    combined: const PopupMenuStyle(
+      buttonStyle: ButtonStyle(spacing: 4, alignment: Alignment.bottomRight),
+      menuStyle: MenuStyle(padding: EdgeInsets.all(3)),
+    ),
+    global: ({required PopupMenuStyle data}) => ThemeData(popupMenuStyle: data),
+    create: ({required PopupMenuStyle data, required Widget child}) =>
+        PopupMenuTheme(data: data, child: child),
+    merge: ({required PopupMenuStyle data, required Widget child}) =>
+        PopupMenuTheme.merge(data: data, child: child),
+    of: PopupMenuTheme.of,
+    maybeOf: PopupMenuTheme.maybeOf,
+    shouldNotify: (PopupMenuTheme current, PopupMenuTheme old) =>
+        current.updateShouldNotify(old),
+  );
 }
 
 void _componentThemeTests<S, W extends InheritedTheme>({

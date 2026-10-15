@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
 
+import '../foundation/decoration_override.dart';
 import '../foundation/interaction_detector.dart';
 import '../foundation/interaction_state.dart';
 import '../foundation/state_property.dart';
@@ -30,13 +31,31 @@ class Slider extends StatefulWidget {
     this.onHover,
     this.allowedInteraction,
     this.style,
+    this.trackDecoration,
+    this.activeTrackDecoration,
+    this.secondaryActiveTrackDecoration,
+    this.thumbDecoration,
+    this.tickMarkDecoration,
+    this.activeTickMarkDecoration,
   }) : assert(min <= max),
        assert(value >= min && value <= max),
        assert(
          secondaryTrackValue == null ||
              (secondaryTrackValue >= min && secondaryTrackValue <= max),
        ),
-       assert(divisions == null || divisions > 0);
+       assert(divisions == null || divisions > 0),
+       assert(
+         tickMarkDecoration == null || divisions != null,
+         'tickMarkDecoration requires divisions.',
+       ),
+       assert(
+         activeTickMarkDecoration == null || divisions != null,
+         'activeTickMarkDecoration requires divisions.',
+       ),
+       assert(
+         secondaryActiveTrackDecoration == null || secondaryTrackValue != null,
+         'secondaryActiveTrackDecoration requires secondaryTrackValue.',
+       );
 
   /// The current value supplied by the parent.
   final double value;
@@ -85,6 +104,39 @@ class Slider extends StatefulWidget {
 
   /// Inline tokens that take precedence over the component theme.
   final SliderStyle? style;
+
+  /// Replaces the inactive track decoration in every interaction state.
+  ///
+  /// Overrides inherited themes. Cannot be combined with `style.trackDecoration`.
+  final BoxDecoration? trackDecoration;
+
+  /// Replaces the active track decoration in every interaction state.
+  ///
+  /// Overrides inherited themes. Cannot be combined with `style.activeTrackDecoration`.
+  final BoxDecoration? activeTrackDecoration;
+
+  /// Replaces the secondary track decoration in every interaction state.
+  ///
+  /// Overrides inherited themes. Cannot be combined with `style.secondaryActiveTrackDecoration`.
+  /// Requires [secondaryTrackValue] to be non-null.
+  final BoxDecoration? secondaryActiveTrackDecoration;
+
+  /// Replaces the thumb decoration in every interaction state.
+  ///
+  /// Overrides inherited themes. Cannot be combined with `style.thumbDecoration`.
+  final BoxDecoration? thumbDecoration;
+
+  /// Replaces the inactive tick marks decoration in every interaction state.
+  ///
+  /// Overrides inherited themes. Cannot be combined with `style.tickMarkDecoration`.
+  /// Requires [divisions] to be non-null.
+  final BoxDecoration? tickMarkDecoration;
+
+  /// Replaces the active tick marks decoration in every interaction state.
+  ///
+  /// Overrides inherited themes. Cannot be combined with `style.activeTickMarkDecoration`.
+  /// Requires [divisions] to be non-null.
+  final BoxDecoration? activeTickMarkDecoration;
 
   @override
   State<Slider> createState() => _SliderState();
@@ -262,7 +314,73 @@ class _SliderState extends State<Slider> {
 
   @override
   Widget build(BuildContext context) {
+    assert(
+      debugCheckDecorationOverride(
+        widget: 'Slider',
+        parameter: 'trackDecoration',
+        styleToken: 'style.trackDecoration',
+        value: widget.trackDecoration,
+        styleValue: widget.style?.trackDecoration,
+      ),
+    );
+    assert(
+      debugCheckDecorationOverride(
+        widget: 'Slider',
+        parameter: 'activeTrackDecoration',
+        styleToken: 'style.activeTrackDecoration',
+        value: widget.activeTrackDecoration,
+        styleValue: widget.style?.activeTrackDecoration,
+      ),
+    );
+    assert(
+      debugCheckDecorationOverride(
+        widget: 'Slider',
+        parameter: 'secondaryActiveTrackDecoration',
+        styleToken: 'style.secondaryActiveTrackDecoration',
+        value: widget.secondaryActiveTrackDecoration,
+        styleValue: widget.style?.secondaryActiveTrackDecoration,
+      ),
+    );
+    assert(
+      debugCheckDecorationOverride(
+        widget: 'Slider',
+        parameter: 'thumbDecoration',
+        styleToken: 'style.thumbDecoration',
+        value: widget.thumbDecoration,
+        styleValue: widget.style?.thumbDecoration,
+      ),
+    );
+    assert(
+      debugCheckDecorationOverride(
+        widget: 'Slider',
+        parameter: 'tickMarkDecoration',
+        styleToken: 'style.tickMarkDecoration',
+        value: widget.tickMarkDecoration,
+        styleValue: widget.style?.tickMarkDecoration,
+      ),
+    );
+    assert(
+      debugCheckDecorationOverride(
+        widget: 'Slider',
+        parameter: 'activeTickMarkDecoration',
+        styleToken: 'style.activeTickMarkDecoration',
+        value: widget.activeTickMarkDecoration,
+        styleValue: widget.style?.activeTickMarkDecoration,
+      ),
+    );
     final List<SliderStyle?> layers = <SliderStyle?>[
+      SliderStyle(
+        trackDecoration: decorationLayer(widget.trackDecoration),
+        activeTrackDecoration: decorationLayer(widget.activeTrackDecoration),
+        secondaryActiveTrackDecoration: decorationLayer(
+          widget.secondaryActiveTrackDecoration,
+        ),
+        thumbDecoration: decorationLayer(widget.thumbDecoration),
+        tickMarkDecoration: decorationLayer(widget.tickMarkDecoration),
+        activeTickMarkDecoration: decorationLayer(
+          widget.activeTickMarkDecoration,
+        ),
+      ),
       widget.style,
       SliderTheme.of(context),
     ];

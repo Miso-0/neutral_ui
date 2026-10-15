@@ -17,6 +17,7 @@ class InteractionDetector extends StatefulWidget {
     required this.builder,
     this.enabled = true,
     this.isSelected,
+    this.isFocused,
     this.onTap,
     this.onLongPress,
     this.onTapDown,
@@ -48,6 +49,9 @@ class InteractionDetector extends StatefulWidget {
 
   /// Selection supplied by a controlled widget, or read from the controller.
   final bool? isSelected;
+
+  /// Overrides focus visibility, including virtual focus in editable menus.
+  final bool? isFocused;
 
   /// Called by taps, activation intents and semantic activation.
   final VoidCallback? onTap;
@@ -160,11 +164,12 @@ class _InteractionDetectorState extends State<InteractionDetector> {
     isDragged: widget.enabled && _dragged,
     isHovered: widget.enabled && _hovering,
     isFocused:
-        _hasFocus &&
-        (_navigationMode == NavigationMode.directional ||
-            (widget.enabled &&
-                FocusManager.instance.highlightMode ==
-                    FocusHighlightMode.traditional)),
+        widget.isFocused ??
+        (_hasFocus &&
+            (_navigationMode == NavigationMode.directional ||
+                (widget.enabled &&
+                    FocusManager.instance.highlightMode ==
+                        FocusHighlightMode.traditional))),
     isSelected:
         widget.isSelected ??
         widget.statesController?.value.contains(WidgetState.selected) ??

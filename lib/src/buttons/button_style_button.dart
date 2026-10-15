@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../foundation/animated_icon_theme.dart';
+import '../foundation/decoration_override.dart';
 import '../foundation/interaction_detector.dart';
 import '../foundation/interaction_state.dart';
 import '../foundation/state_property.dart';
@@ -13,7 +14,7 @@ import '../styles/button_style.dart';
 /// Subclasses choose a component theme with [themeStyleOf]. Inline [style]
 /// values take precedence over that theme, including state-dependent values.
 abstract class ButtonStyleButton extends StatefulWidget {
-  /// Creates a button whose size and appearance come entirely from its style.
+  /// Creates a button sized by its style, with optional decoration overrides.
   const ButtonStyleButton({
     super.key,
     required this.onPressed,
@@ -22,6 +23,8 @@ abstract class ButtonStyleButton extends StatefulWidget {
     this.onHover,
     this.onFocusChange,
     this.style,
+    this.decoration,
+    this.foregroundDecoration,
     this.focusNode,
     this.autofocus = false,
     this.clipBehavior,
@@ -49,6 +52,16 @@ abstract class ButtonStyleButton extends StatefulWidget {
 
   /// Per-instance tokens that take precedence over the component theme.
   final ButtonStyle? style;
+
+  /// Replaces the background decoration and theme defaults in every state.
+  ///
+  /// Must not be supplied together with [ButtonStyle.decoration] in [style].
+  final BoxDecoration? decoration;
+
+  /// Replaces the foreground decoration and theme defaults in every state.
+  ///
+  /// Must not be supplied with [ButtonStyle.foregroundDecoration] in [style].
+  final BoxDecoration? foregroundDecoration;
 
   /// The externally managed focus node, if any.
   final FocusNode? focusNode;
@@ -110,6 +123,18 @@ abstract class ButtonStyleButton extends StatefulWidget {
   @protected
   bool? get selected => null;
 
+  /// Whether the menu controlled by this button is expanded.
+  @protected
+  bool? get expanded => null;
+
+  /// The optional checked state exposed to accessibility.
+  @protected
+  bool? get checked => null;
+
+  /// Overrides focus visibility for a virtually focused menu option.
+  @protected
+  bool? get virtualFocused => null;
+
   /// Alternative primary content displayed when [selected] is true.
   @protected
   Widget? get selectedChild => null;
@@ -125,7 +150,29 @@ abstract class ButtonStyleButton extends StatefulWidget {
 class _ButtonStyleButtonState extends State<ButtonStyleButton> {
   @override
   Widget build(BuildContext context) {
+    assert(
+      debugCheckDecorationOverride(
+        widget: widget.runtimeType.toString(),
+        parameter: 'decoration',
+        styleToken: 'style.decoration',
+        value: widget.decoration,
+        styleValue: widget.style?.decoration,
+      ),
+    );
+    assert(
+      debugCheckDecorationOverride(
+        widget: widget.runtimeType.toString(),
+        parameter: 'foregroundDecoration',
+        styleToken: 'style.foregroundDecoration',
+        value: widget.foregroundDecoration,
+        styleValue: widget.style?.foregroundDecoration,
+      ),
+    );
     final List<ButtonStyle?> layers = <ButtonStyle?>[
+      ButtonStyle(
+        decoration: decorationLayer(widget.decoration),
+        foregroundDecoration: decorationLayer(widget.foregroundDecoration),
+      ),
       widget.style,
       widget.themeStyleOf(context),
       widget.defaultStyleOf(context),
@@ -142,10 +189,19 @@ class _ButtonStyleButtonState extends State<ButtonStyleButton> {
       button: widget.isSemanticButton,
       enabled: widget.enabled,
       selected: widget.selected,
+      expanded: widget.expanded,
+      checked: widget.checked,
+      onExpand: widget.enabled && widget.expanded == false
+          ? widget.onPressed
+          : null,
+      onCollapse: widget.enabled && widget.expanded == true
+          ? widget.onPressed
+          : null,
       tooltip: widget.semanticTooltip,
       child: InteractionDetector(
         enabled: widget.enabled,
-        isSelected: widget.selected,
+        isSelected: widget.selected ?? widget.expanded,
+        isFocused: widget.virtualFocused,
         onTap: widget.onPressed,
         onLongPress: widget.onLongPress,
         onHover: widget.onHover,

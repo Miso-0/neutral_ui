@@ -230,4 +230,105 @@ void main() {
     );
     expect(merged.sliderStyle.preferredWidth, 200);
   });
+  test('ThemeData copies and merges dropdownButtonStyle', () {
+    const DropdownStyle first = DropdownStyle(cursorWidth: 1);
+    const DropdownStyle second = DropdownStyle(cursorWidth: 2);
+    const ThemeData original = ThemeData(dropdownButtonStyle: first);
+    final ThemeData copied = const ThemeData().copyWith(
+      dropdownButtonStyle: first,
+    );
+    expect(const ThemeData().dropdownButtonStyle, const DropdownStyle());
+    expect(copied, original);
+    expect(copied.hashCode, original.hashCode);
+    expect(
+      copied.copyWith(dropdownButtonStyle: second).dropdownButtonStyle,
+      second,
+    );
+    expect(copied.copyWith(), original);
+    expect(
+      original
+          .merge(const ThemeData(dropdownButtonStyle: second))
+          .dropdownButtonStyle,
+      first,
+    );
+    expect(const ThemeData().merge(original), original);
+    expect(original.merge(null), same(original));
+    expect(original.toString(), contains('dropdownButtonStyle:'));
+  });
+  test('ThemeData copies and merges dropdownMenuStyle', () {
+    const DropdownStyle first = DropdownStyle(cursorWidth: 1);
+    const DropdownStyle second = DropdownStyle(cursorWidth: 2);
+    const ThemeData original = ThemeData(dropdownMenuStyle: first);
+    final ThemeData copied = const ThemeData().copyWith(
+      dropdownMenuStyle: first,
+    );
+    expect(const ThemeData().dropdownMenuStyle, const DropdownStyle());
+    expect(copied, original);
+    expect(copied.hashCode, original.hashCode);
+    expect(
+      copied.copyWith(dropdownMenuStyle: second).dropdownMenuStyle,
+      second,
+    );
+    expect(copied.copyWith(), original);
+    expect(
+      original
+          .merge(const ThemeData(dropdownMenuStyle: second))
+          .dropdownMenuStyle,
+      first,
+    );
+    expect(const ThemeData().merge(original), original);
+    expect(original.merge(null), same(original));
+    expect(original.toString(), contains('dropdownMenuStyle:'));
+  });
+  test('ThemeData copies and merges popupMenuStyle', () {
+    const PopupMenuStyle first = PopupMenuStyle(dividerHeight: 1);
+    const PopupMenuStyle second = PopupMenuStyle(dividerHeight: 2);
+    const ThemeData original = ThemeData(popupMenuStyle: first);
+    final ThemeData copied = const ThemeData().copyWith(popupMenuStyle: first);
+    expect(const ThemeData().popupMenuStyle, const PopupMenuStyle());
+    expect(copied, original);
+    expect(copied.hashCode, original.hashCode);
+    expect(copied.copyWith(popupMenuStyle: second).popupMenuStyle, second);
+    expect(copied.copyWith(), original);
+    expect(
+      original.merge(const ThemeData(popupMenuStyle: second)).popupMenuStyle,
+      first,
+    );
+    expect(const ThemeData().merge(original), original);
+    expect(original.merge(null), same(original));
+    expect(original.toString(), contains('popupMenuStyle:'));
+  });
+  test('ThemeData deep-merges each menu component slot', () {
+    const ThemeData local = ThemeData(
+      dropdownButtonStyle: DropdownStyle(buttonStyle: ButtonStyle(spacing: 2)),
+      dropdownMenuStyle: DropdownStyle(
+        menuStyle: MenuStyle(offset: Offset(1, 2)),
+      ),
+      popupMenuStyle: PopupMenuStyle(itemStyle: ButtonStyle(spacing: 3)),
+    );
+    const ThemeData inherited = ThemeData(
+      dropdownButtonStyle: DropdownStyle(
+        buttonStyle: ButtonStyle(spacing: 9, alignment: Alignment.centerRight),
+      ),
+      dropdownMenuStyle: DropdownStyle(
+        menuStyle: MenuStyle(offset: Offset(3, 4), maximumSize: Size(100, 200)),
+      ),
+      popupMenuStyle: PopupMenuStyle(
+        itemStyle: ButtonStyle(spacing: 9, alignment: Alignment.topLeft),
+      ),
+    );
+    final ThemeData merged = local.merge(inherited);
+    expect(
+      merged.dropdownButtonStyle.buttonStyle,
+      const ButtonStyle(spacing: 2, alignment: Alignment.centerRight),
+    );
+    expect(
+      merged.dropdownMenuStyle.menuStyle,
+      const MenuStyle(offset: Offset(1, 2), maximumSize: Size(100, 200)),
+    );
+    expect(
+      merged.popupMenuStyle.itemStyle,
+      const ButtonStyle(spacing: 3, alignment: Alignment.topLeft),
+    );
+  });
 }

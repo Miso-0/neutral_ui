@@ -125,10 +125,16 @@ mixin ToggleEngine<W extends StatefulWidget>
   }
 
   /// Interpolates a decoration token between both selection appearances.
+  ///
+  /// An [override] supplies the same decoration at every selection position.
   Decoration? decorationToken(
     InteractionState state,
-    StateProperty<Decoration?>? Function(ToggleStyle style) select,
-  ) {
+    StateProperty<Decoration?>? Function(ToggleStyle style) select, {
+    BoxDecoration? override,
+  }) {
+    if (override != null) {
+      return override;
+    }
     return Decoration.lerp(
       stateToken<Decoration>(state.copyWith(isSelected: false), select),
       stateToken<Decoration>(state.copyWith(isSelected: true), select),

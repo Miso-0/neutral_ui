@@ -14,6 +14,9 @@ void main() {
       ToggleStyle,
       ListTileStyle,
       SliderStyle,
+      MenuStyle,
+      DropdownStyle,
+      PopupMenuStyle,
       ElevatedButtonTheme,
       OutlinedButtonTheme,
       TextButtonTheme,
@@ -23,9 +26,14 @@ void main() {
       RadioTheme,
       ListTileTheme,
       SliderTheme,
+      DropdownButtonTheme,
+      DropdownMenuTheme,
+      PopupMenuTheme,
       IconAlignment,
       ListTileTitleAlignment,
       SliderInteraction,
+      DropdownMenuCloseBehavior,
+      PopupMenuPosition,
       ButtonStyleButton,
       ElevatedButton,
       OutlinedButton,
@@ -36,6 +44,16 @@ void main() {
       Radio<int>,
       ListTile,
       Slider,
+      DropdownButton<int>,
+      DropdownMenuItem<int>,
+      DropdownMenu<int>,
+      DropdownMenuEntry<int>,
+      PopupMenuButton<int>,
+      PopupMenuButtonState<int>,
+      PopupMenuEntry<int>,
+      PopupMenuItem<int>,
+      CheckedPopupMenuItem<int>,
+      PopupMenuDivider,
     ];
     int resolver(InteractionState state) => state.isPressed ? 1 : 0;
     Widget builder(BuildContext context, InteractionState state) =>
@@ -47,10 +65,37 @@ void main() {
       double value,
       String? label,
     ) => Text(label ?? formatter(value));
+    List<Widget> selectedItems(BuildContext context) => const <Widget>[];
+    Widget transition(
+      BuildContext context,
+      Animation<double> animation,
+      Widget child,
+    ) => child;
+    List<DropdownMenuEntry<int>> filter(
+      List<DropdownMenuEntry<int>> entries,
+      String query,
+    ) => entries;
+    int? search(List<DropdownMenuEntry<int>> entries, String query) => null;
+    Widget selection(
+      BuildContext context,
+      List<DropdownMenuEntry<int>> entries,
+    ) => const SizedBox();
+    List<PopupMenuEntry<int>> popupItems(BuildContext context) =>
+        const <PopupMenuEntry<int>>[];
+    void itemSelected(int value) {}
+    void canceled() {}
     expect(types, isNotEmpty);
     expect(<StateResolver<int>>[resolver].single(const InteractionState()), 0);
     expect(<InteractionWidgetBuilder>[builder], hasLength(1));
     expect(<SemanticFormatterCallback>[formatter].single(0.5), '0.5');
     expect(<SliderValueIndicatorBuilder>[indicator], hasLength(1));
+    expect(<DropdownButtonBuilder>[selectedItems], hasLength(1));
+    expect(<MenuTransitionBuilder>[transition], hasLength(1));
+    expect(<FilterCallback<int>>[filter], hasLength(1));
+    expect(<SearchCallback<int>>[search], hasLength(1));
+    expect(<DropdownSelectionBuilder<int>>[selection], hasLength(1));
+    expect(<PopupMenuItemBuilder<int>>[popupItems], hasLength(1));
+    expect(<PopupMenuItemSelected<int>>[itemSelected], hasLength(1));
+    expect(<PopupMenuCanceled>[canceled], hasLength(1));
   });
 }

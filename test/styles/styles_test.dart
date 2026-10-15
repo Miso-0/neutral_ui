@@ -2499,4 +2499,444 @@ void main() {
       expect(full.toString(), contains('SliderStyle('));
     });
   });
+  group('MenuStyle', () {
+    _menuStyleTokenTest<MenuStyle, Decoration>(
+      name: 'decoration',
+      empty: const MenuStyle(),
+      first: const BoxDecoration(color: Color(0xFF112233)),
+      second: const BoxDecoration(color: Color(0xFF445566)),
+      create: (Decoration value) => MenuStyle(decoration: value),
+      copy: (MenuStyle style, Decoration? value) =>
+          style.copyWith(decoration: value),
+      read: (MenuStyle style) => style.decoration,
+      merge: (MenuStyle style, MenuStyle? other) => style.merge(other),
+    );
+    _menuStyleTokenTest<MenuStyle, EdgeInsetsGeometry>(
+      name: 'padding',
+      empty: const MenuStyle(),
+      first: const EdgeInsets.all(3),
+      second: const EdgeInsetsDirectional.only(start: 9),
+      create: (EdgeInsetsGeometry value) => MenuStyle(padding: value),
+      copy: (MenuStyle style, EdgeInsetsGeometry? value) =>
+          style.copyWith(padding: value),
+      read: (MenuStyle style) => style.padding,
+      merge: (MenuStyle style, MenuStyle? other) => style.merge(other),
+    );
+    _menuStyleTokenTest<MenuStyle, Size>(
+      name: 'minimumSize',
+      empty: const MenuStyle(),
+      first: const Size(10, 20),
+      second: const Size(30, 40),
+      create: (Size value) => MenuStyle(minimumSize: value),
+      copy: (MenuStyle style, Size? value) =>
+          style.copyWith(minimumSize: value),
+      read: (MenuStyle style) => style.minimumSize,
+      merge: (MenuStyle style, MenuStyle? other) => style.merge(other),
+    );
+    _menuStyleTokenTest<MenuStyle, Size>(
+      name: 'maximumSize',
+      empty: const MenuStyle(),
+      first: const Size(100, 200),
+      second: const Size(300, 400),
+      create: (Size value) => MenuStyle(maximumSize: value),
+      copy: (MenuStyle style, Size? value) =>
+          style.copyWith(maximumSize: value),
+      read: (MenuStyle style) => style.maximumSize,
+      merge: (MenuStyle style, MenuStyle? other) => style.merge(other),
+    );
+    _menuStyleTokenTest<MenuStyle, bool>(
+      name: 'matchAnchorWidth',
+      empty: const MenuStyle(),
+      first: true,
+      second: false,
+      create: (bool value) => MenuStyle(matchAnchorWidth: value),
+      copy: (MenuStyle style, bool? value) =>
+          style.copyWith(matchAnchorWidth: value),
+      read: (MenuStyle style) => style.matchAnchorWidth,
+      merge: (MenuStyle style, MenuStyle? other) => style.merge(other),
+    );
+    _menuStyleTokenTest<MenuStyle, Offset>(
+      name: 'offset',
+      empty: const MenuStyle(),
+      first: const Offset(1, 2),
+      second: const Offset(3, 4),
+      create: (Offset value) => MenuStyle(offset: value),
+      copy: (MenuStyle style, Offset? value) => style.copyWith(offset: value),
+      read: (MenuStyle style) => style.offset,
+      merge: (MenuStyle style, MenuStyle? other) => style.merge(other),
+    );
+    _menuStyleTokenTest<MenuStyle, EdgeInsets>(
+      name: 'edgePadding',
+      empty: const MenuStyle(),
+      first: const EdgeInsets.all(3),
+      second: const EdgeInsets.all(9),
+      create: (EdgeInsets value) => MenuStyle(edgePadding: value),
+      copy: (MenuStyle style, EdgeInsets? value) =>
+          style.copyWith(edgePadding: value),
+      read: (MenuStyle style) => style.edgePadding,
+      merge: (MenuStyle style, MenuStyle? other) => style.merge(other),
+    );
+    _menuStyleTokenTest<MenuStyle, Clip>(
+      name: 'clipBehavior',
+      empty: const MenuStyle(),
+      first: Clip.hardEdge,
+      second: Clip.antiAlias,
+      create: (Clip value) => MenuStyle(clipBehavior: value),
+      copy: (MenuStyle style, Clip? value) =>
+          style.copyWith(clipBehavior: value),
+      read: (MenuStyle style) => style.clipBehavior,
+      merge: (MenuStyle style, MenuStyle? other) => style.merge(other),
+    );
+    _menuStyleTokenTest<MenuStyle, Duration>(
+      name: 'transitionDuration',
+      empty: const MenuStyle(),
+      first: const Duration(milliseconds: 20),
+      second: const Duration(milliseconds: 30),
+      create: (Duration value) => MenuStyle(transitionDuration: value),
+      copy: (MenuStyle style, Duration? value) =>
+          style.copyWith(transitionDuration: value),
+      read: (MenuStyle style) => style.transitionDuration,
+      merge: (MenuStyle style, MenuStyle? other) => style.merge(other),
+    );
+    _menuStyleTokenTest<MenuStyle, Curve>(
+      name: 'transitionCurve',
+      empty: const MenuStyle(),
+      first: Curves.linear,
+      second: Curves.easeInOut,
+      create: (Curve value) => MenuStyle(transitionCurve: value),
+      copy: (MenuStyle style, Curve? value) =>
+          style.copyWith(transitionCurve: value),
+      read: (MenuStyle style) => style.transitionCurve,
+      merge: (MenuStyle style, MenuStyle? other) => style.merge(other),
+    );
+    _menuStyleTokenTest<MenuStyle, MenuTransitionBuilder>(
+      name: 'transitionBuilder',
+      empty: const MenuStyle(),
+      first: _firstMenuTransition,
+      second: _secondMenuTransition,
+      create: (MenuTransitionBuilder value) =>
+          MenuStyle(transitionBuilder: value),
+      copy: (MenuStyle style, MenuTransitionBuilder? value) =>
+          style.copyWith(transitionBuilder: value),
+      read: (MenuStyle style) => style.transitionBuilder,
+      merge: (MenuStyle style, MenuStyle? other) => style.merge(other),
+    );
+  });
+  group('DropdownStyle', () {
+    _menuStyleTokenTest<DropdownStyle, ButtonStyle>(
+      name: 'buttonStyle',
+      empty: const DropdownStyle(),
+      first: const ButtonStyle(spacing: 3),
+      second: const ButtonStyle(spacing: 9),
+      create: (ButtonStyle value) => DropdownStyle(buttonStyle: value),
+      copy: (DropdownStyle style, ButtonStyle? value) =>
+          style.copyWith(buttonStyle: value),
+      read: (DropdownStyle style) => style.buttonStyle,
+      merge: (DropdownStyle style, DropdownStyle? other) => style.merge(other),
+    );
+    _menuStyleTokenTest<DropdownStyle, MenuStyle>(
+      name: 'menuStyle',
+      empty: const DropdownStyle(),
+      first: const MenuStyle(matchAnchorWidth: true),
+      second: const MenuStyle(matchAnchorWidth: false),
+      create: (MenuStyle value) => DropdownStyle(menuStyle: value),
+      copy: (DropdownStyle style, MenuStyle? value) =>
+          style.copyWith(menuStyle: value),
+      read: (DropdownStyle style) => style.menuStyle,
+      merge: (DropdownStyle style, DropdownStyle? other) => style.merge(other),
+    );
+    _menuStyleTokenTest<DropdownStyle, ButtonStyle>(
+      name: 'itemStyle',
+      empty: const DropdownStyle(),
+      first: const ButtonStyle(spacing: 3),
+      second: const ButtonStyle(spacing: 9),
+      create: (ButtonStyle value) => DropdownStyle(itemStyle: value),
+      copy: (DropdownStyle style, ButtonStyle? value) =>
+          style.copyWith(itemStyle: value),
+      read: (DropdownStyle style) => style.itemStyle,
+      merge: (DropdownStyle style, DropdownStyle? other) => style.merge(other),
+    );
+    _menuStyleTokenTest<DropdownStyle, StateProperty<Widget?>>(
+      name: 'icon',
+      empty: const DropdownStyle(),
+      first: const StateProperty<Widget?>.all(_firstWidget),
+      second: const StateProperty<Widget?>.all(_secondWidget),
+      create: (StateProperty<Widget?> value) => DropdownStyle(icon: value),
+      copy: (DropdownStyle style, StateProperty<Widget?>? value) =>
+          style.copyWith(icon: value),
+      read: (DropdownStyle style) => style.icon,
+      merge: (DropdownStyle style, DropdownStyle? other) => style.merge(other),
+    );
+    _menuStyleTokenTest<DropdownStyle, StateProperty<Widget?>>(
+      name: 'selectedIndicator',
+      empty: const DropdownStyle(),
+      first: const StateProperty<Widget?>.all(_firstWidget),
+      second: const StateProperty<Widget?>.all(_secondWidget),
+      create: (StateProperty<Widget?> value) =>
+          DropdownStyle(selectedIndicator: value),
+      copy: (DropdownStyle style, StateProperty<Widget?>? value) =>
+          style.copyWith(selectedIndicator: value),
+      read: (DropdownStyle style) => style.selectedIndicator,
+      merge: (DropdownStyle style, DropdownStyle? other) => style.merge(other),
+    );
+    _menuStyleTokenTest<DropdownStyle, StateProperty<TextStyle?>>(
+      name: 'textStyle',
+      empty: const DropdownStyle(),
+      first: const StateProperty<TextStyle?>.all(TextStyle(fontSize: 12)),
+      second: const StateProperty<TextStyle?>.all(TextStyle(fontSize: 18)),
+      create: (StateProperty<TextStyle?> value) =>
+          DropdownStyle(textStyle: value),
+      copy: (DropdownStyle style, StateProperty<TextStyle?>? value) =>
+          style.copyWith(textStyle: value),
+      read: (DropdownStyle style) => style.textStyle,
+      merge: (DropdownStyle style, DropdownStyle? other) => style.merge(other),
+    );
+    _menuStyleTokenTest<DropdownStyle, StateProperty<TextStyle?>>(
+      name: 'hintStyle',
+      empty: const DropdownStyle(),
+      first: const StateProperty<TextStyle?>.all(TextStyle(fontSize: 12)),
+      second: const StateProperty<TextStyle?>.all(TextStyle(fontSize: 18)),
+      create: (StateProperty<TextStyle?> value) =>
+          DropdownStyle(hintStyle: value),
+      copy: (DropdownStyle style, StateProperty<TextStyle?>? value) =>
+          style.copyWith(hintStyle: value),
+      read: (DropdownStyle style) => style.hintStyle,
+      merge: (DropdownStyle style, DropdownStyle? other) => style.merge(other),
+    );
+    _menuStyleTokenTest<DropdownStyle, Color>(
+      name: 'cursorColor',
+      empty: const DropdownStyle(),
+      first: const Color(0xFF112233),
+      second: const Color(0xFF445566),
+      create: (Color value) => DropdownStyle(cursorColor: value),
+      copy: (DropdownStyle style, Color? value) =>
+          style.copyWith(cursorColor: value),
+      read: (DropdownStyle style) => style.cursorColor,
+      merge: (DropdownStyle style, DropdownStyle? other) => style.merge(other),
+    );
+    _menuStyleTokenTest<DropdownStyle, Color>(
+      name: 'selectionColor',
+      empty: const DropdownStyle(),
+      first: const Color(0xFF112233),
+      second: const Color(0xFF445566),
+      create: (Color value) => DropdownStyle(selectionColor: value),
+      copy: (DropdownStyle style, Color? value) =>
+          style.copyWith(selectionColor: value),
+      read: (DropdownStyle style) => style.selectionColor,
+      merge: (DropdownStyle style, DropdownStyle? other) => style.merge(other),
+    );
+    _menuStyleTokenTest<DropdownStyle, double>(
+      name: 'cursorWidth',
+      empty: const DropdownStyle(),
+      first: 1.0,
+      second: 2.0,
+      create: (double value) => DropdownStyle(cursorWidth: value),
+      copy: (DropdownStyle style, double? value) =>
+          style.copyWith(cursorWidth: value),
+      read: (DropdownStyle style) => style.cursorWidth,
+      merge: (DropdownStyle style, DropdownStyle? other) => style.merge(other),
+    );
+  });
+  group('PopupMenuStyle', () {
+    _menuStyleTokenTest<PopupMenuStyle, ButtonStyle>(
+      name: 'buttonStyle',
+      empty: const PopupMenuStyle(),
+      first: const ButtonStyle(spacing: 3),
+      second: const ButtonStyle(spacing: 9),
+      create: (ButtonStyle value) => PopupMenuStyle(buttonStyle: value),
+      copy: (PopupMenuStyle style, ButtonStyle? value) =>
+          style.copyWith(buttonStyle: value),
+      read: (PopupMenuStyle style) => style.buttonStyle,
+      merge: (PopupMenuStyle style, PopupMenuStyle? other) =>
+          style.merge(other),
+    );
+    _menuStyleTokenTest<PopupMenuStyle, MenuStyle>(
+      name: 'menuStyle',
+      empty: const PopupMenuStyle(),
+      first: const MenuStyle(matchAnchorWidth: true),
+      second: const MenuStyle(matchAnchorWidth: false),
+      create: (MenuStyle value) => PopupMenuStyle(menuStyle: value),
+      copy: (PopupMenuStyle style, MenuStyle? value) =>
+          style.copyWith(menuStyle: value),
+      read: (PopupMenuStyle style) => style.menuStyle,
+      merge: (PopupMenuStyle style, PopupMenuStyle? other) =>
+          style.merge(other),
+    );
+    _menuStyleTokenTest<PopupMenuStyle, ButtonStyle>(
+      name: 'itemStyle',
+      empty: const PopupMenuStyle(),
+      first: const ButtonStyle(spacing: 3),
+      second: const ButtonStyle(spacing: 9),
+      create: (ButtonStyle value) => PopupMenuStyle(itemStyle: value),
+      copy: (PopupMenuStyle style, ButtonStyle? value) =>
+          style.copyWith(itemStyle: value),
+      read: (PopupMenuStyle style) => style.itemStyle,
+      merge: (PopupMenuStyle style, PopupMenuStyle? other) =>
+          style.merge(other),
+    );
+    _menuStyleTokenTest<PopupMenuStyle, StateProperty<Widget?>>(
+      name: 'checkIndicator',
+      empty: const PopupMenuStyle(),
+      first: const StateProperty<Widget?>.all(_firstWidget),
+      second: const StateProperty<Widget?>.all(_secondWidget),
+      create: (StateProperty<Widget?> value) =>
+          PopupMenuStyle(checkIndicator: value),
+      copy: (PopupMenuStyle style, StateProperty<Widget?>? value) =>
+          style.copyWith(checkIndicator: value),
+      read: (PopupMenuStyle style) => style.checkIndicator,
+      merge: (PopupMenuStyle style, PopupMenuStyle? other) =>
+          style.merge(other),
+    );
+    _menuStyleTokenTest<PopupMenuStyle, Decoration>(
+      name: 'dividerDecoration',
+      empty: const PopupMenuStyle(),
+      first: const BoxDecoration(color: Color(0xFF112233)),
+      second: const BoxDecoration(color: Color(0xFF445566)),
+      create: (Decoration value) => PopupMenuStyle(dividerDecoration: value),
+      copy: (PopupMenuStyle style, Decoration? value) =>
+          style.copyWith(dividerDecoration: value),
+      read: (PopupMenuStyle style) => style.dividerDecoration,
+      merge: (PopupMenuStyle style, PopupMenuStyle? other) =>
+          style.merge(other),
+    );
+    _menuStyleTokenTest<PopupMenuStyle, double>(
+      name: 'dividerHeight',
+      empty: const PopupMenuStyle(),
+      first: 1.0,
+      second: 2.0,
+      create: (double value) => PopupMenuStyle(dividerHeight: value),
+      copy: (PopupMenuStyle style, double? value) =>
+          style.copyWith(dividerHeight: value),
+      read: (PopupMenuStyle style) => style.dividerHeight,
+      merge: (PopupMenuStyle style, PopupMenuStyle? other) =>
+          style.merge(other),
+    );
+    _menuStyleTokenTest<PopupMenuStyle, PopupMenuPosition>(
+      name: 'position',
+      empty: const PopupMenuStyle(),
+      first: PopupMenuPosition.over,
+      second: PopupMenuPosition.under,
+      create: (PopupMenuPosition value) => PopupMenuStyle(position: value),
+      copy: (PopupMenuStyle style, PopupMenuPosition? value) =>
+          style.copyWith(position: value),
+      read: (PopupMenuStyle style) => style.position,
+      merge: (PopupMenuStyle style, PopupMenuStyle? other) =>
+          style.merge(other),
+    );
+  });
+  test('DropdownStyle deep-merges nested button, item and menu tokens', () {
+    const DropdownStyle local = DropdownStyle(
+      buttonStyle: ButtonStyle(spacing: 2),
+      itemStyle: ButtonStyle(spacing: 3),
+      menuStyle: MenuStyle(offset: Offset(1, 2)),
+    );
+    const DropdownStyle inherited = DropdownStyle(
+      buttonStyle: ButtonStyle(spacing: 8, alignment: Alignment.centerRight),
+      itemStyle: ButtonStyle(spacing: 9, tapTargetSize: Size(40, 40)),
+      menuStyle: MenuStyle(offset: Offset(3, 4), maximumSize: Size(200, 300)),
+      cursorWidth: 2,
+    );
+    final DropdownStyle merged = local.merge(inherited);
+    expect(
+      merged.buttonStyle,
+      const ButtonStyle(spacing: 2, alignment: Alignment.centerRight),
+    );
+    expect(
+      merged.itemStyle,
+      const ButtonStyle(spacing: 3, tapTargetSize: Size(40, 40)),
+    );
+    expect(
+      merged.menuStyle,
+      const MenuStyle(offset: Offset(1, 2), maximumSize: Size(200, 300)),
+    );
+    expect(merged.cursorWidth, 2);
+    expect(local.copyWith(cursorWidth: 3).buttonStyle, local.buttonStyle);
+    expect(local.copyWith(cursorWidth: 3).itemStyle, local.itemStyle);
+    expect(local.copyWith(cursorWidth: 3).menuStyle, local.menuStyle);
+    expect(
+      local
+          .copyWith(
+            buttonStyle: const ButtonStyle(alignment: Alignment.topLeft),
+          )
+          .buttonStyle,
+      const ButtonStyle(alignment: Alignment.topLeft),
+    );
+  });
+  test('PopupMenuStyle deep-merges nested button, item and menu tokens', () {
+    const PopupMenuStyle local = PopupMenuStyle(
+      buttonStyle: ButtonStyle(spacing: 2),
+      itemStyle: ButtonStyle(spacing: 3),
+      menuStyle: MenuStyle(offset: Offset(1, 2)),
+    );
+    const PopupMenuStyle inherited = PopupMenuStyle(
+      buttonStyle: ButtonStyle(spacing: 8, alignment: Alignment.centerRight),
+      itemStyle: ButtonStyle(spacing: 9, tapTargetSize: Size(40, 40)),
+      menuStyle: MenuStyle(offset: Offset(3, 4), maximumSize: Size(200, 300)),
+      position: PopupMenuPosition.under,
+    );
+    final PopupMenuStyle merged = local.merge(inherited);
+    expect(
+      merged.buttonStyle,
+      const ButtonStyle(spacing: 2, alignment: Alignment.centerRight),
+    );
+    expect(
+      merged.itemStyle,
+      const ButtonStyle(spacing: 3, tapTargetSize: Size(40, 40)),
+    );
+    expect(
+      merged.menuStyle,
+      const MenuStyle(offset: Offset(1, 2), maximumSize: Size(200, 300)),
+    );
+    expect(merged.position, PopupMenuPosition.under);
+    expect(local.copyWith(dividerHeight: 2).buttonStyle, local.buttonStyle);
+    expect(local.copyWith(dividerHeight: 2).itemStyle, local.itemStyle);
+    expect(local.copyWith(dividerHeight: 2).menuStyle, local.menuStyle);
+    expect(
+      local
+          .copyWith(menuStyle: const MenuStyle(padding: EdgeInsets.all(3)))
+          .menuStyle,
+      const MenuStyle(padding: EdgeInsets.all(3)),
+    );
+  });
+}
+
+Widget _firstMenuTransition(
+  BuildContext context,
+  Animation<double> animation,
+  Widget child,
+) => child;
+
+Widget _secondMenuTransition(
+  BuildContext context,
+  Animation<double> animation,
+  Widget child,
+) => FadeTransition(opacity: animation, child: child);
+
+void _menuStyleTokenTest<S, T>({
+  required String name,
+  required S empty,
+  required T first,
+  required T second,
+  required S Function(T value) create,
+  required S Function(S style, T? value) copy,
+  required T? Function(S style) read,
+  required S Function(S style, S? other) merge,
+}) {
+  test('$name copies, merges and participates in value equality', () {
+    final S original = create(first);
+    final S copied = copy(empty, first);
+    final S changed = copy(original, second);
+    expect(read(empty), isNull);
+    expect(read(copied), first);
+    expect(copied, original);
+    expect(copied.hashCode, original.hashCode);
+    expect(read(changed), second);
+    expect(changed, isNot(original));
+    expect(copy(original, null), original);
+    expect(merge(original, create(second)), original);
+    expect(merge(empty, original), original);
+    expect(merge(original, empty), original);
+    expect(merge(original, null), same(original));
+    expect(original.toString(), contains('$name:'));
+  });
 }

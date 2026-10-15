@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/widgets.dart';
 
 import '../foundation/animated_icon_theme.dart';
+import '../foundation/decoration_override.dart';
 import '../foundation/interaction_detector.dart';
 import '../foundation/interaction_state.dart';
 import '../foundation/style_resolution.dart';
@@ -30,6 +31,8 @@ class ListTile extends StatelessWidget {
     this.autofocus = false,
     this.statesController,
     this.style,
+    this.decoration,
+    this.foregroundDecoration,
   }) : assert(!isThreeLine || subtitle != null);
 
   /// Content preceding the text block in reading order.
@@ -77,9 +80,41 @@ class ListTile extends StatelessWidget {
   /// Inline tokens that take precedence over the component theme.
   final ListTileStyle? style;
 
+  /// Replaces the background decoration and theme defaults in every state.
+  ///
+  /// Must not be supplied with [ListTileStyle.decoration] in [style].
+  final BoxDecoration? decoration;
+
+  /// Replaces the foreground decoration and theme defaults in every state.
+  ///
+  /// Must not be supplied with [ListTileStyle.foregroundDecoration] in [style].
+  final BoxDecoration? foregroundDecoration;
+
   @override
   Widget build(BuildContext context) {
+    assert(
+      debugCheckDecorationOverride(
+        widget: 'ListTile',
+        parameter: 'decoration',
+        styleToken: 'style.decoration',
+        value: decoration,
+        styleValue: style?.decoration,
+      ),
+    );
+    assert(
+      debugCheckDecorationOverride(
+        widget: 'ListTile',
+        parameter: 'foregroundDecoration',
+        styleToken: 'style.foregroundDecoration',
+        value: foregroundDecoration,
+        styleValue: style?.foregroundDecoration,
+      ),
+    );
     final List<ListTileStyle?> layers = <ListTileStyle?>[
+      ListTileStyle(
+        decoration: decorationLayer(decoration),
+        foregroundDecoration: decorationLayer(foregroundDecoration),
+      ),
       style,
       ListTileTheme.of(context),
     ];

@@ -6,7 +6,7 @@ import 'button_style_button.dart';
 
 /// A headless button styled by the nearest [TextButtonTheme].
 ///
-/// No decoration, padding, or minimum size is applied unless supplied by style.
+/// Appearance comes from the decoration parameters and inherited or inline style.
 class TextButton extends ButtonStyleButton {
   /// Creates a button with optional leading, trailing, and icon content.
   const TextButton({
@@ -17,6 +17,8 @@ class TextButton extends ButtonStyleButton {
     super.onHover,
     super.onFocusChange,
     super.style,
+    super.decoration,
+    super.foregroundDecoration,
     super.focusNode,
     super.autofocus = false,
     super.clipBehavior,
@@ -40,6 +42,8 @@ class TextButton extends ButtonStyleButton {
     super.onHover,
     super.onFocusChange,
     super.style,
+    super.decoration,
+    super.foregroundDecoration,
     super.focusNode,
     super.autofocus = false,
     super.clipBehavior,

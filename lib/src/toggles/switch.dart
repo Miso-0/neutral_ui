@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../foundation/decoration_override.dart';
 import '../foundation/interaction_detector.dart';
 import '../foundation/interaction_state.dart';
 import '../foundation/state_property.dart';
@@ -20,6 +21,8 @@ class Switch extends StatefulWidget {
     this.onFocusChange,
     this.semanticLabel,
     this.style,
+    this.decoration,
+    this.thumbDecoration,
   });
 
   /// Whether the switch is on.
@@ -42,6 +45,16 @@ class Switch extends StatefulWidget {
 
   /// Inline tokens that override the inherited switch theme.
   final ToggleStyle? style;
+
+  /// Replaces the track decoration in every interaction and selection state.
+  ///
+  /// Overrides inherited themes. Cannot be combined with `style.decoration`.
+  final BoxDecoration? decoration;
+
+  /// Replaces the thumb decoration in every interaction and selection state.
+  ///
+  /// Overrides inherited themes. Cannot be combined with `style.thumbDecoration`.
+  final BoxDecoration? thumbDecoration;
 
   @override
   State<Switch> createState() => _SwitchState();
@@ -119,6 +132,24 @@ class _SwitchState extends State<Switch>
 
   @override
   Widget build(BuildContext context) {
+    assert(
+      debugCheckDecorationOverride(
+        widget: 'Switch',
+        parameter: 'decoration',
+        styleToken: 'style.decoration',
+        value: widget.decoration,
+        styleValue: widget.style?.decoration,
+      ),
+    );
+    assert(
+      debugCheckDecorationOverride(
+        widget: 'Switch',
+        parameter: 'thumbDecoration',
+        styleToken: 'style.thumbDecoration',
+        value: widget.thumbDecoration,
+        styleValue: widget.style?.thumbDecoration,
+      ),
+    );
     configureToggle();
     final bool enabled = widget.onChanged != null;
     return Semantics(
@@ -180,6 +211,7 @@ class _SwitchState extends State<Switch>
                   decoration: decorationToken(
                     state,
                     (ToggleStyle style) => style.decoration,
+                    override: widget.decoration,
                   ),
                   padding: padding,
                   child: Align(
@@ -197,6 +229,7 @@ class _SwitchState extends State<Switch>
                       decoration: decorationToken(
                         state,
                         (ToggleStyle style) => style.thumbDecoration,
+                        override: widget.thumbDecoration,
                       ),
                       child: Align(
                         alignment: Alignment.center,

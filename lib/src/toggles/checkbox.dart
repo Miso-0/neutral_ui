@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../foundation/decoration_override.dart';
 import '../foundation/interaction_detector.dart';
 import '../foundation/interaction_state.dart';
 import '../foundation/state_property.dart';
@@ -21,6 +22,7 @@ class Checkbox extends StatefulWidget {
     this.onFocusChange,
     this.semanticLabel,
     this.style,
+    this.decoration,
   }) : assert(tristate || value != null);
 
   /// The current selection, or null for an indeterminate checkbox.
@@ -46,6 +48,11 @@ class Checkbox extends StatefulWidget {
 
   /// Inline tokens that override the inherited checkbox theme.
   final ToggleStyle? style;
+
+  /// Replaces the box decoration in every interaction and selection state.
+  ///
+  /// Overrides inherited themes. Cannot be combined with `style.decoration`.
+  final BoxDecoration? decoration;
 
   @override
   State<Checkbox> createState() => _CheckboxState();
@@ -95,6 +102,15 @@ class _CheckboxState extends State<Checkbox>
 
   @override
   Widget build(BuildContext context) {
+    assert(
+      debugCheckDecorationOverride(
+        widget: 'Checkbox',
+        parameter: 'decoration',
+        styleToken: 'style.decoration',
+        value: widget.decoration,
+        styleValue: widget.style?.decoration,
+      ),
+    );
     configureToggle();
     final bool enabled = widget.onChanged != null;
     return Semantics(
@@ -139,6 +155,7 @@ class _CheckboxState extends State<Checkbox>
                   decoration: decorationToken(
                     state,
                     (ToggleStyle style) => style.decoration,
+                    override: widget.decoration,
                   ),
                   padding: plainToken<EdgeInsetsGeometry>(
                     (ToggleStyle style) => style.padding,

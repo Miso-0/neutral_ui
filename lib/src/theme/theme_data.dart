@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 
 import '../styles/button_style.dart';
+import '../styles/dropdown_style.dart';
+import '../styles/popup_menu_style.dart';
 import '../styles/toggle_style.dart';
 import '../styles/list_tile_style.dart';
 import '../styles/slider_style.dart';
@@ -21,6 +23,9 @@ class ThemeData {
     this.radioStyle = const ToggleStyle(),
     this.listTileStyle = const ListTileStyle(),
     this.sliderStyle = const SliderStyle(),
+    this.dropdownButtonStyle = const DropdownStyle(),
+    this.dropdownMenuStyle = const DropdownStyle(),
+    this.popupMenuStyle = const PopupMenuStyle(),
   });
 
   /// The tokens for elevatedButton components.
@@ -50,6 +55,15 @@ class ThemeData {
   /// The tokens for slider components.
   final SliderStyle sliderStyle;
 
+  /// The tokens for dropdownButton components.
+  final DropdownStyle dropdownButtonStyle;
+
+  /// The tokens for dropdownMenu components.
+  final DropdownStyle dropdownMenuStyle;
+
+  /// The tokens for popupMenu components.
+  final PopupMenuStyle popupMenuStyle;
+
   /// Returns a copy with the supplied component styles replaced.
   ThemeData copyWith({
     ButtonStyle? elevatedButtonStyle,
@@ -61,6 +75,9 @@ class ThemeData {
     ToggleStyle? radioStyle,
     ListTileStyle? listTileStyle,
     SliderStyle? sliderStyle,
+    DropdownStyle? dropdownButtonStyle,
+    DropdownStyle? dropdownMenuStyle,
+    PopupMenuStyle? popupMenuStyle,
   }) {
     return ThemeData(
       elevatedButtonStyle: elevatedButtonStyle ?? this.elevatedButtonStyle,
@@ -72,6 +89,9 @@ class ThemeData {
       radioStyle: radioStyle ?? this.radioStyle,
       listTileStyle: listTileStyle ?? this.listTileStyle,
       sliderStyle: sliderStyle ?? this.sliderStyle,
+      dropdownButtonStyle: dropdownButtonStyle ?? this.dropdownButtonStyle,
+      dropdownMenuStyle: dropdownMenuStyle ?? this.dropdownMenuStyle,
+      popupMenuStyle: popupMenuStyle ?? this.popupMenuStyle,
     );
   }
 
@@ -90,6 +110,9 @@ class ThemeData {
       radioStyle: radioStyle.merge(other.radioStyle),
       listTileStyle: listTileStyle.merge(other.listTileStyle),
       sliderStyle: sliderStyle.merge(other.sliderStyle),
+      dropdownButtonStyle: dropdownButtonStyle.merge(other.dropdownButtonStyle),
+      dropdownMenuStyle: dropdownMenuStyle.merge(other.dropdownMenuStyle),
+      popupMenuStyle: popupMenuStyle.merge(other.popupMenuStyle),
     );
   }
 
@@ -105,7 +128,10 @@ class ThemeData {
             switchStyle == other.switchStyle &&
             radioStyle == other.radioStyle &&
             listTileStyle == other.listTileStyle &&
-            sliderStyle == other.sliderStyle;
+            sliderStyle == other.sliderStyle &&
+            dropdownButtonStyle == other.dropdownButtonStyle &&
+            dropdownMenuStyle == other.dropdownMenuStyle &&
+            popupMenuStyle == other.popupMenuStyle;
   }
 
   @override
@@ -119,9 +145,12 @@ class ThemeData {
     radioStyle,
     listTileStyle,
     sliderStyle,
+    dropdownButtonStyle,
+    dropdownMenuStyle,
+    popupMenuStyle,
   ]);
 
   @override
   String toString() =>
-      'ThemeData(elevatedButtonStyle: $elevatedButtonStyle, outlinedButtonStyle: $outlinedButtonStyle, textButtonStyle: $textButtonStyle, iconButtonStyle: $iconButtonStyle, checkboxStyle: $checkboxStyle, switchStyle: $switchStyle, radioStyle: $radioStyle, listTileStyle: $listTileStyle, sliderStyle: $sliderStyle)';
+      'ThemeData(elevatedButtonStyle: $elevatedButtonStyle, outlinedButtonStyle: $outlinedButtonStyle, textButtonStyle: $textButtonStyle, iconButtonStyle: $iconButtonStyle, checkboxStyle: $checkboxStyle, switchStyle: $switchStyle, radioStyle: $radioStyle, listTileStyle: $listTileStyle, sliderStyle: $sliderStyle, dropdownButtonStyle: $dropdownButtonStyle, dropdownMenuStyle: $dropdownMenuStyle, popupMenuStyle: $popupMenuStyle)';
 }

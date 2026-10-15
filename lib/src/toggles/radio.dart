@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../foundation/decoration_override.dart';
 import '../foundation/interaction_detector.dart';
 import '../foundation/interaction_state.dart';
 import '../foundation/state_property.dart';
@@ -24,6 +25,8 @@ class Radio<T> extends StatefulWidget {
     this.onFocusChange,
     this.semanticLabel,
     this.style,
+    this.decoration,
+    this.thumbDecoration,
   });
 
   /// The value represented by this radio.
@@ -58,6 +61,16 @@ class Radio<T> extends StatefulWidget {
 
   /// Inline tokens that override the inherited radio theme.
   final ToggleStyle? style;
+
+  /// Replaces the ring decoration in every interaction and selection state.
+  ///
+  /// Overrides inherited themes. Cannot be combined with `style.decoration`.
+  final BoxDecoration? decoration;
+
+  /// Replaces the dot decoration in every interaction and selection state.
+  ///
+  /// Overrides inherited themes. Cannot be combined with `style.thumbDecoration`.
+  final BoxDecoration? thumbDecoration;
 
   @override
   State<Radio<T>> createState() => _RadioState<T>();
@@ -161,6 +174,24 @@ class _RadioState<T> extends State<Radio<T>>
 
   @override
   Widget build(BuildContext context) {
+    assert(
+      debugCheckDecorationOverride(
+        widget: 'Radio',
+        parameter: 'decoration',
+        styleToken: 'style.decoration',
+        value: widget.decoration,
+        styleValue: widget.style?.decoration,
+      ),
+    );
+    assert(
+      debugCheckDecorationOverride(
+        widget: 'Radio',
+        parameter: 'thumbDecoration',
+        styleToken: 'style.thumbDecoration',
+        value: widget.thumbDecoration,
+        styleValue: widget.style?.thumbDecoration,
+      ),
+    );
     configureToggle();
     return Semantics(
       container: true,
@@ -208,6 +239,7 @@ class _RadioState<T> extends State<Radio<T>>
                   decoration: decorationToken(
                     state,
                     (ToggleStyle style) => style.decoration,
+                    override: widget.decoration,
                   ),
                   padding: plainToken<EdgeInsetsGeometry>(
                     (ToggleStyle style) => style.padding,
@@ -227,6 +259,7 @@ class _RadioState<T> extends State<Radio<T>>
                           decoration: decorationToken(
                             state,
                             (ToggleStyle style) => style.thumbDecoration,
+                            override: widget.thumbDecoration,
                           ),
                         ),
                         indicators(state),

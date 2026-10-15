@@ -21,6 +21,8 @@ class IconButton extends ButtonStyleButton {
     super.onHover,
     super.onFocusChange,
     super.style,
+    super.decoration,
+    super.foregroundDecoration,
     super.focusNode,
     super.autofocus = false,
     super.clipBehavior,
