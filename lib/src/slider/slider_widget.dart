@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
 
+import '../foundation/animated_surface.dart';
 import '../foundation/decoration_override.dart';
 import '../foundation/interaction_detector.dart';
 import '../foundation/interaction_state.dart';
@@ -605,7 +606,7 @@ class _SliderState extends State<Slider> {
             top: (height - trackHeight) / 2,
             width: width,
             height: trackHeight,
-            child: AnimatedContainer(
+            child: AnimatedSurface(
               duration: duration,
               curve: curve,
               decoration: decoration,
@@ -635,7 +636,7 @@ class _SliderState extends State<Slider> {
                     top: height / 2,
                     child: FractionalTranslation(
                       translation: const Offset(-0.5, -0.5),
-                      child: AnimatedContainer(
+                      child: AnimatedSurface(
                         width: tick.width,
                         height: tick.height,
                         duration: duration,
@@ -651,7 +652,7 @@ class _SliderState extends State<Slider> {
                 top: height / 2,
                 child: FractionalTranslation(
                   translation: const Offset(-0.5, -0.5),
-                  child: AnimatedContainer(
+                  child: AnimatedSurface(
                     width: thumb.width,
                     height: thumb.height,
                     duration: duration,

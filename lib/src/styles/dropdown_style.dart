@@ -16,7 +16,7 @@ class DropdownStyle {
     this.buttonStyle,
     this.menuStyle,
     this.itemStyle,
-    this.icon,
+    this.iconTurns,
     this.selectedIndicator,
     this.textStyle,
     this.hintStyle,
@@ -34,8 +34,11 @@ class DropdownStyle {
   /// The tokens for option rows.
   final ButtonStyle? itemStyle;
 
-  /// The trailing indicator, with selected state meaning open.
-  final StateProperty<Widget?>? icon;
+  /// How far the trailing icon rotates while the menu is open, in full turns.
+  ///
+  /// Defaults to 0.5, which flips the icon. Use 0 to keep it still. The
+  /// rotation follows the trigger's `animationDuration` and `animationCurve`.
+  final double? iconTurns;
 
   /// The leading option glyph, with selected state meaning chosen.
   final StateProperty<Widget?>? selectedIndicator;
@@ -60,7 +63,7 @@ class DropdownStyle {
     ButtonStyle? buttonStyle,
     MenuStyle? menuStyle,
     ButtonStyle? itemStyle,
-    StateProperty<Widget?>? icon,
+    double? iconTurns,
     StateProperty<Widget?>? selectedIndicator,
     StateProperty<TextStyle?>? textStyle,
     StateProperty<TextStyle?>? hintStyle,
@@ -72,7 +75,7 @@ class DropdownStyle {
       buttonStyle: buttonStyle ?? this.buttonStyle,
       menuStyle: menuStyle ?? this.menuStyle,
       itemStyle: itemStyle ?? this.itemStyle,
-      icon: icon ?? this.icon,
+      iconTurns: iconTurns ?? this.iconTurns,
       selectedIndicator: selectedIndicator ?? this.selectedIndicator,
       textStyle: textStyle ?? this.textStyle,
       hintStyle: hintStyle ?? this.hintStyle,
@@ -92,7 +95,7 @@ class DropdownStyle {
       buttonStyle: buttonStyle?.merge(other.buttonStyle) ?? other.buttonStyle,
       menuStyle: menuStyle?.merge(other.menuStyle) ?? other.menuStyle,
       itemStyle: itemStyle?.merge(other.itemStyle) ?? other.itemStyle,
-      icon: icon ?? other.icon,
+      iconTurns: iconTurns ?? other.iconTurns,
       selectedIndicator: selectedIndicator ?? other.selectedIndicator,
       textStyle: textStyle ?? other.textStyle,
       hintStyle: hintStyle ?? other.hintStyle,
@@ -109,7 +112,7 @@ class DropdownStyle {
             buttonStyle == other.buttonStyle &&
             menuStyle == other.menuStyle &&
             itemStyle == other.itemStyle &&
-            icon == other.icon &&
+            iconTurns == other.iconTurns &&
             selectedIndicator == other.selectedIndicator &&
             textStyle == other.textStyle &&
             hintStyle == other.hintStyle &&
@@ -123,7 +126,7 @@ class DropdownStyle {
     buttonStyle,
     menuStyle,
     itemStyle,
-    icon,
+    iconTurns,
     selectedIndicator,
     textStyle,
     hintStyle,
@@ -134,5 +137,5 @@ class DropdownStyle {
 
   @override
   String toString() =>
-      'DropdownStyle(buttonStyle: $buttonStyle, menuStyle: $menuStyle, itemStyle: $itemStyle, icon: $icon, selectedIndicator: $selectedIndicator, textStyle: $textStyle, hintStyle: $hintStyle, cursorColor: $cursorColor, selectionColor: $selectionColor, cursorWidth: $cursorWidth)';
+      'DropdownStyle(buttonStyle: $buttonStyle, menuStyle: $menuStyle, itemStyle: $itemStyle, iconTurns: $iconTurns, selectedIndicator: $selectedIndicator, textStyle: $textStyle, hintStyle: $hintStyle, cursorColor: $cursorColor, selectionColor: $selectionColor, cursorWidth: $cursorWidth)';
 }

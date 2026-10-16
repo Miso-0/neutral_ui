@@ -10,6 +10,7 @@ import '../theme/menu_themes.dart';
 import 'menu_host.dart';
 import 'menu_item_button.dart';
 import 'menu_panel.dart';
+import 'selection_indicator.dart';
 
 /// Builds the entries each time a popup opens.
 typedef PopupMenuItemBuilder<T> = List<PopupMenuEntry<T>> Function(
@@ -145,11 +146,12 @@ class _PopupMenuItemState<T> extends State<PopupMenuItem<T>> {
         : null;
     Widget? leading = widget.leading;
     if (checked != null) {
-      leading = resolveStateful<PopupMenuStyle, Widget>(
+      leading = resolveStatefulOrDefault<PopupMenuStyle, Widget>(
         InteractionState.fromWidgetStates(_states.value)
             .copyWith(isSelected: checked.checked, isDisabled: !widget.enabled),
         <PopupMenuStyle?>[scope?.style, theme],
         (PopupMenuStyle style) => style.checkIndicator,
+        () => defaultSelectionIndicator(selected: checked.checked),
       );
     }
     return MenuItemButton(

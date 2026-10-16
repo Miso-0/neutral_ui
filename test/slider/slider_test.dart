@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pure_ui/pure_ui.dart';
+import 'package:pure_ui/src/foundation/animated_surface.dart';
 
 import '../helpers/pump.dart';
 
@@ -362,14 +363,14 @@ void main() {
         ),
       ),
     );
-    AnimatedContainer thumb = tester
-        .widgetList<AnimatedContainer>(find.byType(AnimatedContainer))
+    AnimatedSurface thumb = tester
+        .widgetList<AnimatedSurface>(find.byType(AnimatedSurface))
         .last;
     expect(thumb.constraints!.maxWidth, 20);
     final TestGesture gesture = await tester.startGesture(_at(tester, 0.5));
     await tester.pump(const Duration(milliseconds: 150));
     thumb = tester
-        .widgetList<AnimatedContainer>(find.byType(AnimatedContainer))
+        .widgetList<AnimatedSurface>(find.byType(AnimatedSurface))
         .last;
     expect(thumb.constraints!.maxWidth, 30);
     await gesture.up();
@@ -526,17 +527,15 @@ void main() {
     expect(stack.children.length, 9);
     expect((stack.children[1] as Positioned).width, 135);
     expect((stack.children[2] as Positioned).width, 90);
-    final List<AnimatedContainer> containers = tester
-        .widgetList<AnimatedContainer>(find.byType(AnimatedContainer))
+    final List<AnimatedSurface> containers = tester
+        .widgetList<AnimatedSurface>(find.byType(AnimatedSurface))
         .toList();
     expect(
-      containers.where((AnimatedContainer c) => c.decoration == active).length,
+      containers.where((AnimatedSurface c) => c.decoration == active).length,
       3,
     );
     expect(
-      containers
-          .where((AnimatedContainer c) => c.decoration == inactive)
-          .length,
+      containers.where((AnimatedSurface c) => c.decoration == inactive).length,
       2,
     );
   });

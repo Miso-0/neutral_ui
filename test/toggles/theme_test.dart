@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pure_ui/pure_ui.dart';
+import 'package:pure_ui/src/foundation/animated_surface.dart';
 
 import '../helpers/pump.dart';
 
@@ -73,7 +74,7 @@ void main() {
           theme: component.global(_sized(24.0)),
         );
         expect(
-          tester.getSize(find.byType(AnimatedContainer).first),
+          tester.getSize(find.byType(AnimatedSurface).first),
           const Size(36.0, 36.0),
         );
         await pumpPure(
@@ -83,7 +84,7 @@ void main() {
         );
         await tester.pumpAndSettle();
         expect(
-          tester.getSize(find.byType(AnimatedContainer).first),
+          tester.getSize(find.byType(AnimatedSurface).first),
           const Size(30.0, 30.0),
         );
         await pumpPure(
@@ -92,7 +93,7 @@ void main() {
           theme: component.global(_sized(24.0)),
         );
         expect(
-          tester.getSize(find.byType(AnimatedContainer).first),
+          tester.getSize(find.byType(AnimatedSurface).first),
           const Size(24.0, 24.0),
         );
       },
@@ -120,16 +121,16 @@ void main() {
           ),
         );
         expect(
-          tester.getSize(find.byType(AnimatedContainer).first),
+          tester.getSize(find.byType(AnimatedSurface).first),
           const Size(24.0, 24.0),
         );
         final TestGesture gesture = await tester.startGesture(
-          tester.getCenter(find.byType(AnimatedContainer).first),
+          tester.getCenter(find.byType(AnimatedSurface).first),
         );
         await tester.pump(const Duration(milliseconds: 150));
         expect(states.any((InteractionState state) => state.isPressed), isTrue);
         expect(
-          tester.getSize(find.byType(AnimatedContainer).first),
+          tester.getSize(find.byType(AnimatedSurface).first),
           const Size(36.0, 36.0),
         );
         await gesture.cancel();
@@ -146,7 +147,7 @@ void main() {
         theme: component.global(_sized(20.0)),
       );
       expect(
-        tester.getSize(find.byType(AnimatedContainer).first),
+        tester.getSize(find.byType(AnimatedSurface).first),
         const Size(20.0, 20.0),
       );
     });

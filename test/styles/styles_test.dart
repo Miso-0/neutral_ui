@@ -2656,15 +2656,15 @@ void main() {
       read: (DropdownStyle style) => style.itemStyle,
       merge: (DropdownStyle style, DropdownStyle? other) => style.merge(other),
     );
-    _menuStyleTokenTest<DropdownStyle, StateProperty<Widget?>>(
-      name: 'icon',
+    _menuStyleTokenTest<DropdownStyle, double>(
+      name: 'iconTurns',
       empty: const DropdownStyle(),
-      first: const StateProperty<Widget?>.all(_firstWidget),
-      second: const StateProperty<Widget?>.all(_secondWidget),
-      create: (StateProperty<Widget?> value) => DropdownStyle(icon: value),
-      copy: (DropdownStyle style, StateProperty<Widget?>? value) =>
-          style.copyWith(icon: value),
-      read: (DropdownStyle style) => style.icon,
+      first: 0.25,
+      second: 0.5,
+      create: (double value) => DropdownStyle(iconTurns: value),
+      copy: (DropdownStyle style, double? value) =>
+          style.copyWith(iconTurns: value),
+      read: (DropdownStyle style) => style.iconTurns,
       merge: (DropdownStyle style, DropdownStyle? other) => style.merge(other),
     );
     _menuStyleTokenTest<DropdownStyle, StateProperty<Widget?>>(

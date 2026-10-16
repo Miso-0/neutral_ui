@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pure_ui/pure_ui.dart';
+import 'package:pure_ui/src/foundation/animated_surface.dart';
 
 import '../helpers/pump.dart';
 
@@ -136,9 +137,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
     final BoxDecoration decoration =
-        tester
-                .widget<AnimatedContainer>(find.byType(AnimatedContainer))
-                .decoration!
+        tester.widget<AnimatedSurface>(find.byType(AnimatedSurface)).decoration!
             as BoxDecoration;
     expect(decoration.color!.r, closeTo(0.5, 0.001));
     expect(decoration.color!.g, closeTo(0.5, 0.001));

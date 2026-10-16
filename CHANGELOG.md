@@ -1,3 +1,17 @@
+## 0.4.0
+
+- Add painted default glyphs, `ChevronGlyph`, `CheckGlyph` and `DotsGlyph`, drawn with `CustomPainter` in the ambient icon theme.
+- Dropdowns default to a chevron arrow that flips while the menu is open, turning by the new `DropdownStyle.iconTurns` (half a turn by default) with the trigger's duration and curve.
+- Chosen dropdown rows and checked popup items default to a check that keeps its space when hidden; loading buttons default to dots.
+- Defaults apply only when no style layer provides the token; a provided token that resolves to null opts out.
+- Breaking: remove `DropdownMenu.selectedTrailingIcon` and the `DropdownStyle.icon` token in favor of one flipping arrow.
+- Editable DropdownMenu fields now open on taps anywhere on the field, including unpainted padding, gaps and icons.
+- The gallery uses painted glyphs throughout instead of keyboard characters.
+
+## 0.3.1
+
+- Fix the dark flash in hover, focus and selection fades that start or end at a transparent color, most visible when sweeping across menu rows. Decoration colors now interpolate in premultiplied-alpha space.
+
 ## 0.3.0
 
 - Add direct BoxDecoration parameters to buttons, ListTile, toggles, sliders and menu triggers, panels and rows.

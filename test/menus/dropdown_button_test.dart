@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pure_ui/pure_ui.dart';
+import 'package:pure_ui/src/foundation/animated_surface.dart';
 import 'package:pure_ui/src/menus/menu_item_button.dart';
 
 import '../helpers/pump.dart';
@@ -54,11 +55,11 @@ Future<void> _open(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
-AnimatedContainer _optionContainer(WidgetTester tester, int index) =>
-    tester.widget<AnimatedContainer>(
+AnimatedSurface _optionContainer(WidgetTester tester, int index) =>
+    tester.widget<AnimatedSurface>(
       find.descendant(
         of: _options.at(index),
-        matching: find.byType(AnimatedContainer),
+        matching: find.byType(AnimatedSurface),
       ),
     );
 
@@ -140,6 +141,7 @@ void main() {
           ),
         ],
         value: 1,
+        icon: const SizedBox.shrink(),
         onChanged: (int? value) {},
       ),
     );
@@ -529,10 +531,6 @@ void main() {
               return null;
             }),
           ),
-          icon: StateProperty<Widget?>.resolveWith(
-            (InteractionState state) =>
-                Text(state.isSelected ? 'Open' : 'Closed'),
-          ),
           selectedIndicator: StateProperty<Widget?>.resolveWith(
             (InteractionState state) =>
                 state.isSelected ? const Text('Chosen') : null,
@@ -541,11 +539,91 @@ void main() {
       ),
     );
     expect(trigger!.isSelected, isFalse);
-    expect(find.text('Closed'), findsOneWidget);
     await _open(tester);
     expect(trigger!.isSelected, isTrue);
-    expect(find.text('Open'), findsOneWidget);
     expect(find.text('Chosen'), findsOneWidget);
+  });
+
+  testWidgets('the single icon flips while open and turns back on close', (
+    WidgetTester tester,
+  ) async {
+    const Key iconKey = Key('arrow');
+    await pumpPure(
+      tester,
+      DropdownButton<String>(
+        key: _dropdownKey,
+        items: _items(),
+        value: 'one',
+        icon: const SizedBox(key: iconKey, width: 10, height: 10),
+        onChanged: (String? value) {},
+        style: const DropdownStyle(
+          buttonStyle: ButtonStyle(
+            animationDuration: Duration(milliseconds: 200),
+            animationCurve: Curves.linear,
+          ),
+        ),
+      ),
+    );
+    Finder rotation() => find.ancestor(
+      of: find.byKey(iconKey),
+      matching: find.byType(RotationTransition),
+    );
+    double turns() => tester.widget<RotationTransition>(rotation()).turns.value;
+    expect(find.byKey(iconKey), findsOneWidget);
+    expect(turns(), 0);
+    await tester.tap(find.byKey(_dropdownKey));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(turns(), closeTo(0.25, 1e-9));
+    await tester.pumpAndSettle();
+    expect(turns(), 0.5);
+    expect(find.byKey(iconKey), findsOneWidget);
+    _controller(tester).close();
+    await tester.pumpAndSettle();
+    expect(turns(), 0);
+  });
+
+  testWidgets('iconTurns resolves from inline style, then the theme', (
+    WidgetTester tester,
+  ) async {
+    const Key iconKey = Key('arrow');
+    Future<double> openTurns(DropdownStyle? style, DropdownStyle theme) async {
+      await pumpPure(
+        tester,
+        DropdownButton<String>(
+          key: _dropdownKey,
+          items: _items(),
+          value: 'one',
+          icon: const SizedBox(key: iconKey, width: 10, height: 10),
+          onChanged: (String? value) {},
+          style: style,
+        ),
+        theme: ThemeData(dropdownButtonStyle: theme),
+      );
+      await tester.tap(find.byKey(_dropdownKey));
+      await tester.pumpAndSettle();
+      final double value = tester
+          .widget<RotationTransition>(
+            find.ancestor(
+              of: find.byKey(iconKey),
+              matching: find.byType(RotationTransition),
+            ),
+          )
+          .turns
+          .value;
+      _controller(tester).close();
+      await tester.pumpAndSettle();
+      return value;
+    }
+
+    expect(await openTurns(null, const DropdownStyle(iconTurns: 0.25)), 0.25);
+    expect(
+      await openTurns(
+        const DropdownStyle(iconTurns: 0),
+        const DropdownStyle(iconTurns: 0.25),
+      ),
+      0,
+    );
   });
 
   testWidgets('semantics expose expanded, selected, and disabled states', (

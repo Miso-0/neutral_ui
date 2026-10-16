@@ -6,6 +6,7 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pure_ui/pure_ui.dart';
+import 'package:pure_ui/src/foundation/animated_surface.dart';
 import 'package:pure_ui/src/menus/menu_item_button.dart';
 
 import '../helpers/pump.dart';
@@ -398,8 +399,8 @@ void main() {
       of: find.text('Choose'),
       matching: find.byType(MenuItemButton),
     );
-    AnimatedContainer container() => tester.widget<AnimatedContainer>(
-      find.descendant(of: option(), matching: find.byType(AnimatedContainer)),
+    AnimatedSurface container() => tester.widget<AnimatedSurface>(
+      find.descendant(of: option(), matching: find.byType(AnimatedSurface)),
     );
     await pumpPure(
       tester,

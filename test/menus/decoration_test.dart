@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pure_ui/pure_ui.dart';
+import 'package:pure_ui/src/foundation/animated_surface.dart';
 import 'package:pure_ui/src/menus/menu_item_button.dart';
 import 'package:pure_ui/src/menus/menu_panel.dart';
 
@@ -34,9 +35,9 @@ const ThemeData _globalTheme = ThemeData(
   popupMenuStyle: _popupTheme,
 );
 
-AnimatedContainer _surface(WidgetTester tester, Finder parent) {
+AnimatedSurface _surface(WidgetTester tester, Finder parent) {
   final Iterable<Element> elements = find
-      .descendant(of: parent, matching: find.byType(AnimatedContainer))
+      .descendant(of: parent, matching: find.byType(AnimatedSurface))
       .evaluate();
   // RawMenuAnchor owns its overlay subtree too. Keep the anchor's surface
   // separate from its option surfaces once the panel is open.
@@ -53,7 +54,7 @@ AnimatedContainer _surface(WidgetTester tester, Finder parent) {
           });
           return !inPanel;
         });
-  return surface.widget as AnimatedContainer;
+  return surface.widget as AnimatedSurface;
 }
 
 Finder get _anchor => find.byKey(_anchorKey);

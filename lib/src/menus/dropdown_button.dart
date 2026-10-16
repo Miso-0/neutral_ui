@@ -2,15 +2,18 @@ import 'package:flutter/widgets.dart';
 
 import '../buttons/button_style_button.dart';
 import '../foundation/decoration_override.dart';
+import '../foundation/glyphs.dart';
 import '../foundation/interaction_state.dart';
 import '../foundation/style_resolution.dart';
 import '../styles/button_style.dart';
 import '../styles/dropdown_style.dart';
 import '../styles/menu_style.dart';
 import '../theme/menu_themes.dart';
+import 'dropdown_icon.dart';
 import 'menu_host.dart';
 import 'menu_item_button.dart';
 import 'menu_panel.dart';
+import 'selection_indicator.dart';
 
 /// Builds the content displayed for each selected dropdown item.
 typedef DropdownButtonBuilder = List<Widget> Function(BuildContext context);
@@ -132,7 +135,12 @@ class DropdownButton<T> extends StatefulWidget {
   /// Called immediately before opening the menu.
   final VoidCallback? onTap;
 
-  /// Overrides the style's trailing indicator.
+  /// The trailing indicator, drawn in its closed orientation.
+  ///
+  /// Defaults to a painted [ChevronGlyph] in the trigger's icon theme. It turns
+  /// by [DropdownStyle.iconTurns] (a half turn by default) while the menu is
+  /// open, so a single downward arrow flips to point up. Pass
+  /// `SizedBox.shrink()` to omit it.
   final Widget? icon;
 
   /// Whether the trigger content fills the available horizontal space.
@@ -319,30 +327,20 @@ class _DropdownButtonState<T> extends State<DropdownButton<T>>
           (ButtonStyle style) => style.spacing,
         ) ??
         0;
-    return ValueListenableBuilder<Set<WidgetState>>(
-      valueListenable: _triggerStates,
-      builder: (BuildContext context, Set<WidgetState> states, Widget? child) {
-        final Widget? icon =
-            widget.icon ??
-            resolveStateful<DropdownStyle, Widget>(
-              InteractionState.fromWidgetStates(states),
-              layers,
-              (DropdownStyle style) => style.icon,
-            );
-        return Row(
-          mainAxisSize: widget.isExpanded ? MainAxisSize.max : MainAxisSize.min,
-          children: <Widget>[
-            if (widget.isExpanded)
-              Expanded(child: stack)
-            else
-              Flexible(child: stack),
-            if (icon != null) ...<Widget>[
-              if (spacing != 0) SizedBox(width: spacing),
-              icon,
-            ],
-          ],
-        );
-      },
+    return Row(
+      mainAxisSize: widget.isExpanded ? MainAxisSize.max : MainAxisSize.min,
+      children: <Widget>[
+        if (widget.isExpanded)
+          Expanded(child: stack)
+        else
+          Flexible(child: stack),
+        if (spacing != 0) SizedBox(width: spacing),
+        DropdownIcon(
+          icon: widget.icon ?? const ChevronGlyph(),
+          open: menuOpen,
+          layers: layers,
+        ),
+      ],
     );
   }
 
@@ -379,11 +377,16 @@ class _DropdownButtonState<T> extends State<DropdownButton<T>>
         valueListenable: _itemStates[index],
         builder:
             (BuildContext context, Set<WidgetState> states, Widget? child) {
-              final Widget? indicator = resolveStateful<DropdownStyle, Widget>(
-                InteractionState.fromWidgetStates(states),
-                layers,
-                (DropdownStyle style) => style.selectedIndicator,
+              final InteractionState state = InteractionState.fromWidgetStates(
+                states,
               );
+              final Widget? indicator =
+                  resolveStatefulOrDefault<DropdownStyle, Widget>(
+                    state,
+                    layers,
+                    (DropdownStyle style) => style.selectedIndicator,
+                    () => defaultSelectionIndicator(selected: state.isSelected),
+                  );
               return Row(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[

@@ -26,7 +26,9 @@ void main() {
       );
       final Finder fieldSurface = find.ancestor(
         of: field,
-        matching: find.byType(AnimatedContainer),
+        matching: find.byWidgetPredicate(
+          (Widget widget) => widget.runtimeType.toString() == 'AnimatedSurface',
+        ),
       );
       BoxDecoration surface() =>
           tester

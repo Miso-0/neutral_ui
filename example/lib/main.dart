@@ -55,8 +55,15 @@ ButtonStyle _button({bool solid = false}) => ButtonStyle(
     ),
   ),
   spacing: 9,
-  loadingIndicator: const StateProperty<Widget?>.all(
-    Text('•••', style: TextStyle(color: Color(0xFFFFFFFF))),
+  iconTheme: StateProperty<IconThemeData?>.resolveWith(
+    (InteractionState state) => IconThemeData(
+      color: state.isDisabled
+          ? _muted
+          : solid
+          ? const Color(0xFFFFFFFF)
+          : _ink,
+      size: 16,
+    ),
   ),
 );
 
@@ -125,6 +132,9 @@ MenuStyle _menuPanel({bool matchAnchorWidth = true}) => MenuStyle(
 );
 
 ButtonStyle _menuItem() => _button().copyWith(
+  iconTheme: const StateProperty<IconThemeData?>.all(
+    IconThemeData(color: _accent, size: 16),
+  ),
   decoration: StateProperty<Decoration?>.resolveWith(
     (InteractionState state) => BoxDecoration(
       color: state.isFocused || state.isPressed
@@ -173,21 +183,12 @@ DropdownStyle _dropdown() => DropdownStyle(
   buttonStyle: _button().copyWith(
     alignment: AlignmentDirectional.centerStart,
     decoration: StateProperty<Decoration?>.resolveWith(_dropdownSurface),
+    iconTheme: const StateProperty<IconThemeData?>.all(
+      IconThemeData(color: _muted, size: 14),
+    ),
   ),
   menuStyle: _menuPanel(),
   itemStyle: _menuItem(),
-  icon: StateProperty<Widget?>.resolveWith(
-    (InteractionState state) => Text(state.isSelected ? '⌃' : '⌄'),
-  ),
-  selectedIndicator: StateProperty<Widget?>.resolveWith(
-    (InteractionState state) => SizedBox(
-      width: 16,
-      child: Text(
-        state.isSelected ? '✓' : '',
-        style: const TextStyle(color: _accent),
-      ),
-    ),
-  ),
   textStyle: const StateProperty<TextStyle?>.all(
     TextStyle(color: _ink, fontSize: 14),
   ),
@@ -221,15 +222,6 @@ ThemeData _theme() => ThemeData(
     buttonStyle: _button(),
     menuStyle: _menuPanel(matchAnchorWidth: false),
     itemStyle: _menuItem(),
-    checkIndicator: StateProperty<Widget?>.resolveWith(
-      (InteractionState state) => SizedBox(
-        width: 16,
-        child: Text(
-          state.isSelected ? '✓' : '',
-          style: const TextStyle(color: _accent),
-        ),
-      ),
-    ),
     dividerDecoration: const BoxDecoration(color: _line),
     dividerHeight: 1,
   ),
@@ -252,6 +244,9 @@ ThemeData _theme() => ThemeData(
     ),
     subtitleTextStyle: const StateProperty<TextStyle?>.all(
       TextStyle(color: _muted, fontSize: 13, height: 1.5),
+    ),
+    iconTheme: const StateProperty<IconThemeData?>.all(
+      IconThemeData(color: _muted, size: 16),
     ),
     contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
     horizontalTitleGap: 14,
@@ -437,7 +432,7 @@ class _GalleryState extends State<_Gallery> {
   ) => <PopupMenuEntry<String>>[
     const PopupMenuItem<String>(
       value: 'duplicate',
-      leading: Text('+'),
+      leading: _PlusGlyph(),
       child: Text('Duplicate project'),
     ),
     CheckedPopupMenuItem<String>(
@@ -618,7 +613,7 @@ class _GalleryState extends State<_Gallery> {
               key: const ValueKey<String>('popup-over'),
               tooltip: 'Project actions over',
               semanticLabel: 'Project actions',
-              icon: const Text('•••'),
+              icon: const DotsGlyph(),
               position: PopupMenuPosition.over,
               itemBuilder: _projectActions,
               onSelected: _selectAction,
@@ -632,7 +627,7 @@ class _GalleryState extends State<_Gallery> {
             offset: const Offset(0, 8),
             itemBuilder: _projectActions,
             onSelected: _selectAction,
-            child: const Text('Project actions below ⌄'),
+            child: const Text('Project actions below'),
           ),
         ],
       ),
@@ -675,7 +670,7 @@ class _GalleryState extends State<_Gallery> {
         ),
         title: const Text('A little texture'),
         subtitle: const Text('An asset image in a widget-level decoration.'),
-        trailing: const Text('→'),
+        trailing: const _ArrowGlyph(),
         onTap: () => _record('Decorated tile activated'),
       ),
       const SizedBox(height: 18),
@@ -828,7 +823,7 @@ class _GalleryState extends State<_Gallery> {
                           OutlinedButton.icon(
                             onPressed: () =>
                                 _record('Outline action activated'),
-                            icon: const Text('+'),
+                            icon: const _PlusGlyph(),
                             label: const Text('Add item'),
                           ),
                           TextButton(
@@ -880,8 +875,8 @@ class _GalleryState extends State<_Gallery> {
                           ),
                           OutlinedButton(
                             onPressed: () => _record('Slots action activated'),
-                            leading: const Text('+'),
-                            trailing: const Text('→'),
+                            leading: const _PlusGlyph(),
+                            trailing: const _ArrowGlyph(),
                             child: const Text('With slots'),
                           ),
                           Builder(
@@ -986,7 +981,7 @@ class _GalleryState extends State<_Gallery> {
                           style: TextStyle(color: _accent),
                         ),
                         title: const Text('Your workspace'),
-                        trailing: const Text('→'),
+                        trailing: const _ArrowGlyph(),
                         onTap: () => _record('Workspace opened'),
                       ),
                       ListTile(
@@ -1210,6 +1205,101 @@ class _GalleryState extends State<_Gallery> {
       ),
     ),
   );
+}
+
+/// Paints gallery content glyphs in the ambient icon theme, like PureUI's glyphs.
+Widget _galleryGlyph(
+  BuildContext context,
+  CustomPainter Function(Color color, TextDirection direction) painter,
+) {
+  final IconThemeData theme = IconTheme.of(context);
+  return ExcludeSemantics(
+    child: SizedBox.square(
+      dimension: theme.size ?? 24,
+      child: CustomPaint(
+        painter: painter(theme.color ?? _ink, Directionality.of(context)),
+      ),
+    ),
+  );
+}
+
+Paint _glyphStroke(Color color, Size size) => Paint()
+  ..color = color
+  ..style = PaintingStyle.stroke
+  ..strokeWidth = size.shortestSide / 10
+  ..strokeCap = StrokeCap.round
+  ..strokeJoin = StrokeJoin.round;
+
+class _PlusGlyph extends StatelessWidget {
+  const _PlusGlyph();
+
+  @override
+  Widget build(BuildContext context) => _galleryGlyph(
+    context,
+    (Color color, TextDirection direction) => _PlusPainter(color),
+  );
+}
+
+class _PlusPainter extends CustomPainter {
+  const _PlusPainter(this.color);
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Paint paint = _glyphStroke(color, size);
+    canvas
+      ..drawLine(
+        Offset(size.width * 0.5, size.height * 0.22),
+        Offset(size.width * 0.5, size.height * 0.78),
+        paint,
+      )
+      ..drawLine(
+        Offset(size.width * 0.22, size.height * 0.5),
+        Offset(size.width * 0.78, size.height * 0.5),
+        paint,
+      );
+  }
+
+  @override
+  bool shouldRepaint(_PlusPainter oldDelegate) => color != oldDelegate.color;
+}
+
+/// A forward arrow that points toward the end edge, so it mirrors in RTL.
+class _ArrowGlyph extends StatelessWidget {
+  const _ArrowGlyph();
+
+  @override
+  Widget build(BuildContext context) => _galleryGlyph(
+    context,
+    (Color color, TextDirection direction) => _ArrowPainter(color, direction),
+  );
+}
+
+class _ArrowPainter extends CustomPainter {
+  const _ArrowPainter(this.color, this.direction);
+
+  final Color color;
+  final TextDirection direction;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    double x(double fraction) =>
+        size.width * (direction == TextDirection.ltr ? fraction : 1 - fraction);
+    canvas.drawPath(
+      Path()
+        ..moveTo(x(0.2), size.height * 0.5)
+        ..lineTo(x(0.8), size.height * 0.5)
+        ..moveTo(x(0.56), size.height * 0.28)
+        ..lineTo(x(0.8), size.height * 0.5)
+        ..lineTo(x(0.56), size.height * 0.72),
+      _glyphStroke(color, size),
+    );
+  }
+
+  @override
+  bool shouldRepaint(_ArrowPainter oldDelegate) =>
+      color != oldDelegate.color || direction != oldDelegate.direction;
 }
 
 class _CheckPainter extends CustomPainter {

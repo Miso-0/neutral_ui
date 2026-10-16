@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pure_ui/pure_ui.dart';
+import 'package:pure_ui/src/foundation/animated_surface.dart';
 
 import '../helpers/pump.dart';
 
@@ -37,13 +38,13 @@ class _ToggleCase {
 
 List<Decoration?> _painted(WidgetTester tester) {
   return tester
-      .widgetList<AnimatedContainer>(
+      .widgetList<AnimatedSurface>(
         find.descendant(
           of: find.byKey(_controlKey),
-          matching: find.byType(AnimatedContainer),
+          matching: find.byType(AnimatedSurface),
         ),
       )
-      .map((AnimatedContainer container) {
+      .map((AnimatedSurface container) {
         final Finder finder = find.byWidget(container);
         return tester
             .widget<DecoratedBox>(
@@ -224,13 +225,13 @@ void main() {
           await mouse.removePointer();
           await tester.pumpAndSettle();
           final Size offSize = tester.getSize(
-            find.byType(AnimatedContainer).first,
+            find.byType(AnimatedSurface).first,
           );
           update(() => selected = true);
           await tester.pump();
           await tester.pump(const Duration(milliseconds: 100));
           final Size middleSize = tester.getSize(
-            find.byType(AnimatedContainer).first,
+            find.byType(AnimatedSurface).first,
           );
           expect(middleSize.width, greaterThan(offSize.width));
           expect(middleSize.width, lessThan(48));

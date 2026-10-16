@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../foundation/animated_surface.dart';
 import '../foundation/decoration_override.dart';
 import '../foundation/interaction_detector.dart';
 import '../foundation/interaction_state.dart';
@@ -231,7 +232,7 @@ class _RadioState<T> extends State<Radio<T>>
                   state,
                   (ToggleStyle style) => style.thumbSize,
                 );
-                return AnimatedContainer(
+                return AnimatedSurface(
                   duration: interactionDuration,
                   curve: interactionCurve,
                   width: size?.width,
@@ -251,7 +252,7 @@ class _RadioState<T> extends State<Radio<T>>
                     child: Stack(
                       alignment: Alignment.center,
                       children: <Widget>[
-                        AnimatedContainer(
+                        AnimatedSurface(
                           duration: interactionDuration,
                           curve: interactionCurve,
                           width: thumb?.width ?? 0.0,

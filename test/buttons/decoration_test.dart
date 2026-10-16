@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pure_ui/pure_ui.dart';
+import 'package:pure_ui/src/foundation/animated_surface.dart';
 
 import '../helpers/pump.dart';
 
@@ -166,10 +167,10 @@ void main() {
         addTearDown(focus.dispose);
         addTearDown(states.dispose);
         void verify() {
-          final AnimatedContainer container = tester.widget<AnimatedContainer>(
+          final AnimatedSurface container = tester.widget<AnimatedSurface>(
             find.descendant(
               of: find.byKey(_key),
-              matching: find.byType(AnimatedContainer),
+              matching: find.byType(AnimatedSurface),
             ),
           );
           expect(container.decoration, _background);

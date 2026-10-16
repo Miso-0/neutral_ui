@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pure_ui/pure_ui.dart';
+import 'package:pure_ui/src/foundation/animated_surface.dart';
 
 import '../helpers/pump.dart';
 
@@ -127,11 +128,11 @@ final List<_Variant> _variants = <_Variant>[
   ),
 ];
 
-AnimatedContainer _container(WidgetTester tester) =>
-    tester.widget<AnimatedContainer>(
+AnimatedSurface _container(WidgetTester tester) =>
+    tester.widget<AnimatedSurface>(
       find.descendant(
         of: find.byKey(_buttonKey),
-        matching: find.byType(AnimatedContainer),
+        matching: find.byType(AnimatedSurface),
       ),
     );
 

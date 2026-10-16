@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pure_ui/pure_ui.dart';
+import 'package:pure_ui/src/foundation/animated_surface.dart';
 
 import '../helpers/pump.dart';
 
@@ -11,7 +12,7 @@ const ToggleStyle _dragStyle = ToggleStyle(
 );
 
 AlignmentGeometry _thumbAlignment(WidgetTester tester) {
-  final Finder track = find.byType(AnimatedContainer).first;
+  final Finder track = find.byType(AnimatedSurface).first;
   return tester
       .widget<Align>(
         find.descendant(of: track, matching: find.byType(Align)).first,
@@ -58,7 +59,7 @@ void main() {
     );
     expect(tester.getSize(find.byType(Switch)), const Size(48.0, 48.0));
     expect(
-      tester.getSize(find.byType(AnimatedContainer).first),
+      tester.getSize(find.byType(AnimatedSurface).first),
       const Size(44.0, 20.0),
     );
   });
@@ -136,8 +137,8 @@ void main() {
     await gesture.up();
     await tester.pumpAndSettle();
     expect(value, isTrue);
-    final Finder thumb = find.byType(AnimatedContainer).last;
-    final Finder track = find.byType(AnimatedContainer).first;
+    final Finder thumb = find.byType(AnimatedSurface).last;
+    final Finder track = find.byType(AnimatedSurface).first;
     expect(tester.getTopLeft(thumb).dx, tester.getTopLeft(track).dx + 4.0);
   });
 

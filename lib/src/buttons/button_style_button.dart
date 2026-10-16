@@ -1,7 +1,9 @@
 import 'package:flutter/widgets.dart';
 
 import '../foundation/animated_icon_theme.dart';
+import '../foundation/animated_surface.dart';
 import '../foundation/decoration_override.dart';
+import '../foundation/glyphs.dart';
 import '../foundation/interaction_detector.dart';
 import '../foundation/interaction_state.dart';
 import '../foundation/state_property.dart';
@@ -289,10 +291,11 @@ class _ButtonStyleButtonState extends State<ButtonStyleButton> {
     final DefaultTextStyle ambient = DefaultTextStyle.of(context);
     final Widget? indicator = widget.isLoading
         ? widget.loadingIndicator ??
-              resolveStateful<ButtonStyle, Widget>(
+              resolveStatefulOrDefault<ButtonStyle, Widget>(
                 state,
                 layers,
                 (ButtonStyle style) => style.loadingIndicator,
+                () => const DotsGlyph(),
               )
         : null;
     final Widget content = Stack(
@@ -320,7 +323,7 @@ class _ButtonStyleButtonState extends State<ButtonStyleButton> {
         duration: duration,
         curve: curve,
         constraints: _resolveConstraints(state, layers),
-        child: AnimatedContainer(
+        child: AnimatedSurface(
           duration: duration,
           curve: curve,
           padding: padding,

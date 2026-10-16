@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pure_ui/pure_ui.dart';
+import 'package:pure_ui/src/foundation/animated_surface.dart';
 
 import '../helpers/pump.dart';
 
@@ -73,11 +74,11 @@ void main() {
         ),
       ),
     );
-    AnimatedContainer surface() => tester.widget<AnimatedContainer>(
+    AnimatedSurface surface() => tester.widget<AnimatedSurface>(
       find
           .descendant(
             of: find.byType(ListTile),
-            matching: find.byType(AnimatedContainer),
+            matching: find.byType(AnimatedSurface),
           )
           .first,
     );

@@ -46,9 +46,13 @@ ButtonStyle(
 )
 ```
 
-Visual tokens are unset by default: your application supplies colors, radii, borders, shadows, margins, glyphs, track sizes and text styles. Editable cursors use the required fallback described below. An unstyled control can be invisible. Supply content and tokens to render it. Visual null values fall through to the next style layer for the current state. Padding and gaps default to zero.
+Visual tokens are unset by default: your application supplies colors, radii, borders, shadows, margins, track sizes and text styles. Editable cursors use the required fallback described below. An unstyled control can be invisible, apart from the default glyphs below. Supply content and tokens to render it. Visual null values fall through to the next style layer for the current state. Padding and gaps default to zero.
+
+A few indicator slots paint a default glyph instead of staying empty: the dropdown arrow (`ChevronGlyph`), the chosen dropdown row and checked popup item (`CheckGlyph`), and the button loading indicator (`DotsGlyph`). Glyphs are drawn with `CustomPainter`, never text characters, and take their color, opacity and size from the ambient `IconTheme` exactly like an `Icon`, so each control's `iconTheme` token styles them. A default applies only when no style layer provides the token: provide a token that resolves to null to show nothing, or any widget to replace it. The glyph widgets are public, so you can reuse them elsewhere.
 
 The structural defaults are 200 ms animation with `Curves.easeInOut`, enabled feedback, click/basic cursors, centered button content with start-aligned icons, `threeLine` tile alignment, and slider width 144 when unbounded, keyboard step 0.05 and `tapAndSlide` interaction. Checkbox, Switch, Radio and IconButton have a 48 by 48 minimum hit target; Slider has a 48 minimum height. Buttons and ListTile size to content and style. Compact targets can be overridden with `tapTargetSize`.
+
+Decoration transitions blend fill, border and shadow colors in premultiplied-alpha space, as CSS transitions do. Fading between `Color(0x00000000)` and a light color therefore never passes through gray, so transparent idle states are safe for hover effects. Gradients and `ShapeDecoration` use Flutter's standard interpolation.
 
 ## Decorations
 
@@ -135,7 +139,7 @@ Stateful fields are nullable `StateProperty<T?>` values. Plain fields are nullab
 | `ToggleStyle` | `size`, `decoration`, `thumbSize`, `thumbDecoration`, `indicator`, `indeterminateIndicator`, `mouseCursor` | `padding`, `tapTargetSize`, `animationDuration`, `animationCurve`, `enableFeedback` |
 | `ListTileStyle` | `decoration`, `foregroundDecoration`, `titleTextStyle`, `subtitleTextStyle`, `leadingAndTrailingTextStyle`, `iconTheme`, `mouseCursor` | `contentPadding`, `minVerticalPadding`, `horizontalTitleGap`, `minLeadingWidth`, `subtitleSpacing`, `minTileHeight`, `minTwoLineTileHeight`, `minThreeLineTileHeight`, `titleAlignment`, `animationDuration`, `animationCurve`, `enableFeedback` |
 | `MenuStyle` | None | `decoration`, `padding`, `minimumSize`, `maximumSize`, `matchAnchorWidth`, `offset`, `edgePadding`, `clipBehavior`, `transitionDuration`, `transitionCurve`, `transitionBuilder` |
-| `DropdownStyle` | `icon`, `selectedIndicator`, `textStyle`, `hintStyle` | `buttonStyle`, `menuStyle`, `itemStyle`, `cursorColor`, `selectionColor`, `cursorWidth` |
+| `DropdownStyle` | `selectedIndicator`, `textStyle`, `hintStyle` | `buttonStyle`, `menuStyle`, `itemStyle`, `iconTurns`, `cursorColor`, `selectionColor`, `cursorWidth` |
 | `PopupMenuStyle` | `checkIndicator` | `buttonStyle`, `menuStyle`, `itemStyle`, `dividerDecoration`, `dividerHeight`, `position` |
 | `SliderStyle` | `trackHeight`, `trackDecoration`, `activeTrackDecoration`, `secondaryActiveTrackDecoration`, `thumbSize`, `thumbDecoration`, `tickMarkSize`, `tickMarkDecoration`, `activeTickMarkDecoration`, `mouseCursor` | `valueIndicatorBuilder`, `padding`, `tapTargetSize`, `preferredWidth`, `keyboardStep`, `allowedInteraction`, `animationDuration`, `animationCurve` |
 
@@ -143,7 +147,7 @@ Toggle `size` describes the checkbox box, switch track or radio ring. `thumbSize
 
 ## Controls
 
-Buttons support callbacks, focus, hover, external `WidgetStatesController`, loading, and leading/trailing slots. `ElevatedButton`, `OutlinedButton`, and `TextButton` have `.icon` constructors with `IconAlignment.start` or `end`. Loading disables activation and preserves content size. IconButton supports `isSelected`, `selectedIcon`, and a semantic `tooltip`. Wrap in Flutter's `RawTooltip` to show a visible tooltip.
+Buttons support callbacks, focus, hover, external `WidgetStatesController`, loading, and leading/trailing slots. `ElevatedButton`, `OutlinedButton`, and `TextButton` have `.icon` constructors with `IconAlignment.start` or `end`. Loading disables activation and preserves content size, painting a `DotsGlyph` over the hidden content unless the loading token resolves to null. IconButton supports `isSelected`, `selectedIcon`, and a semantic `tooltip`. Wrap in Flutter's `RawTooltip` to show a visible tooltip.
 
 Every button accepts direct `decoration` and `foregroundDecoration` parameters for a fixed surface or overlay.
 
@@ -189,11 +193,13 @@ WidgetsApp(
 
 All three menu controls accept direct trigger or field `decoration` and panel `menuDecoration` parameters. Dropdown entries and popup items accept their own row `decoration`.
 
+Both dropdowns paint a `ChevronGlyph` arrow by default. Pass `DropdownButton.icon` or `DropdownMenu.trailingIcon` to replace it with one icon drawn pointing down. While the menu is open the arrow turns by `DropdownStyle.iconTurns`, half a turn by default so it flips to point up, using the trigger's `animationDuration` and `animationCurve`. Set `iconTurns: 0` to keep it still. To hide it, pass `SizedBox.shrink()` as the DropdownButton icon or set `showTrailingIcon: false` on DropdownMenu.
+
 All menus support keyboard activation, arrow navigation that skips disabled options, Escape and outside-tap dismissal. Panels follow their anchor and close when an ancestor scrolls or the window resizes. Start-edge alignment respects RTL, and panels flip and clamp inside `edgePadding`. Dropdown panels are at least as wide as their anchor by default, subject to `maximumSize` and available overlay space. Popup panels size to their content by default. `MenuStyle.transitionDuration` defaults to zero, and a `MenuTransitionBuilder` can opt into animation. Closing completes the reverse transition before removing the panel.
 
 Option rows resolve each token per state in this order: entry style, inline `style.itemStyle`, nearest component theme, structural defaults. Trigger and panel tokens follow the same order without the entry style. `DropdownStyle` and `PopupMenuStyle` deep-merge their nested button and menu styles. Open triggers resolve `isSelected`; selected dropdown rows and checked popup indicators resolve it for their chosen or checked state. Search highlights resolve visible focus while real focus stays in the editable field.
 
-No menu glyphs or panel visuals are supplied. An editable field must have a cursor color: `DropdownStyle.cursorColor` falls back to the ambient text color, then opaque black. This is the package's only color fallback. Trigger and option semantics expose button, text field, expanded, selected, checked and enabled states as appropriate. Menu-specific `SemanticsRole` values are omitted because Flutter's widgets layer does not export those types.
+No panel visuals are supplied, and menu glyphs follow the default glyph rules above. An editable field must have a cursor color: `DropdownStyle.cursorColor` falls back to the ambient text color, then opaque black. This is the package's only explicit color fallback; glyphs otherwise use the icon theme's color. Trigger and option semantics expose button, text field, expanded, selected, checked and enabled states as appropriate. Menu-specific `SemanticsRole` values are omitted because Flutter's widgets layer does not export those types.
 
 ## Run the gallery
 

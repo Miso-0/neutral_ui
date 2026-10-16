@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../foundation/decoration_lerp.dart';
 import '../foundation/interaction_state.dart';
 import '../foundation/state_property.dart';
 import '../foundation/style_resolution.dart';
@@ -135,7 +136,7 @@ mixin ToggleEngine<W extends StatefulWidget>
     if (override != null) {
       return override;
     }
-    return Decoration.lerp(
+    return lerpDecoration(
       stateToken<Decoration>(state.copyWith(isSelected: false), select),
       stateToken<Decoration>(state.copyWith(isSelected: true), select),
       togglePosition,

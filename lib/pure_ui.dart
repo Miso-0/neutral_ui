@@ -1,6 +1,7 @@
 /// Headless controls, interaction state and composable themes for Flutter.
 library;
 
+export 'src/foundation/glyphs.dart';
 export 'src/foundation/interaction_detector.dart';
 export 'src/foundation/interaction_state.dart';
 export 'src/foundation/state_property.dart';

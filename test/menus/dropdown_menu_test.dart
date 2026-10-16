@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pure_ui/pure_ui.dart';
+import 'package:pure_ui/src/foundation/animated_surface.dart';
 import 'package:pure_ui/src/menus/menu_item_button.dart';
 import 'package:pure_ui/src/menus/menu_panel.dart';
 
@@ -49,7 +50,7 @@ void main() {
       (tester
                   .widget<DecoratedBox>(
                     find.descendant(
-                      of: find.byType(AnimatedContainer),
+                      of: find.byType(AnimatedSurface),
                       matching: find.byType(DecoratedBox),
                     ),
                   )
@@ -514,6 +515,7 @@ void main() {
         dropdownMenuEntries: entries,
         requestFocusOnTap: true,
         width: 210,
+        showTrailingIcon: false,
       ),
     );
     expect(tester.getSize(find.byType(EditableText)).width, 210);
@@ -525,6 +527,7 @@ void main() {
           dropdownMenuEntries: entries,
           requestFocusOnTap: true,
           expandedInsets: EdgeInsets.symmetric(horizontal: 20),
+          showTrailingIcon: false,
         ),
       ),
     );
@@ -681,7 +684,7 @@ void main() {
     },
   );
 
-  testWidgets('trailing and selected indicators resolve live hover states', (
+  testWidgets('selected indicators resolve live hover states', (
     WidgetTester tester,
   ) async {
     await pumpPure(
@@ -690,10 +693,6 @@ void main() {
         dropdownMenuEntries: entries,
         requestFocusOnTap: true,
         style: DropdownStyle(
-          icon: StateProperty<Widget?>.resolveWith(
-            (InteractionState state) =>
-                Text(state.isHovered ? 'hover icon' : 'idle icon'),
-          ),
           selectedIndicator: StateProperty<Widget?>.resolveWith(
             (InteractionState state) =>
                 state.isHovered ? const Text('hover option') : null,
@@ -702,13 +701,69 @@ void main() {
       ),
     );
     final TestGesture gesture = await hover(tester, find.byType(EditableText));
-    await tester.pump();
-    expect(find.text('hover icon'), findsOneWidget);
     await openField(tester);
     await gesture.moveTo(tester.getCenter(option('Banana')));
     await tester.pumpAndSettle();
     expect(find.text('hover option'), findsOneWidget);
-    expect(find.text('idle icon'), findsOneWidget);
     await gesture.removePointer();
+  });
+
+  for (final bool selectOnly in <bool>[false, true]) {
+    testWidgets(
+      'the single trailing icon flips while open (selectOnly: $selectOnly)',
+      (WidgetTester tester) async {
+        const Key iconKey = Key('arrow');
+        await pumpPure(
+          tester,
+          DropdownMenu<int>(
+            trailingIcon: const SizedBox(key: iconKey, width: 10, height: 10),
+            dropdownMenuEntries: entries,
+            requestFocusOnTap: true,
+            selectOnly: selectOnly,
+            style: const DropdownStyle(
+              buttonStyle: ButtonStyle(
+                animationDuration: Duration(milliseconds: 200),
+                animationCurve: Curves.linear,
+              ),
+            ),
+          ),
+        );
+        double turns() => tester
+            .widget<RotationTransition>(
+              find.ancestor(
+                of: find.byKey(iconKey),
+                matching: find.byType(RotationTransition),
+              ),
+            )
+            .turns
+            .value;
+        expect(turns(), 0);
+        await tester.tap(find.byKey(iconKey));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+        expect(turns(), closeTo(0.25, 1e-9));
+        await tester.pumpAndSettle();
+        expect(turns(), 0.5);
+        expect(find.byKey(iconKey), findsOneWidget);
+        await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+        await tester.pumpAndSettle();
+        expect(turns(), 0);
+      },
+    );
+  }
+
+  testWidgets('showTrailingIcon false omits the required icon', (
+    WidgetTester tester,
+  ) async {
+    const Key iconKey = Key('arrow');
+    await pumpPure(
+      tester,
+      const DropdownMenu<int>(
+        trailingIcon: SizedBox(key: iconKey, width: 10, height: 10),
+        showTrailingIcon: false,
+        dropdownMenuEntries: entries,
+      ),
+    );
+    expect(find.byKey(iconKey), findsNothing);
   });
 }

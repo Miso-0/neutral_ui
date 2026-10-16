@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../foundation/animated_surface.dart';
 import '../foundation/decoration_override.dart';
 import '../foundation/interaction_detector.dart';
 import '../foundation/interaction_state.dart';
@@ -147,7 +148,7 @@ class _CheckboxState extends State<Checkbox>
                   state,
                   (ToggleStyle style) => style.size,
                 );
-                return AnimatedContainer(
+                return AnimatedSurface(
                   duration: interactionDuration,
                   curve: interactionCurve,
                   width: size?.width,

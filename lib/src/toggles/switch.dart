@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../foundation/animated_surface.dart';
 import '../foundation/decoration_override.dart';
 import '../foundation/interaction_detector.dart';
 import '../foundation/interaction_state.dart';
@@ -203,7 +204,7 @@ class _SwitchState extends State<Switch>
                       thumb.height + resolvedPadding.vertical,
                     );
                 _travel = size.width - resolvedPadding.horizontal - thumb.width;
-                return AnimatedContainer(
+                return AnimatedSurface(
                   duration: interactionDuration,
                   curve: interactionCurve,
                   width: size.width,
@@ -221,7 +222,7 @@ class _SwitchState extends State<Switch>
                     ),
                     widthFactor: 1.0,
                     heightFactor: 1.0,
-                    child: AnimatedContainer(
+                    child: AnimatedSurface(
                       duration: interactionDuration,
                       curve: interactionCurve,
                       width: thumb.width,

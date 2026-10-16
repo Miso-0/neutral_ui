@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 
+import '../foundation/animated_surface.dart';
 import '../foundation/decoration_override.dart';
+import '../foundation/glyphs.dart';
 import '../foundation/interaction_detector.dart';
 import '../foundation/interaction_state.dart';
 import '../foundation/style_resolution.dart';
@@ -9,10 +11,12 @@ import '../styles/button_style.dart';
 import '../styles/dropdown_style.dart';
 import '../styles/menu_style.dart';
 import '../theme/menu_themes.dart';
+import 'dropdown_icon.dart';
 import 'key_activators.dart';
 import 'menu_host.dart';
 import 'menu_item_button.dart';
 import 'menu_panel.dart';
+import 'selection_indicator.dart';
 
 /// Filters the available entries in response to an editable query.
 typedef FilterCallback<T> = List<DropdownMenuEntry<T>> Function(
@@ -110,7 +114,6 @@ class DropdownMenu<T> extends StatefulWidget {
     this.hintText,
     this.leadingIcon,
     this.trailingIcon,
-    this.selectedTrailingIcon,
     this.showTrailingIcon = true,
     this.width,
     this.menuHeight,
@@ -152,7 +155,6 @@ class DropdownMenu<T> extends StatefulWidget {
     this.hintText,
     this.leadingIcon,
     this.trailingIcon,
-    this.selectedTrailingIcon,
     this.showTrailingIcon = true,
     this.width,
     this.menuHeight,
@@ -216,11 +218,13 @@ class DropdownMenu<T> extends StatefulWidget {
   /// Content before the field text.
   final Widget? leadingIcon;
 
-  /// Content after the field text while closed.
+  /// The trailing indicator, drawn in its closed orientation.
+  ///
+  /// Defaults to a painted [ChevronGlyph] in the field's icon theme. It turns
+  /// by [DropdownStyle.iconTurns] (a half turn by default) while the menu is
+  /// open, so a single downward arrow flips to point up. Use
+  /// [showTrailingIcon] to omit it.
   final Widget? trailingIcon;
-
-  /// Content after the field text while open.
-  final Widget? selectedTrailingIcon;
 
   /// Whether the trailing slot is included.
   final bool showTrailingIcon;
@@ -631,15 +635,13 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
           isSelected: menuOpen,
           isDisabled: !widget.enabled,
         );
-    final Widget? trailing = !widget.showTrailingIcon
-        ? null
-        : (menuOpen ? widget.selectedTrailingIcon : null) ??
-              widget.trailingIcon ??
-              resolveStateful<DropdownStyle, Widget>(
-                state,
-                layers,
-                (DropdownStyle style) => style.icon,
-              );
+    final Widget? trailing = widget.showTrailingIcon
+        ? DropdownIcon(
+            icon: widget.trailingIcon ?? const ChevronGlyph(),
+            open: menuOpen,
+            layers: layers,
+          )
+        : null;
     final Widget? selection =
         widget._multiple && widget.selectionBuilder != null
         ? widget.selectionBuilder!(context, _selectedEntries)
@@ -818,19 +820,17 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
           isFocused: entry == _highlighted,
           isDisabled: !entry.enabled || !widget.enabled,
         );
-    final Widget? indicator = resolveStateful<DropdownStyle, Widget>(
+    final Widget? indicator = resolveStatefulOrDefault<DropdownStyle, Widget>(
       state,
       layers,
       (DropdownStyle style) => style.selectedIndicator,
+      () => defaultSelectionIndicator(selected: state.isSelected),
     );
     final Widget? leading = indicator == null
         ? entry.leadingIcon
         : Row(
             mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              indicator,
-              if (entry.leadingIcon != null) entry.leadingIcon!,
-            ],
+            children: <Widget>[indicator, ?entry.leadingIcon],
           );
     return ExcludeFocus(
       key: _entryKeys.putIfAbsent(entry, GlobalKey.new),
@@ -992,8 +992,12 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
         layers,
         state,
       );
-      return TextFieldTapRegion(
+      // TextFieldTapRegion's group, made opaque so taps on unpainted padding,
+      // gaps or icons still toggle the menu.
+      return TapRegion(
         key: _editableTapKey,
+        groupId: EditableText,
+        behavior: HitTestBehavior.opaque,
         onTapUpInside: widget.enabled
             ? (PointerUpEvent event) {
                 final RenderBox box =
@@ -1010,7 +1014,7 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
           minSize: surface.tapTargetSize,
           child: ConstrainedBox(
             constraints: constraints,
-            child: AnimatedContainer(
+            child: AnimatedSurface(
               duration:
                   surface.animationDuration ??
                   const Duration(milliseconds: 200),

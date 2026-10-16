@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/widgets.dart';
 
 import '../foundation/animated_icon_theme.dart';
+import '../foundation/animated_surface.dart';
 import '../foundation/decoration_override.dart';
 import '../foundation/interaction_detector.dart';
 import '../foundation/interaction_state.dart';
@@ -231,7 +232,7 @@ class ListTile extends StatelessWidget {
               ),
             ),
           );
-          return AnimatedContainer(
+          return AnimatedSurface(
             duration: duration,
             curve: curve,
             padding: padding,
