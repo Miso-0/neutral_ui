@@ -265,6 +265,134 @@ void main() {
     expect(tester.widget<ListTile>(tile).decoration, decoration);
     expect(tester.takeException(), isNull);
   });
+  testWidgets('foundations gallery localizes dates and consumes outside taps', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1280, 1100);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(const GalleryApp());
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('08 / Foundations'));
+    await tester.pumpAndSettle();
+    expect(find.text('Friday, October 16, 2026'), findsOneWidget);
+    final Finder foundations = find
+        .ancestor(
+          of: find.text('08 / Foundations'),
+          matching: find.byType(Container),
+        )
+        .first;
+    expect(
+      find.descendant(of: foundations, matching: find.byType(CalendarGlyph)),
+      findsOneWidget,
+    );
+    await tester.tap(find.text('Open an overlay'));
+    await tester.pumpAndSettle();
+    expect(find.text('Select foundation').hitTestable(), findsOneWidget);
+    await tester.tap(find.text('LIVE INTERACTION STATE'));
+    await tester.pumpAndSettle();
+    expect(find.text('Select foundation').hitTestable(), findsNothing);
+    expect(find.text('Ready to interact'), findsOneWidget);
+    await tester.tap(find.text('LIVE INTERACTION STATE'));
+    await tester.pumpAndSettle();
+    expect(find.text('Custom interaction surface activated'), findsOneWidget);
+    await tester.tap(find.text('Open an overlay'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Select foundation').hitTestable());
+    await tester.pumpAndSettle();
+    expect(find.text('Foundation selected'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+  testWidgets('roadmap families render and gallery interactions complete', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1280, 1100);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(const GalleryApp());
+    await tester.pumpAndSettle();
+    for (final String section in <String>[
+      '09 / Overlays and feedback',
+      '10 / Text input and search',
+      '11 / Date and time',
+      '12 / Chips and button variants',
+      '13 / Navigation and feedback',
+    ]) {
+      expect(find.text(section), findsOneWidget);
+    }
+    await tester.ensureVisible(
+      find.byKey(const ValueKey<String>('roadmap-dialog')),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Open dialog'));
+    await tester.pumpAndSettle();
+    expect(find.text('Create a workspace?'), findsOneWidget);
+    await tester.tap(find.text('Create workspace'));
+    await tester.pumpAndSettle();
+    expect(find.text('Workspace created'), findsOneWidget);
+    await tester.tap(find.text('Queue a message'));
+    await tester.pumpAndSettle();
+    expect(find.text('Your changes are saved'), findsOneWidget);
+    await tester.tap(find.text('Undo'));
+    await tester.pumpAndSettle();
+    expect(find.text('Save undone'), findsOneWidget);
+    final Finder input = find.byKey(const ValueKey<String>('roadmap-text'));
+    await tester.ensureVisible(input);
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.descendant(of: input, matching: find.byType(EditableText)),
+      'Demo',
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Project: Demo'), findsOneWidget);
+    await tester.ensureVisible(find.text('13 / Navigation and feedback'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Settings').hitTestable());
+    await tester.pumpAndSettle();
+    expect(find.text('Your preferences'), findsOneWidget);
+    await tester.tap(find.text('Project details'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text('This content stays mounted while collapsed.'),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+  testWidgets('gallery RTL and reduced motion apply inside modal routes', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1280, 1100);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(const GalleryApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(Switch).first);
+    await tester.pumpAndSettle();
+    final Finder preference = find.text('Reduced motion for new components');
+    await tester.ensureVisible(preference);
+    await tester.pumpAndSettle();
+    final Finder preferenceRow = find
+        .ancestor(of: preference, matching: find.byType(Row))
+        .first;
+    await tester.tap(
+      find.descendant(of: preferenceRow, matching: find.byType(Switch)),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Open dialog'));
+    await tester.pump();
+    final BuildContext dialog = tester.element(
+      find.text('Create a workspace?'),
+    );
+    expect(Directionality.of(dialog), TextDirection.rtl);
+    expect(MediaQuery.disableAnimationsOf(dialog), isTrue);
+    expect(ModalRoute.of(dialog)!.animation!.value, 1);
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
 }
 
 Future<void> _openGalleryMenu(WidgetTester tester, String key) async {

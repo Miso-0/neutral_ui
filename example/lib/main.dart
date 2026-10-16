@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:pure_ui/pure_ui.dart';
 
+import 'sections/roadmap_sections.dart';
+
 const Color _ink = Color(0xFF142C2A);
 const Color _muted = Color(0xFF657B77);
 const Color _accent = Color(0xFF087F6D);
@@ -295,13 +297,21 @@ ThemeData _theme() => ThemeData(
   ),
 );
 
-/// A WidgetsApp gallery with all visual tokens supplied by a central theme.
-class GalleryApp extends StatelessWidget {
+/// A PureApp gallery with all visual tokens supplied by a central theme.
+class GalleryApp extends StatefulWidget {
   /// Creates the gallery application.
   const GalleryApp({super.key});
 
   @override
-  Widget build(BuildContext context) => WidgetsApp(
+  State<GalleryApp> createState() => _GalleryAppState();
+}
+
+class _GalleryAppState extends State<GalleryApp> {
+  bool _rtl = false;
+  bool _reducedMotion = false;
+
+  @override
+  Widget build(BuildContext context) => PureApp(
     color: _canvas,
     title: 'PureUI gallery',
     debugShowCheckedModeBanner: false,
@@ -311,19 +321,29 @@ class GalleryApp extends StatelessWidget {
       height: 1.4,
       fontFamily: 'Arial',
     ),
-    builder: (BuildContext context, Widget? child) => PureTheme(
-      data: _theme(),
-      child: Overlay(
-        initialEntries: <OverlayEntry>[
-          OverlayEntry(builder: (BuildContext context) => const _Gallery()),
-        ],
+    theme: roadmapTheme(_theme()),
+    builder: (BuildContext context, Widget? child) => Directionality(
+      textDirection: _rtl ? TextDirection.rtl : TextDirection.ltr,
+      child: MediaQuery(
+        data: MediaQuery.of(context)
+            .copyWith(disableAnimations: _reducedMotion),
+        child: child!,
+      ),
+    ),
+    home: ScaffoldMessenger(
+      child: _Gallery(
+        onDirectionChanged: (bool value) => setState(() => _rtl = value),
+        onReducedMotionChanged: (bool value) =>
+            setState(() => _reducedMotion = value),
       ),
     ),
   );
 }
 
 class _Gallery extends StatefulWidget {
-  const _Gallery();
+  const _Gallery({this.onDirectionChanged, this.onReducedMotionChanged});
+  final ValueChanged<bool>? onDirectionChanged;
+  final ValueChanged<bool>? onReducedMotionChanged;
 
   @override
   State<_Gallery> createState() => _GalleryState();
@@ -440,10 +460,12 @@ class _GalleryState extends State<_Gallery> {
       checked: _pinned,
       child: const Text('Pin to sidebar'),
     ),
+
     const PopupMenuDivider(),
-    const PopupMenuItem<String>(
+    PopupMenuItem<String>(
       value: 'archive',
       enabled: false,
+      onTap: () {},
       child: Text('Archive project'),
     ),
     const PopupMenuItem<String>(value: 'delete', child: Text('Delete project')),
@@ -725,6 +747,61 @@ class _GalleryState extends State<_Gallery> {
     ],
   );
 
+  Widget _foundations() {
+    final PureLocalizations strings = PureLocalizations.of(context);
+    final DateTime date = DateTime(2026, 10, 16);
+    return _section(
+      '08',
+      'Foundations',
+      'Directional glyphs, localized dates and smooth anchored overlays.',
+      <Widget>[
+        const IconTheme(
+          data: IconThemeData(color: _accent, size: 28),
+          child: Wrap(
+            spacing: 24,
+            runSpacing: 16,
+            children: <Widget>[
+              ChevronGlyph(direction: GlyphDirection.start),
+              ChevronGlyph(direction: GlyphDirection.end),
+              CloseGlyph(),
+              SearchGlyph(),
+              CalendarGlyph(),
+              ClockGlyph(),
+              EditGlyph(),
+              ArrowGlyph(direction: GlyphDirection.start),
+              ArrowGlyph(),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+        Text(strings.formatFullDate(date)),
+        Text(
+          strings.formatCompactDate(date),
+          style: const TextStyle(color: _muted),
+        ),
+        const SizedBox(height: 20),
+        PopupMenuButton<String>(
+          key: const ValueKey<String>('consume-menu'),
+          style: PopupMenuStyle(
+            buttonStyle: _button(),
+            menuStyle: _menuPanel().copyWith(
+              outsideTapBehavior: OutsideTapBehavior.consume,
+            ),
+            itemStyle: _menuItem(),
+          ),
+          onSelected: (String value) => _record(value),
+          itemBuilder: (BuildContext context) => const <PopupMenuEntry<String>>[
+            PopupMenuItem<String>(
+              value: 'Foundation selected',
+              child: Text('Select foundation'),
+            ),
+          ],
+          child: const Text('Open an overlay'),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) => Directionality(
     textDirection: _rtl ? TextDirection.rtl : TextDirection.ltr,
@@ -774,6 +851,7 @@ class _GalleryState extends State<_Gallery> {
                           value: _rtl,
                           onChanged: (bool value) => setState(() {
                             _rtl = value;
+                            widget.onDirectionChanged?.call(value);
                           }),
                         ),
                       ),
@@ -1147,6 +1225,8 @@ class _GalleryState extends State<_Gallery> {
                   const SizedBox(height: 18),
                   _decorations(),
                   const SizedBox(height: 18),
+                  _foundations(),
+                  const SizedBox(height: 18),
                   InteractionDetector(
                     onTap: () =>
                         _record('Custom interaction surface activated'),
@@ -1193,8 +1273,12 @@ class _GalleryState extends State<_Gallery> {
                         ),
                   ),
                   const SizedBox(height: 24),
+                  RoadmapSections(
+                    onReducedMotionChanged: widget.onReducedMotionChanged,
+                  ),
+                  const SizedBox(height: 24),
                   const Text(
-                    'PureUI 0.3 / Flutter widgets, your visual language.',
+                    'PureUI 0.10 / Flutter widgets, your visual language.',
                     style: TextStyle(color: _muted, fontSize: 12),
                   ),
                 ],

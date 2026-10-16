@@ -3,6 +3,667 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pure_ui/pure_ui.dart';
 
 void main() {
+  test('ThemeData tooltipStyle copies and deeply inherits tokens', () {
+    final ThemeData first = ThemeData(
+      tooltipStyle: TooltipStyle(
+        decoration: const BoxDecoration(color: Color(0xFF112233)),
+      ),
+    );
+    final ThemeData inherited = ThemeData(
+      tooltipStyle: TooltipStyle(padding: const EdgeInsets.all(4)),
+    );
+    expect(
+      const ThemeData().copyWith(
+        tooltipStyle: TooltipStyle(
+          decoration: const BoxDecoration(color: Color(0xFF112233)),
+        ),
+      ),
+      first,
+    );
+    expect(first.copyWith(), first);
+    expect(
+      first.merge(inherited).tooltipStyle,
+      TooltipStyle(
+        decoration: const BoxDecoration(color: Color(0xFF112233)),
+        padding: const EdgeInsets.all(4),
+      ),
+    );
+    expect(
+      first.hashCode,
+      ThemeData(
+        tooltipStyle: TooltipStyle(
+          decoration: const BoxDecoration(color: Color(0xFF112233)),
+        ),
+      ).hashCode,
+    );
+    expect(first.toString(), contains('tooltipStyle:'));
+  });
+  test('ThemeData dialogStyle copies and deeply inherits tokens', () {
+    final ThemeData first = ThemeData(
+      dialogStyle: DialogStyle(
+        decoration: const BoxDecoration(color: Color(0xFF112233)),
+      ),
+    );
+    final ThemeData inherited = ThemeData(
+      dialogStyle: DialogStyle(padding: const EdgeInsets.all(4)),
+    );
+    expect(
+      const ThemeData().copyWith(
+        dialogStyle: DialogStyle(
+          decoration: const BoxDecoration(color: Color(0xFF112233)),
+        ),
+      ),
+      first,
+    );
+    expect(first.copyWith(), first);
+    expect(
+      first.merge(inherited).dialogStyle,
+      DialogStyle(
+        decoration: const BoxDecoration(color: Color(0xFF112233)),
+        padding: const EdgeInsets.all(4),
+      ),
+    );
+    expect(
+      first.hashCode,
+      ThemeData(
+        dialogStyle: DialogStyle(
+          decoration: const BoxDecoration(color: Color(0xFF112233)),
+        ),
+      ).hashCode,
+    );
+    expect(first.toString(), contains('dialogStyle:'));
+  });
+  test('ThemeData bottomSheetStyle copies and deeply inherits tokens', () {
+    final ThemeData first = ThemeData(
+      bottomSheetStyle: BottomSheetStyle(
+        decoration: const BoxDecoration(color: Color(0xFF112233)),
+      ),
+    );
+    final ThemeData inherited = ThemeData(
+      bottomSheetStyle: BottomSheetStyle(padding: const EdgeInsets.all(4)),
+    );
+    expect(
+      const ThemeData().copyWith(
+        bottomSheetStyle: BottomSheetStyle(
+          decoration: const BoxDecoration(color: Color(0xFF112233)),
+        ),
+      ),
+      first,
+    );
+    expect(first.copyWith(), first);
+    expect(
+      first.merge(inherited).bottomSheetStyle,
+      BottomSheetStyle(
+        decoration: const BoxDecoration(color: Color(0xFF112233)),
+        padding: const EdgeInsets.all(4),
+      ),
+    );
+    expect(
+      first.hashCode,
+      ThemeData(
+        bottomSheetStyle: BottomSheetStyle(
+          decoration: const BoxDecoration(color: Color(0xFF112233)),
+        ),
+      ).hashCode,
+    );
+    expect(first.toString(), contains('bottomSheetStyle:'));
+  });
+  test('ThemeData snackBarStyle copies and deeply inherits tokens', () {
+    final ThemeData first = ThemeData(
+      snackBarStyle: SnackBarStyle(
+        decoration: const BoxDecoration(color: Color(0xFF112233)),
+      ),
+    );
+    final ThemeData inherited = ThemeData(
+      snackBarStyle: SnackBarStyle(padding: const EdgeInsets.all(4)),
+    );
+    expect(
+      const ThemeData().copyWith(
+        snackBarStyle: SnackBarStyle(
+          decoration: const BoxDecoration(color: Color(0xFF112233)),
+        ),
+      ),
+      first,
+    );
+    expect(first.copyWith(), first);
+    expect(
+      first.merge(inherited).snackBarStyle,
+      SnackBarStyle(
+        decoration: const BoxDecoration(color: Color(0xFF112233)),
+        padding: const EdgeInsets.all(4),
+      ),
+    );
+    expect(
+      first.hashCode,
+      ThemeData(
+        snackBarStyle: SnackBarStyle(
+          decoration: const BoxDecoration(color: Color(0xFF112233)),
+        ),
+      ).hashCode,
+    );
+    expect(first.toString(), contains('snackBarStyle:'));
+  });
+  test('ThemeData textFieldStyle copies and deeply inherits tokens', () {
+    final ThemeData first = ThemeData(
+      textFieldStyle: TextFieldStyle(
+        decoration: const StateProperty<Decoration?>.all(
+          BoxDecoration(color: Color(0xFF112233)),
+        ),
+      ),
+    );
+    final ThemeData inherited = ThemeData(
+      textFieldStyle: TextFieldStyle(
+        foregroundDecoration: const StateProperty<Decoration?>.all(
+          BoxDecoration(color: Color(0xFF445566)),
+        ),
+      ),
+    );
+    expect(
+      const ThemeData().copyWith(
+        textFieldStyle: TextFieldStyle(
+          decoration: const StateProperty<Decoration?>.all(
+            BoxDecoration(color: Color(0xFF112233)),
+          ),
+        ),
+      ),
+      first,
+    );
+    expect(first.copyWith(), first);
+    expect(
+      first.merge(inherited).textFieldStyle,
+      TextFieldStyle(
+        decoration: const StateProperty<Decoration?>.all(
+          BoxDecoration(color: Color(0xFF112233)),
+        ),
+        foregroundDecoration: const StateProperty<Decoration?>.all(
+          BoxDecoration(color: Color(0xFF445566)),
+        ),
+      ),
+    );
+    expect(
+      first.hashCode,
+      ThemeData(
+        textFieldStyle: TextFieldStyle(
+          decoration: const StateProperty<Decoration?>.all(
+            BoxDecoration(color: Color(0xFF112233)),
+          ),
+        ),
+      ).hashCode,
+    );
+    expect(first.toString(), contains('textFieldStyle:'));
+  });
+  test('ThemeData autocompleteStyle copies and deeply inherits tokens', () {
+    final ThemeData first = ThemeData(
+      autocompleteStyle: AutocompleteStyle(
+        fieldStyle: const TextFieldStyle(spacing: 2),
+      ),
+    );
+    final ThemeData inherited = ThemeData(
+      autocompleteStyle: AutocompleteStyle(
+        menuStyle: const MenuStyle(offset: Offset(3, 4)),
+      ),
+    );
+    expect(
+      const ThemeData().copyWith(
+        autocompleteStyle: AutocompleteStyle(
+          fieldStyle: const TextFieldStyle(spacing: 2),
+        ),
+      ),
+      first,
+    );
+    expect(first.copyWith(), first);
+    expect(
+      first.merge(inherited).autocompleteStyle,
+      AutocompleteStyle(
+        fieldStyle: const TextFieldStyle(spacing: 2),
+        menuStyle: const MenuStyle(offset: Offset(3, 4)),
+      ),
+    );
+    expect(
+      first.hashCode,
+      ThemeData(
+        autocompleteStyle: AutocompleteStyle(
+          fieldStyle: const TextFieldStyle(spacing: 2),
+        ),
+      ).hashCode,
+    );
+    expect(first.toString(), contains('autocompleteStyle:'));
+  });
+  test('ThemeData searchStyle copies and deeply inherits tokens', () {
+    final ThemeData first = ThemeData(
+      searchStyle: SearchStyle(fieldStyle: const TextFieldStyle(spacing: 2)),
+    );
+    final ThemeData inherited = ThemeData(
+      searchStyle: SearchStyle(
+        viewDecoration: const BoxDecoration(color: Color(0xFF445566)),
+      ),
+    );
+    expect(
+      const ThemeData().copyWith(
+        searchStyle: SearchStyle(fieldStyle: const TextFieldStyle(spacing: 2)),
+      ),
+      first,
+    );
+    expect(first.copyWith(), first);
+    expect(
+      first.merge(inherited).searchStyle,
+      SearchStyle(
+        fieldStyle: const TextFieldStyle(spacing: 2),
+        viewDecoration: const BoxDecoration(color: Color(0xFF445566)),
+      ),
+    );
+    expect(
+      first.hashCode,
+      ThemeData(
+        searchStyle: SearchStyle(fieldStyle: const TextFieldStyle(spacing: 2)),
+      ).hashCode,
+    );
+    expect(first.toString(), contains('searchStyle:'));
+  });
+  test('ThemeData datePickerStyle copies and deeply inherits tokens', () {
+    final ThemeData first = ThemeData(
+      datePickerStyle: DatePickerStyle(
+        decoration: const BoxDecoration(color: Color(0xFF112233)),
+      ),
+    );
+    final ThemeData inherited = ThemeData(
+      datePickerStyle: DatePickerStyle(padding: const EdgeInsets.all(4)),
+    );
+    expect(
+      const ThemeData().copyWith(
+        datePickerStyle: DatePickerStyle(
+          decoration: const BoxDecoration(color: Color(0xFF112233)),
+        ),
+      ),
+      first,
+    );
+    expect(first.copyWith(), first);
+    expect(
+      first.merge(inherited).datePickerStyle,
+      DatePickerStyle(
+        decoration: const BoxDecoration(color: Color(0xFF112233)),
+        padding: const EdgeInsets.all(4),
+      ),
+    );
+    expect(
+      first.hashCode,
+      ThemeData(
+        datePickerStyle: DatePickerStyle(
+          decoration: const BoxDecoration(color: Color(0xFF112233)),
+        ),
+      ).hashCode,
+    );
+    expect(first.toString(), contains('datePickerStyle:'));
+  });
+  test('ThemeData timePickerStyle copies and deeply inherits tokens', () {
+    final ThemeData first = ThemeData(
+      timePickerStyle: TimePickerStyle(
+        decoration: const BoxDecoration(color: Color(0xFF112233)),
+      ),
+    );
+    final ThemeData inherited = ThemeData(
+      timePickerStyle: TimePickerStyle(padding: const EdgeInsets.all(4)),
+    );
+    expect(
+      const ThemeData().copyWith(
+        timePickerStyle: TimePickerStyle(
+          decoration: const BoxDecoration(color: Color(0xFF112233)),
+        ),
+      ),
+      first,
+    );
+    expect(first.copyWith(), first);
+    expect(
+      first.merge(inherited).timePickerStyle,
+      TimePickerStyle(
+        decoration: const BoxDecoration(color: Color(0xFF112233)),
+        padding: const EdgeInsets.all(4),
+      ),
+    );
+    expect(
+      first.hashCode,
+      ThemeData(
+        timePickerStyle: TimePickerStyle(
+          decoration: const BoxDecoration(color: Color(0xFF112233)),
+        ),
+      ).hashCode,
+    );
+    expect(first.toString(), contains('timePickerStyle:'));
+  });
+  test('ThemeData filledButtonStyle copies and deeply inherits tokens', () {
+    final ThemeData first = ThemeData(
+      filledButtonStyle: ButtonStyle(spacing: 2.0),
+    );
+    final ThemeData inherited = ThemeData(
+      filledButtonStyle: ButtonStyle(alignment: AlignmentDirectional.bottomEnd),
+    );
+    expect(
+      const ThemeData().copyWith(filledButtonStyle: ButtonStyle(spacing: 2.0)),
+      first,
+    );
+    expect(first.copyWith(), first);
+    expect(
+      first.merge(inherited).filledButtonStyle,
+      ButtonStyle(spacing: 2.0, alignment: AlignmentDirectional.bottomEnd),
+    );
+    expect(
+      first.hashCode,
+      ThemeData(filledButtonStyle: ButtonStyle(spacing: 2.0)).hashCode,
+    );
+    expect(first.toString(), contains('filledButtonStyle:'));
+  });
+  test(
+    'ThemeData floatingActionButtonStyle copies and deeply inherits tokens',
+    () {
+      final ThemeData first = ThemeData(
+        floatingActionButtonStyle: ButtonStyle(spacing: 2.0),
+      );
+      final ThemeData inherited = ThemeData(
+        floatingActionButtonStyle: ButtonStyle(
+          alignment: AlignmentDirectional.bottomEnd,
+        ),
+      );
+      expect(
+        const ThemeData().copyWith(
+          floatingActionButtonStyle: ButtonStyle(spacing: 2.0),
+        ),
+        first,
+      );
+      expect(first.copyWith(), first);
+      expect(
+        first.merge(inherited).floatingActionButtonStyle,
+        ButtonStyle(spacing: 2.0, alignment: AlignmentDirectional.bottomEnd),
+      );
+      expect(
+        first.hashCode,
+        ThemeData(floatingActionButtonStyle: ButtonStyle(spacing: 2.0))
+            .hashCode,
+      );
+      expect(first.toString(), contains('floatingActionButtonStyle:'));
+    },
+  );
+  test('ThemeData segmentedButtonStyle copies and deeply inherits tokens', () {
+    final ThemeData first = ThemeData(
+      segmentedButtonStyle: ButtonStyle(spacing: 2.0),
+    );
+    final ThemeData inherited = ThemeData(
+      segmentedButtonStyle: ButtonStyle(
+        alignment: AlignmentDirectional.bottomEnd,
+      ),
+    );
+    expect(
+      const ThemeData().copyWith(
+        segmentedButtonStyle: ButtonStyle(spacing: 2.0),
+      ),
+      first,
+    );
+    expect(first.copyWith(), first);
+    expect(
+      first.merge(inherited).segmentedButtonStyle,
+      ButtonStyle(spacing: 2.0, alignment: AlignmentDirectional.bottomEnd),
+    );
+    expect(
+      first.hashCode,
+      ThemeData(segmentedButtonStyle: ButtonStyle(spacing: 2.0)).hashCode,
+    );
+    expect(first.toString(), contains('segmentedButtonStyle:'));
+  });
+  test('ThemeData toggleButtonsStyle copies and deeply inherits tokens', () {
+    final ThemeData first = ThemeData(
+      toggleButtonsStyle: ButtonStyle(spacing: 2.0),
+    );
+    final ThemeData inherited = ThemeData(
+      toggleButtonsStyle: ButtonStyle(
+        alignment: AlignmentDirectional.bottomEnd,
+      ),
+    );
+    expect(
+      const ThemeData().copyWith(toggleButtonsStyle: ButtonStyle(spacing: 2.0)),
+      first,
+    );
+    expect(first.copyWith(), first);
+    expect(
+      first.merge(inherited).toggleButtonsStyle,
+      ButtonStyle(spacing: 2.0, alignment: AlignmentDirectional.bottomEnd),
+    );
+    expect(
+      first.hashCode,
+      ThemeData(toggleButtonsStyle: ButtonStyle(spacing: 2.0)).hashCode,
+    );
+    expect(first.toString(), contains('toggleButtonsStyle:'));
+  });
+  test('ThemeData chipStyle copies and deeply inherits tokens', () {
+    final ThemeData first = ThemeData(
+      chipStyle: ChipStyle(buttonStyle: const ButtonStyle(spacing: 2)),
+    );
+    final ThemeData inherited = ThemeData(
+      chipStyle: ChipStyle(deleteButtonStyle: const ButtonStyle(spacing: 4)),
+    );
+    expect(
+      const ThemeData().copyWith(
+        chipStyle: ChipStyle(buttonStyle: const ButtonStyle(spacing: 2)),
+      ),
+      first,
+    );
+    expect(first.copyWith(), first);
+    expect(
+      first.merge(inherited).chipStyle,
+      ChipStyle(
+        buttonStyle: const ButtonStyle(spacing: 2),
+        deleteButtonStyle: const ButtonStyle(spacing: 4),
+      ),
+    );
+    expect(
+      first.hashCode,
+      ThemeData(
+        chipStyle: ChipStyle(buttonStyle: const ButtonStyle(spacing: 2)),
+      ).hashCode,
+    );
+    expect(first.toString(), contains('chipStyle:'));
+  });
+  test('ThemeData tabBarStyle copies and deeply inherits tokens', () {
+    final ThemeData first = ThemeData(
+      tabBarStyle: TabBarStyle(tabStyle: const ButtonStyle(spacing: 2)),
+    );
+    final ThemeData inherited = ThemeData(
+      tabBarStyle: TabBarStyle(
+        indicatorDecoration: const StateProperty<Decoration?>.all(
+          BoxDecoration(color: Color(0xFF445566)),
+        ),
+      ),
+    );
+    expect(
+      const ThemeData().copyWith(
+        tabBarStyle: TabBarStyle(tabStyle: const ButtonStyle(spacing: 2)),
+      ),
+      first,
+    );
+    expect(first.copyWith(), first);
+    expect(
+      first.merge(inherited).tabBarStyle,
+      TabBarStyle(
+        tabStyle: const ButtonStyle(spacing: 2),
+        indicatorDecoration: const StateProperty<Decoration?>.all(
+          BoxDecoration(color: Color(0xFF445566)),
+        ),
+      ),
+    );
+    expect(
+      first.hashCode,
+      ThemeData(
+        tabBarStyle: TabBarStyle(tabStyle: const ButtonStyle(spacing: 2)),
+      ).hashCode,
+    );
+    expect(first.toString(), contains('tabBarStyle:'));
+  });
+  test('ThemeData navigationStyle copies and deeply inherits tokens', () {
+    final ThemeData first = ThemeData(
+      navigationStyle: NavigationStyle(
+        destinationStyle: const ButtonStyle(spacing: 2),
+      ),
+    );
+    final ThemeData inherited = ThemeData(
+      navigationStyle: NavigationStyle(
+        indicatorDecoration: const StateProperty<Decoration?>.all(
+          BoxDecoration(color: Color(0xFF445566)),
+        ),
+      ),
+    );
+    expect(
+      const ThemeData().copyWith(
+        navigationStyle: NavigationStyle(
+          destinationStyle: const ButtonStyle(spacing: 2),
+        ),
+      ),
+      first,
+    );
+    expect(first.copyWith(), first);
+    expect(
+      first.merge(inherited).navigationStyle,
+      NavigationStyle(
+        destinationStyle: const ButtonStyle(spacing: 2),
+        indicatorDecoration: const StateProperty<Decoration?>.all(
+          BoxDecoration(color: Color(0xFF445566)),
+        ),
+      ),
+    );
+    expect(
+      first.hashCode,
+      ThemeData(
+        navigationStyle: NavigationStyle(
+          destinationStyle: const ButtonStyle(spacing: 2),
+        ),
+      ).hashCode,
+    );
+    expect(first.toString(), contains('navigationStyle:'));
+  });
+  test('ThemeData expansionTileStyle copies and deeply inherits tokens', () {
+    final ThemeData first = ThemeData(
+      expansionTileStyle: ExpansionTileStyle(
+        tileStyle: const ListTileStyle(horizontalTitleGap: 2),
+      ),
+    );
+    final ThemeData inherited = ThemeData(
+      expansionTileStyle: ExpansionTileStyle(
+        decoration: const StateProperty<Decoration?>.all(
+          BoxDecoration(color: Color(0xFF445566)),
+        ),
+      ),
+    );
+    expect(
+      const ThemeData().copyWith(
+        expansionTileStyle: ExpansionTileStyle(
+          tileStyle: const ListTileStyle(horizontalTitleGap: 2),
+        ),
+      ),
+      first,
+    );
+    expect(first.copyWith(), first);
+    expect(
+      first.merge(inherited).expansionTileStyle,
+      ExpansionTileStyle(
+        tileStyle: const ListTileStyle(horizontalTitleGap: 2),
+        decoration: const StateProperty<Decoration?>.all(
+          BoxDecoration(color: Color(0xFF445566)),
+        ),
+      ),
+    );
+    expect(
+      first.hashCode,
+      ThemeData(
+        expansionTileStyle: ExpansionTileStyle(
+          tileStyle: const ListTileStyle(horizontalTitleGap: 2),
+        ),
+      ).hashCode,
+    );
+    expect(first.toString(), contains('expansionTileStyle:'));
+  });
+  test(
+    'ThemeData progressIndicatorStyle copies and deeply inherits tokens',
+    () {
+      final ThemeData first = ThemeData(
+        progressIndicatorStyle: ProgressIndicatorStyle(
+          color: const StateProperty<Color?>.all(Color(0xFF112233)),
+        ),
+      );
+      final ThemeData inherited = ThemeData(
+        progressIndicatorStyle: ProgressIndicatorStyle(
+          backgroundColor: const StateProperty<Color?>.all(Color(0xFF445566)),
+        ),
+      );
+      expect(
+        const ThemeData().copyWith(
+          progressIndicatorStyle: ProgressIndicatorStyle(
+            color: const StateProperty<Color?>.all(Color(0xFF112233)),
+          ),
+        ),
+        first,
+      );
+      expect(first.copyWith(), first);
+      expect(
+        first.merge(inherited).progressIndicatorStyle,
+        ProgressIndicatorStyle(
+          color: const StateProperty<Color?>.all(Color(0xFF112233)),
+          backgroundColor: const StateProperty<Color?>.all(Color(0xFF445566)),
+        ),
+      );
+      expect(
+        first.hashCode,
+        ThemeData(
+          progressIndicatorStyle: ProgressIndicatorStyle(
+            color: const StateProperty<Color?>.all(Color(0xFF112233)),
+          ),
+        ).hashCode,
+      );
+      expect(first.toString(), contains('progressIndicatorStyle:'));
+    },
+  );
+  test('ThemeData badgeStyle copies and deeply inherits tokens', () {
+    final ThemeData first = ThemeData(
+      badgeStyle: BadgeStyle(
+        decoration: const StateProperty<Decoration?>.all(
+          BoxDecoration(color: Color(0xFF112233)),
+        ),
+      ),
+    );
+    final ThemeData inherited = ThemeData(
+      badgeStyle: BadgeStyle(
+        textStyle: const StateProperty<TextStyle?>.all(TextStyle(fontSize: 18)),
+      ),
+    );
+    expect(
+      const ThemeData().copyWith(
+        badgeStyle: BadgeStyle(
+          decoration: const StateProperty<Decoration?>.all(
+            BoxDecoration(color: Color(0xFF112233)),
+          ),
+        ),
+      ),
+      first,
+    );
+    expect(first.copyWith(), first);
+    expect(
+      first.merge(inherited).badgeStyle,
+      BadgeStyle(
+        decoration: const StateProperty<Decoration?>.all(
+          BoxDecoration(color: Color(0xFF112233)),
+        ),
+        textStyle: const StateProperty<TextStyle?>.all(TextStyle(fontSize: 18)),
+      ),
+    );
+    expect(
+      first.hashCode,
+      ThemeData(
+        badgeStyle: BadgeStyle(
+          decoration: const StateProperty<Decoration?>.all(
+            BoxDecoration(color: Color(0xFF112233)),
+          ),
+        ),
+      ).hashCode,
+    );
+    expect(first.toString(), contains('badgeStyle:'));
+  });
+
   test('ThemeData copies and merges elevatedButtonStyle', () {
     final ButtonStyle first = ButtonStyle(
       decoration: const StateProperty<Decoration?>.all(

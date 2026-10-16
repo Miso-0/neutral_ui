@@ -13,6 +13,7 @@ class InteractionState {
     this.isSelected = false,
     this.isDisabled = false,
     this.isDragged = false,
+    this.isError = false,
   });
 
   /// Creates a snapshot from the corresponding Flutter widget states.
@@ -24,6 +25,7 @@ class InteractionState {
       isSelected: states.contains(WidgetState.selected),
       isDisabled: states.contains(WidgetState.disabled),
       isDragged: states.contains(WidgetState.dragged),
+      isError: states.contains(WidgetState.error),
     );
   }
 
@@ -45,6 +47,9 @@ class InteractionState {
   /// Whether a horizontal drag is active.
   final bool isDragged;
 
+  /// Whether the control has a validation error.
+  final bool isError;
+
   /// Whether the control is available for interaction.
   bool get isEnabled => !isDisabled;
 
@@ -57,6 +62,7 @@ class InteractionState {
       if (isSelected) WidgetState.selected,
       if (isDisabled) WidgetState.disabled,
       if (isDragged) WidgetState.dragged,
+      if (isError) WidgetState.error,
     };
   }
 
@@ -68,6 +74,7 @@ class InteractionState {
     bool? isSelected,
     bool? isDisabled,
     bool? isDragged,
+    bool? isError,
   }) {
     return InteractionState(
       isPressed: isPressed ?? this.isPressed,
@@ -76,6 +83,7 @@ class InteractionState {
       isSelected: isSelected ?? this.isSelected,
       isDisabled: isDisabled ?? this.isDisabled,
       isDragged: isDragged ?? this.isDragged,
+      isError: isError ?? this.isError,
     );
   }
 
@@ -88,7 +96,8 @@ class InteractionState {
             isFocused == other.isFocused &&
             isSelected == other.isSelected &&
             isDisabled == other.isDisabled &&
-            isDragged == other.isDragged;
+            isDragged == other.isDragged &&
+            isError == other.isError;
   }
 
   @override
@@ -99,11 +108,12 @@ class InteractionState {
     isSelected,
     isDisabled,
     isDragged,
+    isError,
   );
 
   @override
   String toString() =>
       'InteractionState(isPressed: $isPressed, isHovered: $isHovered, '
       'isFocused: $isFocused, isSelected: $isSelected, '
-      'isDisabled: $isDisabled, isDragged: $isDragged)';
+      'isDisabled: $isDisabled, isDragged: $isDragged, isError: $isError)';
 }

@@ -284,11 +284,15 @@ class _DropdownButtonState<T> extends State<DropdownButton<T>>
 
   void _select(int index) {
     final DropdownMenuItem<T> item = _items[index];
-    if (!_enabled || !item.enabled) return;
+    if (!_enabled || !item.enabled || menuClosing) return;
     final ValueChanged<T?>? onChanged = widget.onChanged;
     item.onTap?.call();
-    if (mounted) closeMenu();
-    onChanged?.call(item.value);
+    void notify() => onChanged?.call(item.value);
+    if (mounted) {
+      closeMenuThen(notify);
+    } else {
+      notify();
+    }
   }
 
   @override

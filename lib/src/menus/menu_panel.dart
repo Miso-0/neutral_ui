@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../overlay/overlay_behavior.dart';
 import '../styles/menu_style.dart';
 
 /// Scrolls an option within its menu without moving an enclosing page.
@@ -27,6 +28,7 @@ class MenuPanel extends StatelessWidget {
     this.semanticLabel,
     this.textField = false,
     this.onNavigate,
+    this.closing = false,
   });
 
   /// The anchor's overlay geometry and tap region.
@@ -53,8 +55,11 @@ class MenuPanel extends StatelessWidget {
   /// Moves to the next or previous enabled option.
   final ValueChanged<int>? onNavigate;
 
+  /// Whether interaction is suspended while the panel finishes its exit.
+  final bool closing;
+
   Object? _move(int direction) {
-    onNavigate?.call(direction);
+    if (!closing) onNavigate?.call(direction);
     return null;
   }
 
@@ -85,6 +90,7 @@ class MenuPanel extends StatelessWidget {
       },
       child: FocusScope(
         node: focusScopeNode,
+        descendantsAreTraversable: !closing,
         child: Semantics(
           scopesRoute: true,
           explicitChildNodes: true,
@@ -95,16 +101,7 @@ class MenuPanel extends StatelessWidget {
             clipBehavior: style.decoration == null
                 ? Clip.none
                 : style.clipBehavior ?? Clip.none,
-            child: IntrinsicWidth(
-              child: SingleChildScrollView(
-                primary: false,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: children,
-                ),
-              ),
-            ),
+            child: _MeasuredMenuContent(closing: closing, children: children),
           ),
         ),
       ),
@@ -112,8 +109,144 @@ class MenuPanel extends StatelessWidget {
     if (textField) panel = TextFieldTapRegion(child: panel);
     return TapRegion(
       groupId: info.tapRegionGroupId,
+      consumeOutsideTaps:
+          style.outsideTapBehavior == OutsideTapBehavior.consume,
       onTapOutside: (PointerDownEvent event) => onClose(),
       child: panel,
     );
   }
+}
+
+// Bounded layout supports flexible rows and content that depends on constraints.
+// One width measurement sizes all rows; transition ticks reuse the cached panel.
+class _MeasuredMenuContent extends StatefulWidget {
+  const _MeasuredMenuContent({required this.children, required this.closing});
+
+  final List<Widget> children;
+  final bool closing;
+
+  @override
+  State<_MeasuredMenuContent> createState() => _MeasuredMenuContentState();
+}
+
+class _MeasuredMenuContentState extends State<_MeasuredMenuContent> {
+  final GlobalKey _contentKey = GlobalKey();
+  double? _width;
+  BoxConstraints? _constraints;
+  bool _measurementPending = false;
+  bool _supportsIntrinsicWidth = true;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _width = null;
+  }
+
+  @override
+  void didUpdateWidget(_MeasuredMenuContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.children != oldWidget.children &&
+        !widget.closing &&
+        !oldWidget.closing) {
+      _width = null;
+      _supportsIntrinsicWidth = true;
+    }
+  }
+
+  bool _hasLayoutDependentContent(Element root, RenderBox contentBox) {
+    bool found = false;
+    bool belongsToContent(RenderObject? object) {
+      while (object != null) {
+        if (identical(object, contentBox)) return true;
+        object = object.parent;
+      }
+      return false;
+    }
+
+    void visit(Element element) {
+      if (found) return;
+      final Widget child = element.widget;
+      if (child is LayoutBuilder ||
+          child is SliverLayoutBuilder ||
+          child is Scrollable ||
+          child is Viewport ||
+          child is ShrinkWrappingViewport ||
+          child is CustomMultiChildLayout ||
+          child is CustomSingleChildLayout) {
+        // OverlayPortal children share element ancestry but paint outside the
+        // measured content, so their layout policy does not affect this width.
+        found = belongsToContent(element.findRenderObject());
+        return;
+      }
+      element.visitChildren(visit);
+    }
+
+    visit(root);
+    return found;
+  }
+
+  void _measure() {
+    if (_measurementPending) return;
+    _measurementPending = true;
+    WidgetsBinding.instance.addPostFrameCallback((Duration timeStamp) {
+      _measurementPending = false;
+      if (!mounted) return;
+      final BuildContext? content = _contentKey.currentContext;
+      final RenderObject? object = content?.findRenderObject();
+      if (object is RenderBox && object.hasSize && object.attached) {
+        // These widgets return zero intrinsic dimensions in release builds.
+        // Detect them before querying so bounded sizing works in every mode.
+        if (_supportsIntrinsicWidth &&
+            content is Element &&
+            _hasLayoutDependentContent(content, object)) {
+          _supportsIntrinsicWidth = false;
+        }
+        double measuredWidth = object.size.width;
+        try {
+          if (_supportsIntrinsicWidth) {
+            measuredWidth = object.getMaxIntrinsicWidth(double.infinity);
+          }
+        } on FlutterError catch (error) {
+          // LayoutBuilder and viewports determine their size during layout.
+          // Their bounded layout is the useful width when no intrinsic size
+          // can be requested.
+          if (!error.toString().contains(
+            'does not support returning intrinsic dimensions',
+          )) {
+            rethrow;
+          }
+          _supportsIntrinsicWidth = false;
+        }
+        final double width = measuredWidth.isFinite
+            ? measuredWidth
+            : object.size.width;
+        if (width != _width) setState(() => _width = width);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (BuildContext context, BoxConstraints constraints) {
+      if (_constraints != constraints) {
+        _constraints = constraints;
+        if (!_supportsIntrinsicWidth) _width = null;
+      }
+      if (_width == null) _measure();
+      return SizedBox(
+        width: _width == null ? null : constraints.constrainWidth(_width!),
+        child: SingleChildScrollView(
+          primary: false,
+          child: Column(
+            key: _contentKey,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: _width == null
+                ? CrossAxisAlignment.start
+                : CrossAxisAlignment.stretch,
+            children: widget.children,
+          ),
+        ),
+      );
+    },
+  );
 }

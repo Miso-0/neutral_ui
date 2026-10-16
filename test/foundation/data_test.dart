@@ -23,6 +23,7 @@ void main() {
         isSelected: true,
         isDisabled: true,
         isDragged: true,
+        isError: true,
       );
       final InteractionState copy = const InteractionState().copyWith(
         isPressed: true,
@@ -31,6 +32,7 @@ void main() {
         isSelected: true,
         isDisabled: true,
         isDragged: true,
+        isError: true,
       );
       expect(copy, all);
       expect(copy.hashCode, all.hashCode);
@@ -43,6 +45,7 @@ void main() {
           isSelected: false,
           isDisabled: false,
           isDragged: false,
+          isError: false,
         ),
         const InteractionState(),
       );
@@ -57,6 +60,7 @@ void main() {
         WidgetState.selected,
         WidgetState.disabled,
         WidgetState.dragged,
+        WidgetState.error,
       ]) {
         final Set<WidgetState> flags = <WidgetState>{flag};
         final InteractionState state = InteractionState.fromWidgetStates(flags);
@@ -72,7 +76,6 @@ void main() {
     test('unrepresented WidgetState values are safely ignored', () {
       expect(
         InteractionState.fromWidgetStates(<WidgetState>{
-          WidgetState.error,
           WidgetState.scrolledUnder,
         }),
         const InteractionState(),

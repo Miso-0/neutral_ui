@@ -554,7 +554,7 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
   }
 
   void _submit() {
-    if (!widget.enabled) return;
+    if (!widget.enabled || menuClosing) return;
     if (!menuOpen) {
       if (_isButton) _toggle();
       return;
@@ -563,15 +563,21 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
     if (entry != null && entry.enabled) {
       _select(entry);
     } else if (!widget._multiple) {
-      if (widget.closeBehavior != DropdownMenuCloseBehavior.none) {
-        closeMenu();
-      }
-      widget.onSelected?.call(null);
+      final ValueChanged<T?>? onSelected = widget.onSelected;
+      _notifySelection(() => onSelected?.call(null));
+    }
+  }
+
+  void _notifySelection(VoidCallback callback) {
+    if (widget.closeBehavior == DropdownMenuCloseBehavior.none) {
+      callback();
+    } else {
+      closeMenuThen(callback);
     }
   }
 
   void _select(DropdownMenuEntry<T> entry) {
-    if (!widget.enabled || !entry.enabled) return;
+    if (!widget.enabled || !entry.enabled || menuClosing) return;
     if (widget._multiple) {
       if (widget.onSelectionChanged == null) return;
       final Set<T> selection = <T>{...widget.selected!};
@@ -588,8 +594,9 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
         _highlighted = entry;
         _writeText('');
       });
-      if (widget.closeBehavior != DropdownMenuCloseBehavior.none) closeMenu();
-      widget.onSelectionChanged!(selection);
+      final ValueChanged<Set<T>> onSelectionChanged =
+          widget.onSelectionChanged!;
+      _notifySelection(() => onSelectionChanged(selection));
     } else {
       setState(() {
         _selectedValue = entry.value;
@@ -598,8 +605,8 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
         _searchActive = false;
         _writeText(entry.label);
       });
-      if (widget.closeBehavior != DropdownMenuCloseBehavior.none) closeMenu();
-      widget.onSelected?.call(entry.value);
+      final ValueChanged<T?>? onSelected = widget.onSelected;
+      _notifySelection(() => onSelected?.call(entry.value));
     }
   }
 
@@ -965,6 +972,9 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
                 ),
               ),
             EditableText(
+              // Avoid scrolling a visible field merely to add EditableText's
+              // default outer margin, which would dismiss its anchored panel.
+              scrollPadding: EdgeInsets.zero,
               controller: _textController,
               focusNode: anchorFocusNode,
               readOnly: !widget.enabled,

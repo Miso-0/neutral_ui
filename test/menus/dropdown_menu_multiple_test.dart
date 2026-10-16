@@ -189,7 +189,7 @@ void main() {
         ),
       );
       await tester.tap(find.byType(EditableText));
-      await tester.pump();
+      await tester.pumpAndSettle();
       expect(
         tester.getSemantics(_option('Apple')),
         matchesSemantics(

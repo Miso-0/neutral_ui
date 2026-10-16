@@ -115,3 +115,69 @@ void useTraditionalFocus() {
     FocusManager.instance.highlightStrategy = old;
   });
 }
+
+/// Pumps route-based components with navigation, localization and PureUI themes.
+Future<void> pumpPureApp(
+  WidgetTester tester,
+  Widget child, {
+  ThemeData theme = const ThemeData(),
+  TextDirection textDirection = TextDirection.ltr,
+  bool disableAnimations = false,
+  GlobalKey<NavigatorState>? navigatorKey,
+}) async {
+  await tester.pumpWidget(
+    PureApp(
+      color: const Color(0xFFFFFFFF),
+      theme: theme,
+      navigatorKey: navigatorKey,
+      builder: (BuildContext context, Widget? child) => MediaQuery(
+        data: MediaQuery.of(context)
+            .copyWith(disableAnimations: disableAnimations),
+        child: Directionality(textDirection: textDirection, child: child!),
+      ),
+      home: Center(child: child),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+/// Samples a currently painted opacity, position, scale or other scalar value.
+Future<List<double>> sampleValues(
+  WidgetTester tester,
+  double Function() readValue, {
+  Duration duration = const Duration(milliseconds: 200),
+  Duration step = const Duration(milliseconds: 10),
+}) async {
+  assert(step > Duration.zero);
+  final List<double> samples = <double>[readValue()];
+  for (Duration elapsed = Duration.zero; elapsed < duration; elapsed += step) {
+    final Duration remaining = duration - elapsed;
+    await tester.pump(remaining < step ? remaining : step);
+    samples.add(readValue());
+  }
+  return samples;
+}
+
+/// Expects each successive value to move toward [to], without overshooting.
+void expectMonotonicValues(
+  List<double> samples, {
+  required double from,
+  required double to,
+}) {
+  const double tolerance = 1e-6;
+  double previous = from;
+  for (final double value in samples) {
+    expect(
+      value,
+      inInclusiveRange(
+        (from < to ? from : to) - tolerance,
+        (from > to ? from : to) + tolerance,
+      ),
+    );
+    expect(
+      to >= from ? value - previous : previous - value,
+      greaterThanOrEqualTo(-tolerance),
+    );
+    previous = value;
+  }
+}

@@ -192,3 +192,164 @@ class IconButtonTheme extends InheritedTheme {
   @override
   bool updateShouldNotify(IconButtonTheme oldWidget) => data != oldWidget.data;
 }
+
+/// Overrides filledButton tokens within a subtree.
+class FilledButtonTheme extends InheritedTheme {
+  /// Supplies component tokens to the child.
+  const FilledButtonTheme({
+    super.key,
+    required this.data,
+    required super.child,
+  });
+
+  /// The component tokens inherited by this subtree.
+  final ButtonStyle data;
+
+  /// Returns the nearest local tokens or the application's component style.
+  static ButtonStyle of(BuildContext context) =>
+      maybeOf(context) ?? PureTheme.of(context).filledButtonStyle;
+
+  /// Returns local tokens when this component theme is present.
+  static ButtonStyle? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<FilledButtonTheme>()?.data;
+
+  /// Inherits unset tokens from the enclosing component theme.
+  static Widget merge({
+    Key? key,
+    required ButtonStyle data,
+    required Widget child,
+  }) => Builder(
+    key: key,
+    builder: (BuildContext context) =>
+        FilledButtonTheme(data: data.merge(of(context)), child: child),
+  );
+
+  @override
+  Widget wrap(BuildContext context, Widget child) =>
+      FilledButtonTheme(data: data, child: child);
+
+  @override
+  bool updateShouldNotify(FilledButtonTheme oldWidget) =>
+      data != oldWidget.data;
+}
+
+/// Overrides floatingActionButton tokens within a subtree.
+class FloatingActionButtonTheme extends InheritedTheme {
+  /// Supplies component tokens to the child.
+  const FloatingActionButtonTheme({
+    super.key,
+    required this.data,
+    required super.child,
+  });
+
+  /// The component tokens inherited by this subtree.
+  final ButtonStyle data;
+
+  /// Returns the nearest local tokens or the application's component style.
+  static ButtonStyle of(BuildContext context) =>
+      maybeOf(context) ?? PureTheme.of(context).floatingActionButtonStyle;
+
+  /// Returns local tokens when this component theme is present.
+  static ButtonStyle? maybeOf(BuildContext context) => context
+      .dependOnInheritedWidgetOfExactType<FloatingActionButtonTheme>()
+      ?.data;
+
+  /// Inherits unset tokens from the enclosing component theme.
+  static Widget merge({
+    Key? key,
+    required ButtonStyle data,
+    required Widget child,
+  }) => Builder(
+    key: key,
+    builder: (BuildContext context) =>
+        FloatingActionButtonTheme(data: data.merge(of(context)), child: child),
+  );
+
+  @override
+  Widget wrap(BuildContext context, Widget child) =>
+      FloatingActionButtonTheme(data: data, child: child);
+
+  @override
+  bool updateShouldNotify(FloatingActionButtonTheme oldWidget) =>
+      data != oldWidget.data;
+}
+
+/// Overrides segmentedButton tokens within a subtree.
+class SegmentedButtonTheme extends InheritedTheme {
+  /// Supplies component tokens to the child.
+  const SegmentedButtonTheme({
+    super.key,
+    required this.data,
+    required super.child,
+  });
+
+  /// The component tokens inherited by this subtree.
+  final ButtonStyle data;
+
+  /// Returns the nearest local tokens or the application's component style.
+  static ButtonStyle of(BuildContext context) =>
+      maybeOf(context) ?? PureTheme.of(context).segmentedButtonStyle;
+
+  /// Returns local tokens when this component theme is present.
+  static ButtonStyle? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<SegmentedButtonTheme>()?.data;
+
+  /// Inherits unset tokens from the enclosing component theme.
+  static Widget merge({
+    Key? key,
+    required ButtonStyle data,
+    required Widget child,
+  }) => Builder(
+    key: key,
+    builder: (BuildContext context) =>
+        SegmentedButtonTheme(data: data.merge(of(context)), child: child),
+  );
+
+  @override
+  Widget wrap(BuildContext context, Widget child) =>
+      SegmentedButtonTheme(data: data, child: child);
+
+  @override
+  bool updateShouldNotify(SegmentedButtonTheme oldWidget) =>
+      data != oldWidget.data;
+}
+
+/// Overrides toggleButtons tokens within a subtree.
+class ToggleButtonsTheme extends InheritedTheme {
+  /// Supplies component tokens to the child.
+  const ToggleButtonsTheme({
+    super.key,
+    required this.data,
+    required super.child,
+  });
+
+  /// The component tokens inherited by this subtree.
+  final ButtonStyle data;
+
+  /// Returns the nearest local tokens or the application's component style.
+  static ButtonStyle of(BuildContext context) =>
+      maybeOf(context) ?? PureTheme.of(context).toggleButtonsStyle;
+
+  /// Returns local tokens when this component theme is present.
+  static ButtonStyle? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<ToggleButtonsTheme>()?.data;
+
+  /// Inherits unset tokens from the enclosing component theme.
+  static Widget merge({
+    Key? key,
+    required ButtonStyle data,
+    required Widget child,
+  }) => Builder(
+    key: key,
+    builder: (BuildContext context) =>
+        ToggleButtonsTheme(data: data.merge(of(context)), child: child),
+  );
+
+  @override
+  Widget wrap(BuildContext context, Widget child) =>
+      ToggleButtonsTheme(data: data, child: child);
+
+  @override
+  bool updateShouldNotify(ToggleButtonsTheme oldWidget) =>
+      data != oldWidget.data;
+}

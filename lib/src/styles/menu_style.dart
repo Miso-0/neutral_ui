@@ -1,5 +1,8 @@
 import 'package:flutter/widgets.dart';
 
+import '../overlay/overlay_behavior.dart';
+import '../overlay/overlay_placement.dart';
+
 /// Builds the transition around a menu panel.
 typedef MenuTransitionBuilder = Widget Function(
   BuildContext context,
@@ -22,8 +25,13 @@ class MenuStyle {
     this.offset,
     this.edgePadding,
     this.clipBehavior,
+    this.placement,
+    this.overlayLocation,
+    this.outsideTapBehavior,
     this.transitionDuration,
+    this.reverseTransitionDuration,
     this.transitionCurve,
+    this.reverseTransitionCurve,
     this.transitionBuilder,
   });
 
@@ -42,7 +50,9 @@ class MenuStyle {
   /// Whether the panel is at least as wide as its anchor.
   final bool? matchAnchorWidth;
 
-  /// The displacement from the anchor position.
+  /// The directional displacement from the anchor position.
+  ///
+  /// A positive horizontal displacement moves toward the reading direction.
   final Offset? offset;
 
   /// The inset kept clear around the overlay edges.
@@ -51,11 +61,30 @@ class MenuStyle {
   /// The clipping behavior of the panel.
   final Clip? clipBehavior;
 
-  /// The duration of opening and closing transitions.
+  /// The placement policy, overriding the menu's legacy positioning tokens.
+  final OverlayPlacement? placement;
+
+  /// The overlay receiving the panel. Defaults to [OverlayLocation.root].
+  final OverlayLocation? overlayLocation;
+
+  /// Whether an outside tap also activates the control beneath the menu.
+  ///
+  /// Defaults to [OutsideTapBehavior.passThrough].
+  final OutsideTapBehavior? outsideTapBehavior;
+
+  /// The opening duration. Defaults to 150 milliseconds.
   final Duration? transitionDuration;
 
-  /// The curve of opening and closing transitions.
+  /// The closing duration. Defaults to 100 milliseconds.
+  ///
+  /// A zero [transitionDuration] also disables closing unless overridden.
+  final Duration? reverseTransitionDuration;
+
+  /// The opening curve. Defaults to [Curves.easeOutCubic].
   final Curve? transitionCurve;
+
+  /// The closing curve. Defaults to [Curves.easeInCubic].
+  final Curve? reverseTransitionCurve;
 
   /// Builds an optional transition around the panel.
   final MenuTransitionBuilder? transitionBuilder;
@@ -70,8 +99,13 @@ class MenuStyle {
     Offset? offset,
     EdgeInsets? edgePadding,
     Clip? clipBehavior,
+    OverlayPlacement? placement,
+    OverlayLocation? overlayLocation,
+    OutsideTapBehavior? outsideTapBehavior,
     Duration? transitionDuration,
+    Duration? reverseTransitionDuration,
     Curve? transitionCurve,
+    Curve? reverseTransitionCurve,
     MenuTransitionBuilder? transitionBuilder,
   }) {
     return MenuStyle(
@@ -83,8 +117,15 @@ class MenuStyle {
       offset: offset ?? this.offset,
       edgePadding: edgePadding ?? this.edgePadding,
       clipBehavior: clipBehavior ?? this.clipBehavior,
+      placement: placement ?? this.placement,
+      overlayLocation: overlayLocation ?? this.overlayLocation,
+      outsideTapBehavior: outsideTapBehavior ?? this.outsideTapBehavior,
       transitionDuration: transitionDuration ?? this.transitionDuration,
+      reverseTransitionDuration:
+          reverseTransitionDuration ?? this.reverseTransitionDuration,
       transitionCurve: transitionCurve ?? this.transitionCurve,
+      reverseTransitionCurve:
+          reverseTransitionCurve ?? this.reverseTransitionCurve,
       transitionBuilder: transitionBuilder ?? this.transitionBuilder,
     );
   }
@@ -103,8 +144,15 @@ class MenuStyle {
       offset: offset ?? other.offset,
       edgePadding: edgePadding ?? other.edgePadding,
       clipBehavior: clipBehavior ?? other.clipBehavior,
+      placement: placement ?? other.placement,
+      overlayLocation: overlayLocation ?? other.overlayLocation,
+      outsideTapBehavior: outsideTapBehavior ?? other.outsideTapBehavior,
       transitionDuration: transitionDuration ?? other.transitionDuration,
+      reverseTransitionDuration:
+          reverseTransitionDuration ?? other.reverseTransitionDuration,
       transitionCurve: transitionCurve ?? other.transitionCurve,
+      reverseTransitionCurve:
+          reverseTransitionCurve ?? other.reverseTransitionCurve,
       transitionBuilder: transitionBuilder ?? other.transitionBuilder,
     );
   }
@@ -121,8 +169,13 @@ class MenuStyle {
             offset == other.offset &&
             edgePadding == other.edgePadding &&
             clipBehavior == other.clipBehavior &&
+            placement == other.placement &&
+            overlayLocation == other.overlayLocation &&
+            outsideTapBehavior == other.outsideTapBehavior &&
             transitionDuration == other.transitionDuration &&
+            reverseTransitionDuration == other.reverseTransitionDuration &&
             transitionCurve == other.transitionCurve &&
+            reverseTransitionCurve == other.reverseTransitionCurve &&
             transitionBuilder == other.transitionBuilder;
   }
 
@@ -136,12 +189,17 @@ class MenuStyle {
     offset,
     edgePadding,
     clipBehavior,
+    placement,
+    overlayLocation,
+    outsideTapBehavior,
     transitionDuration,
+    reverseTransitionDuration,
     transitionCurve,
+    reverseTransitionCurve,
     transitionBuilder,
   ]);
 
   @override
   String toString() =>
-      'MenuStyle(decoration: $decoration, padding: $padding, minimumSize: $minimumSize, maximumSize: $maximumSize, matchAnchorWidth: $matchAnchorWidth, offset: $offset, edgePadding: $edgePadding, clipBehavior: $clipBehavior, transitionDuration: $transitionDuration, transitionCurve: $transitionCurve, transitionBuilder: $transitionBuilder)';
+      'MenuStyle(decoration: $decoration, padding: $padding, minimumSize: $minimumSize, maximumSize: $maximumSize, matchAnchorWidth: $matchAnchorWidth, offset: $offset, edgePadding: $edgePadding, clipBehavior: $clipBehavior, placement: $placement, overlayLocation: $overlayLocation, outsideTapBehavior: $outsideTapBehavior, transitionDuration: $transitionDuration, reverseTransitionDuration: $reverseTransitionDuration, transitionCurve: $transitionCurve, reverseTransitionCurve: $reverseTransitionCurve, transitionBuilder: $transitionBuilder)';
 }

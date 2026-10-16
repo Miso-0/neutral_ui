@@ -400,13 +400,15 @@ class PopupMenuButtonState<T> extends State<PopupMenuButton<T>>
   void _choose(Object? value, VoidCallback? onTap) {
     if (_choosing) return;
     _choosing = true;
-    closeMenu();
-    onTap?.call();
-    if (value != null) widget.onSelected?.call(value as T);
+    final PopupMenuItemSelected<T>? onSelected = widget.onSelected;
+    closeMenuThen(() {
+      onTap?.call();
+      if (value != null) onSelected?.call(value as T);
+    });
   }
 
   @override
-  void onMenuClosed() {
+  void onMenuCloseRequested() {
     if (!_choosing) widget.onCanceled?.call();
   }
 

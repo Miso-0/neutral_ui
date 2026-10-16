@@ -2,7 +2,7 @@
 
 PureUI is a zero-dependency headless Flutter design system. It supplies controlled values, pointer and keyboard interaction, semantics, layout slots, and composable themes. Your application supplies its visual language. The library imports only Flutter's `widgets.dart`, local code, and `dart:math`.
 
-Requires Flutter 3.47 or newer and Dart 3.13.4 or newer. Version 0.3.0 is tested with Flutter 3.47.5.
+Requires Flutter 3.47 or newer and Dart 3.13.4 or newer. Version 0.10.0 is tested with Flutter 3.47.5.
 
 ## Get started
 
@@ -103,7 +103,7 @@ ListTile(
 
 ## Four ways to override a theme
 
-`PureTheme.of(context)` returns the nearest `ThemeData`, or `const ThemeData()`. `PureTheme.maybeOf(context)` returns null if absent. ThemeData owns twelve style slots: `elevatedButtonStyle`, `outlinedButtonStyle`, `textButtonStyle`, `iconButtonStyle`, `checkboxStyle`, `switchStyle`, `radioStyle`, `listTileStyle`, `sliderStyle`, `dropdownButtonStyle`, `dropdownMenuStyle`, and `popupMenuStyle`.
+`PureTheme.of(context)` returns the nearest `ThemeData`, or `const ThemeData()`. `PureTheme.maybeOf(context)` returns null if absent. ThemeData owns 31 style slots: `elevatedButtonStyle`, `outlinedButtonStyle`, `textButtonStyle`, `iconButtonStyle`, `checkboxStyle`, `switchStyle`, `radioStyle`, `listTileStyle`, `sliderStyle`, `dropdownButtonStyle`, `dropdownMenuStyle`, `popupMenuStyle`, `tooltipStyle`, `dialogStyle`, `bottomSheetStyle`, `snackBarStyle`, `textFieldStyle`, `autocompleteStyle`, `searchStyle`, `datePickerStyle`, `timePickerStyle`, `filledButtonStyle`, `floatingActionButtonStyle`, `segmentedButtonStyle`, `toggleButtonsStyle`, `chipStyle`, `tabBarStyle`, `navigationStyle`, `expansionTileStyle`, `progressIndicatorStyle`, `badgeStyle`.
 
 1. Set app-wide tokens with `PureTheme(data: ThemeData(...), child: ...)`.
 2. Inherit app-wide tokens and override some in a subtree with `PureTheme.merge(data: ThemeData(...), child: ...)`.
@@ -138,9 +138,24 @@ Stateful fields are nullable `StateProperty<T?>` values. Plain fields are nullab
 | `ButtonStyle` | `decoration`, `foregroundDecoration`, `padding`, `minimumSize`, `fixedSize`, `maximumSize`, `textStyle`, `iconTheme`, `mouseCursor`, `loadingIndicator` | `alignment`, `spacing`, `iconAlignment`, `tapTargetSize`, `clipBehavior`, `animationDuration`, `animationCurve`, `enableFeedback` |
 | `ToggleStyle` | `size`, `decoration`, `thumbSize`, `thumbDecoration`, `indicator`, `indeterminateIndicator`, `mouseCursor` | `padding`, `tapTargetSize`, `animationDuration`, `animationCurve`, `enableFeedback` |
 | `ListTileStyle` | `decoration`, `foregroundDecoration`, `titleTextStyle`, `subtitleTextStyle`, `leadingAndTrailingTextStyle`, `iconTheme`, `mouseCursor` | `contentPadding`, `minVerticalPadding`, `horizontalTitleGap`, `minLeadingWidth`, `subtitleSpacing`, `minTileHeight`, `minTwoLineTileHeight`, `minThreeLineTileHeight`, `titleAlignment`, `animationDuration`, `animationCurve`, `enableFeedback` |
-| `MenuStyle` | None | `decoration`, `padding`, `minimumSize`, `maximumSize`, `matchAnchorWidth`, `offset`, `edgePadding`, `clipBehavior`, `transitionDuration`, `transitionCurve`, `transitionBuilder` |
+| `MenuStyle` | None | `decoration`, `padding`, `minimumSize`, `maximumSize`, `matchAnchorWidth`, `offset`, `edgePadding`, `clipBehavior`, `placement`, `overlayLocation`, `outsideTapBehavior`, `transitionDuration`, `reverseTransitionDuration`, `transitionCurve`, `reverseTransitionCurve`, `transitionBuilder` |
 | `DropdownStyle` | `selectedIndicator`, `textStyle`, `hintStyle` | `buttonStyle`, `menuStyle`, `itemStyle`, `iconTurns`, `cursorColor`, `selectionColor`, `cursorWidth` |
 | `PopupMenuStyle` | `checkIndicator` | `buttonStyle`, `menuStyle`, `itemStyle`, `dividerDecoration`, `dividerHeight`, `position` |
+| `TooltipStyle` | None | `decoration`, `padding`, `margin`, `constraints`, `textStyle`, `textAlign`, `placement`, `overlayLocation`, `verticalOffset`, `preferBelow`, `transitionDuration`, `reverseTransitionDuration`, `transitionCurve`, `reverseTransitionCurve`, `transitionBuilder` |
+| `DialogStyle` | None | `decoration`, `padding`, `insetPadding`, `constraints`, `alignment`, `barrierColor`, `barrierBlur`, `clipBehavior`, `titleTextStyle`, `contentTextStyle`, `titlePadding`, `contentPadding`, `actionsPadding`, `actionsAlignment`, `actionsOverflowAlignment`, `actionsOverflowDirection`, `actionsOverflowButtonSpacing`, `buttonPadding`, `iconPadding`, `iconTheme`, `optionStyle`, `insetAnimationDuration`, `insetAnimationCurve`, `transitionDuration`, `reverseTransitionDuration`, `transitionCurve`, `reverseTransitionCurve`, `transitionBuilder` |
+| `BottomSheetStyle` | None | `decoration`, `padding`, `constraints`, `clipBehavior`, `barrierColor`, `dragHandleColor`, `dragHandleSize`, `dragHandleDecoration`, `transitionDuration`, `reverseTransitionDuration`, `transitionCurve`, `reverseTransitionCurve`, `snapPoints`, `spring`, `transitionBuilder` |
+| `SnackBarStyle` | None | `decoration`, `padding`, `margin`, `constraints`, `textStyle`, `actionStyle`, `closeButtonStyle`, `spacing`, `alignment`, `clipBehavior`, `transitionDuration`, `reverseTransitionDuration`, `transitionCurve`, `reverseTransitionCurve`, `transitionBuilder` |
+| `TextFieldStyle` | `decoration`, `foregroundDecoration`, `textStyle`, `hintStyle`, `labelStyle`, `helperStyle`, `errorStyle`, `counterStyle`, `contentPadding`, `cursorColor`, `selectionColor`, `mouseCursor`, `iconTheme` | `labelBehavior`, `labelScale`, `spacing`, `cursorWidth`, `cursorHeight`, `cursorRadius`, `clipBehavior`, `scrollPadding`, `animationDuration`, `animationCurve` |
+| `AutocompleteStyle` | None | `fieldStyle`, `menuStyle`, `itemStyle`, `optionsMaxHeight`, `optionsViewOpenDirection` |
+| `SearchStyle` | None | `fieldStyle`, `viewDecoration`, `viewPadding`, `suggestionStyle`, `menuStyle`, `constraints`, `transitionDuration`, `reverseTransitionDuration`, `transitionCurve`, `reverseTransitionCurve`, `transitionBuilder`, `outsideTapBehavior` |
+| `DatePickerStyle` | None | `decoration`, `padding`, `headerTextStyle`, `weekdayTextStyle`, `dayStyle`, `todayStyle`, `selectedDayStyle`, `inRangeDayStyle`, `rangeStartStyle`, `rangeEndStyle`, `yearStyle`, `disabledDayStyle`, `navigationButtonStyle`, `entryModeButtonStyle`, `rangeBandDecoration`, `dayExtent`, `yearExtent`, `monthWidth`, `animationDuration`, `animationCurve`, `placement`, `outsideTapBehavior`, `transitionDuration`, `transitionCurve`, `reverseTransitionCurve`, `reverseTransitionDuration`, `transitionBuilder` |
+| `TimePickerStyle` | None | `decoration`, `padding`, `headerTextStyle`, `dialTextStyle`, `inputTextStyle`, `segmentStyle`, `selectedSegmentStyle`, `periodStyle`, `selectedPeriodStyle`, `entryModeButtonStyle`, `dialDecoration`, `handDecoration`, `handColor`, `dialBackgroundColor`, `dialSize`, `handWidth`, `handRadius`, `animationDuration`, `animationCurve`, `spring` |
+| `ChipStyle` | `selectedIcon`, `deleteIcon` | `buttonStyle`, `deleteButtonStyle`, `avatarSize`, `spacing`, `animationDuration`, `animationCurve` |
+| `TabBarStyle` | `indicatorDecoration` | `tabStyle`, `indicatorBuilder`, `labelPadding`, `padding`, `indicatorPadding`, `indicatorWeight`, `spacing`, `animationDuration`, `animationCurve` |
+| `NavigationStyle` | `indicatorDecoration`, `labelStyle`, `iconTheme` | `destinationStyle`, `padding`, `indicatorPadding`, `indicatorSize`, `spacing`, `animationDuration`, `animationCurve` |
+| `ExpansionTileStyle` | `decoration` | `tileStyle`, `padding`, `childrenPadding`, `expandedAlignment`, `expandedCrossAxisAlignment`, `animationDuration`, `animationCurve` |
+| `BadgeStyle` | `decoration`, `textStyle` | `padding`, `smallSize`, `largeSize`, `alignment`, `offset`, `animationDuration`, `animationCurve` |
+| `ProgressIndicatorStyle` | `color`, `backgroundColor` | `strokeWidth`, `strokeCap`, `minHeight`, `size`, `borderRadius`, `animationDuration`, `animationCurve`, `indeterminateDuration` |
 | `SliderStyle` | `trackHeight`, `trackDecoration`, `activeTrackDecoration`, `secondaryActiveTrackDecoration`, `thumbSize`, `thumbDecoration`, `tickMarkSize`, `tickMarkDecoration`, `activeTickMarkDecoration`, `mouseCursor` | `valueIndicatorBuilder`, `padding`, `tapTargetSize`, `preferredWidth`, `keyboardStep`, `allowedInteraction`, `animationDuration`, `animationCurve` |
 
 Toggle `size` describes the checkbox box, switch track or radio ring. `thumbSize` and `thumbDecoration` describe the switch thumb or radio dot. Indicators are application-provided widgets. Switch track size can be inferred from its thumb size and padding. Checkbox supports an indeterminate indicator and tristate cycling. Selection animations interpolate resolved on/off tokens.
@@ -195,7 +210,7 @@ All three menu controls accept direct trigger or field `decoration` and panel `m
 
 Both dropdowns paint a `ChevronGlyph` arrow by default. Pass `DropdownButton.icon` or `DropdownMenu.trailingIcon` to replace it with one icon drawn pointing down. While the menu is open the arrow turns by `DropdownStyle.iconTurns`, half a turn by default so it flips to point up, using the trigger's `animationDuration` and `animationCurve`. Set `iconTurns: 0` to keep it still. To hide it, pass `SizedBox.shrink()` as the DropdownButton icon or set `showTrailingIcon: false` on DropdownMenu.
 
-All menus support keyboard activation, arrow navigation that skips disabled options, Escape and outside-tap dismissal. Panels follow their anchor and close when an ancestor scrolls or the window resizes. Start-edge alignment respects RTL, and panels flip and clamp inside `edgePadding`. Dropdown panels are at least as wide as their anchor by default, subject to `maximumSize` and available overlay space. Popup panels size to their content by default. `MenuStyle.transitionDuration` defaults to zero, and a `MenuTransitionBuilder` can opt into animation. Closing completes the reverse transition before removing the panel.
+All menus support keyboard activation, arrow navigation that skips disabled options, Escape and outside-tap dismissal. Panels follow their anchor and close when an ancestor scrolls, the window resizes, another route covers their route, or their anchor becomes inactive through `TickerMode`. Start-edge alignment respects RTL, and panels flip and clamp inside `edgePadding`, safe-area padding and keyboard insets. Dropdown panels are at least as wide as their anchor by default, subject to `maximumSize` and available overlay space. Popup panels size to their content by default. `MenuStyle` defaults to a fade and scale entrance over 150 ms and an exit over 100 ms. Set `transitionDuration: Duration.zero` for immediate transitions, or provide a `MenuTransitionBuilder`. `reverseTransitionDuration`, `transitionCurve` and `reverseTransitionCurve` control each direction. Reduced motion makes transitions immediate. Closing completes the reverse transition before removing the panel.
 
 Option rows resolve each token per state in this order: entry style, inline `style.itemStyle`, nearest component theme, structural defaults. Trigger and panel tokens follow the same order without the entry style. `DropdownStyle` and `PopupMenuStyle` deep-merge their nested button and menu styles. Open triggers resolve `isSelected`; selected dropdown rows and checked popup indicators resolve it for their chosen or checked state. Search highlights resolve visible focus while real focus stays in the editable field.
 
@@ -213,3 +228,118 @@ flutter run -d chrome
 The WidgetsApp gallery demonstrates a central visual theme, local component themes, inline `copyWith`, direct decorations with an asset image, loading, selection, RadioGroup, RTL, sliders, searchable and multi-select dropdowns, popup menus and a live interaction-state readout. It has macOS and web runners and no Material dependency.
 
 To verify the package, run `flutter analyze` and `flutter test`, followed by `flutter test`, `flutter build macos` and `flutter build web` inside `example`.
+
+
+## Application, overlays and calendar foundations
+
+`PureApp` supplies a Navigator, `PureTheme`, a `HeroControllerScope` and the default PureUI localization delegate. It accepts `home`, `routes`, `onGenerateRoute`, `navigatorKey` and a `builder` for wrapping routes. Like `WidgetsApp`, it requires an application `color`. Custom localization delegates precede the English default.
+
+```dart
+PureApp(
+  color: const Color(0xFFF4F7F3),
+  theme: const ThemeData(),
+  home: const Center(child: Text('Hello')),
+)
+```
+
+For an application without navigation, `PureApp.builder(color: ..., builder: ...)` provides an Overlay and keeps its content mounted when the app rebuilds. Route-based components require the regular constructor.
+
+Menus use the root overlay by default. Set `MenuStyle(overlayLocation: OverlayLocation.nearest)` to select the closest overlay. Outside taps dismiss and activate underlying controls by default; `outsideTapBehavior: OutsideTapBehavior.consume` consumes that gesture. Nested menu panels share a tap group, so interacting with a nested panel keeps its parent open. Focus returns to the anchor at the end of dismissal only while focus still belongs to the closing panel.
+
+`MenuStyle.placement` accepts `OverlayPlacement` for panels on any side of an anchor. The public `resolvePlacement` function returns both the panel rectangle and chosen side. `OverlayHost` uses the same engine for non-menu overlays without menu focus or keyboard behavior.
+
+| OverlayPlacement token | Behavior |
+| --- | --- |
+| `preferredSide`, `alignment`, `coverAnchor` | Attachment side, directional cross-axis alignment and overlap |
+| `gap`, `crossOffset` | Space from the anchor, mirrored on a flip, and directional cross-axis displacement |
+| `flip` | Keep the side, flip if needed, or choose the larger side |
+| `overflow` | Shrink, shift, or keep the panel size and attachment |
+| `margin` | Additional safe-area and keyboard-edge clearance |
+| `constraints`, `anchorWidth` | Explicit size constraints and no, minimum or exact anchor-width matching |
+
+`MenuStyle.offset.dx` is directional: positive values move toward the reading direction's end. A positive vertical gap stays outside the anchor when the panel flips upward.
+
+`PureLocalizations.of(context)` returns English strings even without a localization delegate. Override `DefaultPureLocalizations` and install a delegate to customize text, month and weekday names, compact date parsing, date/time formatting and accessibility labels. No `intl` dependency is required. `GregorianCalendarDelegate` implements `CalendarDelegate<DateTime>`; custom calendars can replace its date arithmetic and formatting. `DateUtils`, `DateTimeRange`, `TimeOfDay`, picker modes and `DayPeriod` supply widgets-only value types for future pickers.
+
+The painted `CloseGlyph`, `SearchGlyph`, `CalendarGlyph`, `ClockGlyph`, `EditGlyph` and `ArrowGlyph` follow the ambient `IconTheme`. `ChevronGlyph` and `ArrowGlyph` accept `GlyphDirection`; `start` and `end` mirror with text direction, while `left` and `right` stay physical. Glyphs are decorative and excluded from semantics.
+
+
+## Feedback and modal surfaces
+
+`Tooltip` supports hover, long press, tap and visible keyboard focus. It accepts plain `message` or `richMessage`, the framework trigger/delay/feedback parameters, and a `TooltipStyle`. A `GlobalKey<TooltipState>` exposes `ensureTooltipVisible()` and `dismiss()`. `TooltipVisibility` controls a subtree. Escape dismisses the current tooltip; inline motion tokens can be changed while it is shown.
+
+`Dialog`, `AlertDialog`, `SimpleDialog` and `SimpleDialogOption` use `DialogStyle` and `DialogTheme`. `showDialog<T>` requires a Navigator such as the regular `PureApp`, captures inherited themes, closes on Escape or a dismissible barrier, traps Tab focus and returns the value passed to `Navigator.pop`. DialogStyle controls surface decoration, layout, the optional barrier blur, and independent entrance/exit motion.
+
+```dart
+final bool? accepted = await showDialog<bool>(
+  context: context,
+  builder: (BuildContext context) => AlertDialog(
+    title: const Text('Save changes?'),
+    actions: <Widget>[
+      TextButton(
+        onPressed: () => Navigator.of(context).pop(true),
+        child: const Text('Save'),
+      ),
+    ],
+  ),
+);
+```
+
+`BottomSheet` and `showModalBottomSheet` share drag and route motion. Dragging follows the pointer, then a velocity-aware spring settles or dismisses the sheet. `isScrollControlled`, `enableDrag`, `isDismissible`, `showDragHandle`, snap points and the bottom-sheet theme configure the behavior. Reduced motion settles immediately.
+
+Wrap content in `ScaffoldMessenger` to show queued `SnackBar`s. `ScaffoldMessenger.of(context)` provides `showSnackBar`, `hideCurrentSnackBar`, `removeCurrentSnackBar` and `clearSnackBars`. A feature controller exposes the eventual `SnackBarClosedReason`. Messages support actions, a close icon, swipe dismissal, `duration`, `persist` and `onVisible`; accessible navigation prevents automatic hiding. The messenger needs an Overlay but no Material Scaffold.
+
+## Text input, autocomplete and search
+
+`TextField` is built on `EditableText`; `TextFormField` adds `Form` validation, saving and reset. Both expose text/focus controllers, keyboard type, multiline behavior, submission, disabled/read-only states, autofocus and prefix/suffix slots. `labelText`, `hintText`, `helperText`, `errorText` and counters describe the field. `showClearButton` adds a clear action; `showObscureTextToggle` adds a painted eye for password reveal.
+
+`TextFieldStyle` moves the visual parameters into stateful tokens. Error resolvers receive `InteractionState.isError`, alongside focus, hover and disabled flags. Label behavior is above, floating or none; the floating animation retargets from its current value. Direct `decoration` and `foregroundDecoration` parameters override all states and reject matching inline tokens. The widgets-only public API omits services-only `inputFormatters` and `textInputAction` types.
+
+```dart
+TextFormField(
+  labelText: 'Email',
+  hintText: 'you@example.com',
+  validator: (String? value) =>
+      value != null && value.contains('@') ? null : 'Enter an email address',
+  onSaved: (String? value) => saveEmail(value),
+)
+```
+
+`Autocomplete<T>` accepts the framework options/field/view builders, including asynchronous options. The default field uses TextFieldStyle and the options use MenuStyle plus an item ButtonStyle. Arrow selection, submission, highlighted-row scrolling and outside dismissal preserve the editable focus model; exit animation finishes before the visual panel is removed.
+
+`SearchBar` is the editable bar. `SearchAnchor` builds a custom trigger, while `SearchAnchor.bar` supplies one. The attached `SearchController` opens and closes the view and owns the query. `suggestionsBuilder` accepts a widget iterable or its Future; obsolete asynchronous results cannot replace newer results. Docked views use the anchored overlay engine. `isFullScreen: true` expands the anchor rectangle into a route with `viewLeading`, `viewTrailing` and customizable suggestion content. `SearchStyle` and `SearchTheme` cover both surfaces.
+
+## Dates and times
+
+`CalendarDatePicker` displays a lazy, swipable month calendar and a builder-based `YearPicker`. Arrow keys move by day or week, skip disabled dates and cross month boundaries; Tab leaves the calendar grid. `currentDate`, `selectableDayPredicate` and `calendarDelegate` control availability and date interpretation. Day cells update interaction state independently and expose localized full-date semantics.
+
+`DatePickerField` opens the same calendar in an anchored popover. `InputDatePickerFormField` parses and validates text through the selected calendar delegate. `DatePickerDialog` and `showDatePicker` support calendar, input, calendar-only and input-only entry modes. A range uses `CalendarDateRangePicker`, `DateRangePickerDialog` or `showDateRangePicker`, with RTL-aware band caps and validated range input.
+
+```dart
+final DateTime? date = await showDatePicker(
+  context: context,
+  initialDate: selectedDate,
+  firstDate: DateTime(2020),
+  lastDate: DateTime(2030, 12, 31),
+);
+```
+
+`TimePicker`, `TimePickerDialog` and `showTimePicker` provide dial or validated text entry. The hand follows pointer drags before spring snapping. Tap selection snaps minutes by five. The 24-hour layout includes an inner hour ring, and hour/minute segments expose semantic increase/decrease actions. `DatePickerStyle` and `TimePickerStyle`, their component themes and ThemeData slots configure every surface and control without fixed palette defaults.
+
+## Button variants and chips
+
+`FilledButton` has `.icon`, `.tonal` and `.tonalIcon` constructors; `FloatingActionButton` has `.small`, `.large` and `.extended`. All reuse ButtonStyleButton, direct decorations and their own theme slots. Floating actions have at least a 48 by 48 hit target.
+
+`SegmentedButton<T>` uses `ButtonSegment<T>`, a controlled selected set and `onSelectionChanged`. It supports multiple selection, an optional empty set, animated selected indicators and directional group navigation that skips disabled segments. `ToggleButtons` offers index-based selection over a list of children. Both use ButtonStyle and their component themes.
+
+`Chip`, `InputChip`, `FilterChip`, `ChoiceChip` and `ActionChip` share ChipStyle and ChipTheme. Chips support avatar/label slots, controlled selection, independent deletion and localized delete tooltips. Selected marks animate their occupied width, including on disabled selected chips. Direct decoration overrides the inherited chip decoration in every state.
+
+## Navigation, range controls and progress
+
+`DefaultTabController` supplies a `TabController` to `TabBar` and `TabBarView`. The indicator follows page swipes continuously; programmatic retargeting preserves position and velocity. Scrollable strips keep the selected tab visible. `TabBarStyle` supplies tab ButtonStyle, indicator decoration/builder and layout/motion tokens.
+
+`NavigationBar`, `NavigationRail` and `NavigationDrawer` expose destinations, selected indices and selection callbacks. They support directional keyboard navigation, selected semantics and animated indicators through NavigationStyle. `NavigationTheme` supplies shared subtree tokens; a specific bar/rail/drawer theme can override it. `ExpansionTile` reuses ListTile and Expansible, supports maintained child state and animates its directional chevron.
+
+`RangeSlider` uses SliderStyle with `RangeValues` and two independently focusable thumbs. Arrow keys adjust the focused thumb, and a stop or push policy keeps the endpoints ordered. Continuous visual drag positions settle to controlled or discrete values with a velocity-aware spring. It accepts direct track, active track, thumb and tick decorations with the same validation rules as Slider.
+
+`Badge` and `Badge.count` support compact marks or localized capped counts such as `99+`. `CircularProgressIndicator` and `LinearProgressIndicator` animate determinate changes; a null value selects indeterminate motion. Their default paint follows IconTheme, and progress exposes accessible labels and values. All respect reduced motion. BadgeStyle and ProgressIndicatorStyle provide themeable tokens.

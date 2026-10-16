@@ -46,14 +46,52 @@ void main() {
       const Offset(100, 190),
     );
   });
-  test('offset and RTL align from the anchor end', () {
+  test('offset and RTL align from the anchor end directionally', () {
     expect(
       delegate(
         direction: TextDirection.rtl,
         offset: const Offset(3, 7),
       ).getPositionForChild(overlay, const Size(100, 60)),
-      const Offset(83, 137),
+      const Offset(77, 137),
     );
+  });
+  test('flipping preserves the gap above the anchor', () {
+    expect(
+      delegate(
+        rect: const Rect.fromLTWH(100, 250, 80, 30),
+        offset: const Offset(0, 8),
+      ).getPositionForChild(overlay, const Size(100, 60)),
+      const Offset(100, 182),
+    );
+  });
+  test('keyboard insets flip a menu above its anchor', () {
+    const MenuPositionDelegate layout = MenuPositionDelegate(
+      anchorRect: anchor,
+      textDirection: TextDirection.ltr,
+      viewInsets: EdgeInsets.only(bottom: 130),
+    );
+    expect(
+      layout.placementResult(overlay, const Size(100, 60)).side,
+      AxisDirection.up,
+    );
+    expect(layout.getConstraintsForChild(bounds).maxHeight, 100);
+  });
+  test('an explicit placement drives menu geometry and reports the side', () {
+    AxisDirection? side;
+    final MenuPositionDelegate layout = MenuPositionDelegate(
+      anchorRect: anchor,
+      textDirection: TextDirection.ltr,
+      placement: const OverlayPlacement(
+        preferredSide: AxisDirection.right,
+        gap: 6,
+      ),
+      onSideResolved: (AxisDirection value) => side = value,
+    );
+    expect(
+      layout.getPositionForChild(overlay, const Size(100, 60)),
+      const Offset(186, 100),
+    );
+    expect(side, AxisDirection.right);
   });
   test('clamps horizontal placement within padded overlay edges', () {
     expect(

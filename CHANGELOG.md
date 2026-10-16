@@ -1,3 +1,47 @@
+## 0.10.0
+
+- Add TabController, DefaultTabController, Tab, TabBar and TabBarView with retargetable motion and an indicator that follows page drags.
+- Add navigation bars, rails and drawers, maintained-state expansion tiles, two independently focusable range thumbs, capped badges and determinate/indeterminate progress indicators.
+- Extend the themed gallery with navigation, range, progress, RTL and reduced-motion examples.
+
+## 0.9.0
+
+- Add FilledButton and FloatingActionButton variants, SegmentedButton and ToggleButtons with accessible group navigation.
+- Add Chip, InputChip, FilterChip, ChoiceChip and ActionChip, animated selected indicators and independently activated delete buttons.
+- Add component themes, nullable tokens and direct decoration overrides.
+
+## 0.8.0
+
+- Add inline, anchored and modal date pickers, validated date entry and calendar/input modes.
+- Add scrolling date-range calendars and range dialogs, and inline/modal time pickers with 12/24-hour dial and input modes.
+- Use lazy calendar pages, cell-local interaction updates, disabled-day keyboard navigation and a dial that follows pointer drags before spring settling.
+
+## 0.7.0
+
+- Add TextField and TextFormField on EditableText with validation, supporting slots, floating labels, clear/reveal actions and error-state tokens.
+- Add Autocomplete with asynchronous options and animated menu-style panels.
+- Add SearchController, SearchBar and SearchAnchor with docked or expanding route views and stale-result protection.
+- Keep the widgets-only API: services-only input formatter and text input action types are omitted.
+
+## 0.6.0
+
+- Add Tooltip and TooltipVisibility with hover, touch and keyboard triggers, Escape dismissal and per-instance animated hide.
+- Add Dialog, AlertDialog, SimpleDialog and showDialog with localized semantics, barriers, focus trapping and configurable transitions.
+- Add draggable modal bottom sheets with shared drag/route motion and spring settling.
+- Add an overlay-based ScaffoldMessenger queue, SnackBar and SnackBarAction with accessible timing, swipe dismissal and persistent messages.
+
+## 0.5.0
+
+- Add the shared anchored overlay engine, public placement policies and non-menu OverlayHost.
+- Fix nested-overlay clipping, nested menu tap groups, focus restoration timing, covered routes, inactive anchors and flipped-panel gaps.
+- Keep editable dropdown anchors stable when focused in route-based applications, and deliver selection callbacks after their exit completes.
+- Add configurable outside-tap consumption and nearest/root overlay selection; pass-through remains the default.
+- Breaking: MenuStyle.offset.dx is directional in RTL, and menus now fade and scale over 150 ms on entry and 100 ms on exit by default. Set transitionDuration to Duration.zero for immediate transitions.
+- Add reverse motion tokens, reduced-motion and spring helpers, repaint isolation and cached menu widths measured outside transition frames.
+- Add PureLocalizations with overridable English strings, calendar delegates, date utilities and date/time value types without intl.
+- Add PureApp for themed navigation and PureApp.builder for navigator-free overlays; migrate the gallery.
+- Add directional chevrons and arrows plus close, search, calendar, clock and edit glyphs, with a foundations gallery section.
+
 ## 0.4.0
 
 - Add painted default glyphs, `ChevronGlyph`, `CheckGlyph` and `DotsGlyph`, drawn with `CustomPainter` in the ambient icon theme.
