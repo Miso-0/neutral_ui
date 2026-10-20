@@ -131,7 +131,7 @@ Style `merge` is receiver-first: `overrides.merge(base)` fills only unset fields
 
 ## Tokens
 
-Stateful fields are nullable `StateProperty<T?>` values. Plain fields are nullable structural configuration. All seven styles have `copyWith` and `merge`.
+Stateful fields are nullable `StateProperty<T?>` values. Plain fields are nullable structural configuration. Every style has `copyWith` and `merge`.
 
 | Style | Stateful tokens | Plain tokens |
 | --- | --- | --- |
@@ -145,7 +145,7 @@ Stateful fields are nullable `StateProperty<T?>` values. Plain fields are nullab
 | `DialogStyle` | None | `decoration`, `padding`, `insetPadding`, `constraints`, `alignment`, `barrierColor`, `barrierBlur`, `clipBehavior`, `titleTextStyle`, `contentTextStyle`, `titlePadding`, `contentPadding`, `actionsPadding`, `actionsAlignment`, `actionsOverflowAlignment`, `actionsOverflowDirection`, `actionsOverflowButtonSpacing`, `buttonPadding`, `iconPadding`, `iconTheme`, `optionStyle`, `insetAnimationDuration`, `insetAnimationCurve`, `transitionDuration`, `reverseTransitionDuration`, `transitionCurve`, `reverseTransitionCurve`, `transitionBuilder` |
 | `BottomSheetStyle` | None | `decoration`, `padding`, `constraints`, `clipBehavior`, `barrierColor`, `dragHandleColor`, `dragHandleSize`, `dragHandleDecoration`, `transitionDuration`, `reverseTransitionDuration`, `transitionCurve`, `reverseTransitionCurve`, `snapPoints`, `spring`, `transitionBuilder` |
 | `SnackBarStyle` | None | `decoration`, `padding`, `margin`, `constraints`, `textStyle`, `actionStyle`, `closeButtonStyle`, `spacing`, `alignment`, `clipBehavior`, `transitionDuration`, `reverseTransitionDuration`, `transitionCurve`, `reverseTransitionCurve`, `transitionBuilder` |
-| `TextFieldStyle` | `decoration`, `foregroundDecoration`, `textStyle`, `hintStyle`, `labelStyle`, `helperStyle`, `errorStyle`, `counterStyle`, `contentPadding`, `cursorColor`, `selectionColor`, `mouseCursor`, `iconTheme` | `labelBehavior`, `labelScale`, `spacing`, `cursorWidth`, `cursorHeight`, `cursorRadius`, `clipBehavior`, `scrollPadding`, `animationDuration`, `animationCurve` |
+| `TextFieldStyle` | `decoration`, `foregroundDecoration`, `textStyle`, `hintStyle`, `labelStyle`, `helperStyle`, `errorStyle`, `counterStyle`, `contentPadding`, `minimumSize`, `fixedSize`, `maximumSize`, `cursorColor`, `selectionColor`, `mouseCursor`, `iconTheme` | `actionStyle`, `labelBehavior`, `labelScale`, `spacing`, `cursorWidth`, `cursorHeight`, `cursorRadius`, `clipBehavior`, `scrollPadding`, `animationDuration`, `animationCurve` |
 | `AutocompleteStyle` | None | `fieldStyle`, `menuStyle`, `itemStyle`, `optionsMaxHeight`, `optionsViewOpenDirection` |
 | `SearchStyle` | None | `fieldStyle`, `viewDecoration`, `viewPadding`, `suggestionStyle`, `menuStyle`, `constraints`, `transitionDuration`, `reverseTransitionDuration`, `transitionCurve`, `reverseTransitionCurve`, `transitionBuilder`, `outsideTapBehavior` |
 | `DatePickerStyle` | None | `decoration`, `padding`, `headerTextStyle`, `weekdayTextStyle`, `dayStyle`, `todayStyle`, `selectedDayStyle`, `inRangeDayStyle`, `rangeStartStyle`, `rangeEndStyle`, `yearStyle`, `disabledDayStyle`, `navigationButtonStyle`, `entryModeButtonStyle`, `rangeBandDecoration`, `dayExtent`, `yearExtent`, `monthWidth`, `animationDuration`, `animationCurve`, `placement`, `outsideTapBehavior`, `transitionDuration`, `transitionCurve`, `reverseTransitionCurve`, `reverseTransitionDuration`, `transitionBuilder` |
@@ -162,7 +162,7 @@ Toggle `size` describes the checkbox box, switch track or radio ring. `thumbSize
 
 ## Controls
 
-Buttons support callbacks, focus, hover, external `WidgetStatesController`, loading, and leading/trailing slots. `ElevatedButton`, `OutlinedButton`, and `TextButton` have `.icon` constructors with `IconAlignment.start` or `end`. Loading disables activation and preserves content size, painting a `DotsGlyph` over the hidden content unless the loading token resolves to null. IconButton supports `isSelected`, `selectedIcon`, and a semantic `tooltip`. Wrap in Flutter's `RawTooltip` to show a visible tooltip.
+Buttons support callbacks, focus, hover, external `WidgetStatesController`, loading, and leading/trailing slots. `ElevatedButton`, `OutlinedButton`, and `TextButton` have `.icon` constructors with `IconAlignment.start` or `end`. Loading disables activation and preserves content size, painting a `DotsGlyph` over the hidden content unless the loading token resolves to null. IconButton supports `isSelected`, `selectedIcon`, and a semantic `tooltip`. Wrap in `Tooltip` to show a visible tooltip.
 
 Every button accepts direct `decoration` and `foregroundDecoration` parameters for a fixed surface or overlay.
 
@@ -294,6 +294,8 @@ Wrap content in `ScaffoldMessenger` to show queued `SnackBar`s. `ScaffoldMesseng
 `TextField` is built on `EditableText`; `TextFormField` adds `Form` validation, saving and reset. Both expose text/focus controllers, keyboard type, multiline behavior, submission, disabled/read-only states, autofocus and prefix/suffix slots. `labelText`, `hintText`, `helperText`, `errorText` and counters describe the field. `showClearButton` adds a clear action; `showObscureTextToggle` adds a painted eye for password reveal.
 
 `TextFieldStyle` moves the visual parameters into stateful tokens. Error resolvers receive `InteractionState.isError`, alongside focus, hover and disabled flags. Label behavior is above, floating or none; the floating animation retargets from its current value. Direct `decoration` and `foregroundDecoration` parameters override all states and reject matching inline tokens. The widgets-only public API omits services-only `inputFormatters` and `textInputAction` types.
+
+Set `width` and `height` on `TextField` or `TextFormField` for exact dimensions, or use the style's size tokens. Height describes the input box; labels and supporting text remain outside it. Compact boxes reduce content padding first, then fit text, the cursor, icons and actions to the remaining space. Narrow boxes reduce horizontal padding and spacing and fit side content while entered text keeps its normal scrolling. Larger boxes retain the configured typography. `textAlignVertical` positions the contents, and `actionStyle` customizes the clear and password reveal buttons.
 
 ```dart
 TextFormField(

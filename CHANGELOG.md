@@ -1,5 +1,7 @@
 ## 0.10.0
 
+- Fit text-field padding, typography, cursors and side controls to explicit dimensions and parent bounds, with matching sizing on TextFormField.
+- Fix text-field focus and tap ordering by using Flutter's selection gesture handling across the decorated surface; suffix actions and canceled drags no longer activate the field callback.
 - Add TabController, DefaultTabController, Tab, TabBar and TabBarView with retargetable motion and an indicator that follows page drags.
 - Add navigation bars, rails and drawers, maintained-state expansion tiles, two independently focusable range thumbs, capped badges and determinate/indeterminate progress indicators.
 - Extend the themed gallery with navigation, range, progress, RTL and reduced-motion examples.

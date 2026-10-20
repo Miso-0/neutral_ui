@@ -943,22 +943,11 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
       final Decoration? foreground = surface.foregroundDecoration?.resolve(
         state,
       );
-      final Size minimum = surface.minimumSize?.resolve(state) ?? Size.zero;
-      final Size maximum = surface.maximumSize?.resolve(state) ?? Size.infinite;
-      final Size? fixed = surface.fixedSize?.resolve(state);
-      BoxConstraints constraints = BoxConstraints(
-        minWidth: minimum.width,
-        minHeight: minimum.height,
-        maxWidth: maximum.width,
-        maxHeight: maximum.height,
+      final BoxConstraints constraints = sizeConstraints(
+        minimum: surface.minimumSize?.resolve(state),
+        maximum: surface.maximumSize?.resolve(state),
+        fixed: surface.fixedSize?.resolve(state),
       );
-      if (fixed != null) {
-        final Size size = constraints.constrain(fixed);
-        constraints = constraints.tighten(
-          width: size.width.isFinite ? size.width : null,
-          height: size.height.isFinite ? size.height : null,
-        );
-      }
       final Widget text = _textBox(
         Stack(
           alignment: AlignmentDirectional.centerStart,

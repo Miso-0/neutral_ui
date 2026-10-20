@@ -88,7 +88,15 @@ class RangeSlider extends StatefulWidget {
     this.activeTickMarkDecoration,
   }) : assert(min <= max),
        assert(values.start >= min && values.end <= max),
-       assert(divisions == null || divisions > 0);
+       assert(divisions == null || divisions > 0),
+       assert(
+         tickMarkDecoration == null || divisions != null,
+         'tickMarkDecoration requires divisions.',
+       ),
+       assert(
+         activeTickMarkDecoration == null || divisions != null,
+         'activeTickMarkDecoration requires divisions.',
+       );
 
   /// The values for this component.
   final RangeValues values;

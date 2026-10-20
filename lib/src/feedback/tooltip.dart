@@ -186,11 +186,11 @@ class TooltipState extends State<Tooltip> with SingleTickerProviderStateMixin {
     );
   }
 
-  void _show() {
+  void _show({bool explicit = false}) {
     if (!mounted ||
         !_allowed ||
         _shown ||
-        _suppressSignal ||
+        (_suppressSignal && !explicit) ||
         (widget.message ?? widget.richMessage!.toPlainText()).isEmpty) {
       return;
     }
@@ -222,8 +222,15 @@ class TooltipState extends State<Tooltip> with SingleTickerProviderStateMixin {
         (widget.message ?? widget.richMessage!.toPlainText()).isEmpty) {
       return false;
     }
-    _rawKey.currentState?.ensureTooltipVisible();
-    _show();
+    final RawTooltipState? raw = _rawKey.currentState;
+    if (raw != null) {
+      raw.ensureTooltipVisible();
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((Duration _) {
+        if (mounted && _shown) _rawKey.currentState?.ensureTooltipVisible();
+      });
+    }
+    _show(explicit: true);
     return true;
   }
 

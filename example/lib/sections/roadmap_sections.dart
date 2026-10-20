@@ -432,6 +432,7 @@ class _RoadmapSectionsState extends State<RoadmapSections> {
           const SizedBox(
             width: 280,
             child: TextField(
+              height: 30,
               labelText: 'Password',
               hintText: 'Enter a password',
               obscureText: true,

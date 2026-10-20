@@ -399,41 +399,23 @@ class _ButtonStyleButtonState extends State<ButtonStyleButton> {
   BoxConstraints _resolveConstraints(
     InteractionState state,
     List<ButtonStyle?> layers,
-  ) {
-    final Size minimumSize =
-        resolveStateful<ButtonStyle, Size>(
-          state,
-          layers,
-          (ButtonStyle style) => style.minimumSize,
-        ) ??
-        Size.zero;
-    final Size maximumSize =
-        resolveStateful<ButtonStyle, Size>(
-          state,
-          layers,
-          (ButtonStyle style) => style.maximumSize,
-        ) ??
-        Size.infinite;
-    final Size? fixedSize = resolveStateful<ButtonStyle, Size>(
+  ) => sizeConstraints(
+    minimum: resolveStateful<ButtonStyle, Size>(
+      state,
+      layers,
+      (ButtonStyle style) => style.minimumSize,
+    ),
+    maximum: resolveStateful<ButtonStyle, Size>(
+      state,
+      layers,
+      (ButtonStyle style) => style.maximumSize,
+    ),
+    fixed: resolveStateful<ButtonStyle, Size>(
       state,
       layers,
       (ButtonStyle style) => style.fixedSize,
-    );
-    BoxConstraints constraints = BoxConstraints(
-      minWidth: minimumSize.width,
-      minHeight: minimumSize.height,
-      maxWidth: maximumSize.width,
-      maxHeight: maximumSize.height,
-    );
-    if (fixedSize != null) {
-      final Size size = constraints.constrain(fixedSize);
-      constraints = constraints.tighten(
-        width: size.width.isFinite ? size.width : null,
-        height: size.height.isFinite ? size.height : null,
-      );
-    }
-    return constraints;
-  }
+    ),
+  );
 }
 
 // BoxConstraintsTween rejects finite-to-unbounded transitions. Bounds that

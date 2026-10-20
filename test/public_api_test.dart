@@ -108,7 +108,6 @@ void main() {
       ChipTheme,
       EyeGlyph,
       MotionSpring,
-      TextFieldLabelBehavior,
 
       InteractionState,
       StateProperty<int>,

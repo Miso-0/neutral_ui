@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/widgets.dart';
 
 import '../buttons/icon_button.dart';
@@ -8,9 +10,12 @@ import '../foundation/glyphs.dart';
 import '../foundation/interaction_detector.dart';
 import '../foundation/interaction_state.dart';
 import '../foundation/motion.dart';
+import '../foundation/state_property.dart';
 import '../foundation/style_resolution.dart';
 import '../localizations/pure_localizations.dart';
+import '../styles/button_style.dart';
 import '../styles/text_field_style.dart';
+import '../theme/button_themes.dart';
 import '../theme/input_themes.dart';
 
 /// A widgets-layer editable field with state-driven decoration and text slots.
@@ -45,6 +50,7 @@ class TextField extends StatefulWidget {
     this.selectAllOnFocus,
     this.showCursor,
     this.textAlign = TextAlign.start,
+    this.textAlignVertical,
     this.textDirection,
     this.autofillHints,
     this.scrollController,
@@ -66,11 +72,15 @@ class TextField extends StatefulWidget {
     this.counterText,
     this.showClearButton = false,
     this.showObscureTextToggle = false,
+    this.width,
+    this.height,
     this.style,
     this.decoration,
     this.foregroundDecoration,
     this.statesController,
   }) : assert(maxLength == null || maxLength > 0),
+       assert(width == null || width >= 0),
+       assert(height == null || height >= 0),
        assert(maxLines == null || maxLines > 0),
        assert(minLines == null || minLines > 0),
        assert(maxLines == null || minLines == null || maxLines >= minLines),
@@ -150,6 +160,13 @@ class TextField extends StatefulWidget {
   /// Alignment of entered text.
   final TextAlign textAlign;
 
+  /// Vertical placement of the text, hint and icons inside the field.
+  ///
+  /// Defaults to [TextAlignVertical.center] for single-line fields and
+  /// [TextAlignVertical.top] for multi-line or expanding fields. Icons and
+  /// actions align to the start, center or end by the sign of the value.
+  final TextAlignVertical? textAlignVertical;
+
   /// An explicit direction for entered text.
   final TextDirection? textDirection;
 
@@ -213,6 +230,22 @@ class TextField extends StatefulWidget {
   /// Whether concealed text can be revealed.
   final bool showObscureTextToggle;
 
+  /// The exact width of the field, including its label and supporting text.
+  ///
+  /// Overrides the width of [TextFieldStyle.minimumSize],
+  /// [TextFieldStyle.fixedSize] and [TextFieldStyle.maximumSize]. Like any
+  /// width from those tokens, it holds even when the parent offers a larger
+  /// width, and the field aligns to the start of that space.
+  final double? width;
+
+  /// The exact height of the input box, excluding label and supporting text.
+  ///
+  /// Overrides the height of [TextFieldStyle.minimumSize],
+  /// [TextFieldStyle.fixedSize] and [TextFieldStyle.maximumSize], for single
+  /// and multi-line fields alike. Padding, text and side controls adapt to
+  /// the available space. Multi-line content scrolls within the box.
+  final double? height;
+
   /// Inline appearance tokens.
   final TextFieldStyle? style;
 
@@ -229,13 +262,24 @@ class TextField extends StatefulWidget {
   State<TextField> createState() => _TextFieldState();
 }
 
+class _TextFieldSelectionGestureDetectorBuilder
+    extends TextSelectionGestureDetectorBuilder {
+  _TextFieldSelectionGestureDetectorBuilder(this.state)
+    : super(delegate: state);
+
+  final _TextFieldState state;
+
+  @override
+  void onUserTap() => state.widget.onTap?.call();
+}
+
 class _TextFieldState extends State<TextField>
     with SingleTickerProviderStateMixin
     implements TextSelectionGestureDetectorBuilderDelegate {
   final GlobalKey<EditableTextState> _editableKey =
       GlobalKey<EditableTextState>();
   late final TextSelectionGestureDetectorBuilder _selectionGestures =
-      TextSelectionGestureDetectorBuilder(delegate: this);
+      _TextFieldSelectionGestureDetectorBuilder(this);
 
   @override
   GlobalKey<EditableTextState> get editableTextKey => _editableKey;
@@ -393,7 +437,359 @@ class _TextFieldState extends State<TextField>
     widget.onChanged?.call(text);
   }
 
-  Widget _styledText(String text, TextStyle? style) => Text(text, style: style);
+  // Field actions stay icon-sized so they never make the field taller.
+  static const ButtonStyle _compactAction = ButtonStyle(
+    padding: StateProperty<EdgeInsetsGeometry?>.all(EdgeInsets.zero),
+    minimumSize: StateProperty<Size?>.all(Size.zero),
+    tapTargetSize: Size.zero,
+  );
+
+  BoxConstraints _sizeConstraints(
+    TextFieldStyle style,
+    InteractionState state,
+    bool multiline,
+  ) {
+    final Size? fixed = style.fixedSize?.resolve(state);
+    BoxConstraints size = sizeConstraints(
+      minimum: style.minimumSize?.resolve(state),
+      maximum: style.maximumSize?.resolve(state),
+      fixed: multiline ? null : fixed,
+    );
+    // Multi-line fields take their height from their lines, so only the
+    // fixed width applies to them.
+    if (multiline && fixed != null) {
+      final double width = size.constrainWidth(fixed.width);
+      if (width.isFinite) {
+        size = size.copyWith(minWidth: width, maxWidth: width);
+      }
+    }
+    if (widget.width != null) {
+      size = size.copyWith(minWidth: widget.width, maxWidth: widget.width);
+    }
+    if (widget.height != null) {
+      size = size.copyWith(minHeight: widget.height, maxHeight: widget.height);
+    }
+    return size;
+  }
+
+  double _lineHeight(
+    BuildContext context,
+    TextStyle style,
+    TextScaler textScaler, {
+    bool editable = true,
+  }) {
+    // Match the typography applied by EditableText and Text, including
+    // platform accessibility overrides and the editable's forced strut.
+    final TextStyle metrics = style.copyWith(
+      height: MediaQuery.maybeLineHeightScaleFactorOverrideOf(context),
+      letterSpacing: MediaQuery.maybeLetterSpacingOverrideOf(context),
+      wordSpacing: MediaQuery.maybeWordSpacingOverrideOf(context),
+      fontWeight: !editable && MediaQuery.boldTextOf(context)
+          ? FontWeight.bold
+          : null,
+    );
+    final TextPainter painter = TextPainter(
+      text: TextSpan(text: ' ', style: metrics),
+      textDirection: widget.textDirection ?? Directionality.of(context),
+      textScaler: textScaler,
+      locale: Localizations.maybeLocaleOf(context),
+      strutStyle: editable
+          ? StrutStyle.fromTextStyle(metrics, forceStrutHeight: true)
+          : null,
+      textHeightBehavior: editable
+          ? DefaultTextHeightBehavior.maybeOf(context)
+          : DefaultTextStyle.of(context).textHeightBehavior ??
+                DefaultTextHeightBehavior.maybeOf(context),
+    )..layout();
+    final double height = painter.preferredLineHeight;
+    painter.dispose();
+    return height;
+  }
+
+  Widget _inputContent(
+    BuildContext context,
+    TextFieldStyle style,
+    InteractionState state,
+    PureLocalizations strings,
+    Duration duration,
+    bool multiline,
+    double alignY,
+  ) {
+    final TextStyle textStyle = DefaultTextStyle.of(context).style
+        .merge(style.textStyle?.resolve(state));
+    final TextStyle hintStyle = textStyle.merge(
+      style.hintStyle?.resolve(state),
+    );
+    final TextScaler textScaler = MediaQuery.textScalerOf(context);
+    final double unscaledTextHeight = _lineHeight(
+      context,
+      textStyle,
+      TextScaler.noScaling,
+    );
+    final bool sameHintMetrics = widget.hintText == null;
+    final double unscaledHintHeight = sameHintMetrics
+        ? unscaledTextHeight
+        : _lineHeight(
+            context,
+            hintStyle,
+            TextScaler.noScaling,
+            editable: false,
+          );
+    final double textHeight = textScaler == TextScaler.noScaling
+        ? unscaledTextHeight
+        : _lineHeight(context, textStyle, textScaler);
+    final double hintHeight = sameHintMetrics
+        ? textHeight
+        : textScaler == TextScaler.noScaling
+        ? unscaledHintHeight
+        : _lineHeight(context, hintStyle, textScaler, editable: false);
+    final int sideCount =
+        <Widget?>[
+          widget.prefixIcon,
+          widget.prefix,
+          widget.suffix,
+          widget.suffixIcon,
+        ].whereType<Widget>().length +
+        (widget.showClearButton &&
+                _controller.text.isNotEmpty &&
+                !widget.readOnly &&
+                widget.enabled
+            ? 1
+            : 0) +
+        (widget.showObscureTextToggle && widget.obscureText ? 1 : 0);
+    // Reserve the action's line height before it becomes visible too, so
+    // clearing or entering text never changes the typography's fit.
+    final bool hasIcons =
+        widget.prefixIcon != null ||
+        widget.suffixIcon != null ||
+        widget.showClearButton ||
+        (widget.showObscureTextToggle && widget.obscureText);
+    final double spacing = style.spacing ?? 0;
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints box) {
+        final IconThemeData icons = IconTheme.of(context);
+        final double iconSize = icons.size ?? 24;
+        final double lineHeight = math.max(
+          math.max(textHeight, hintHeight),
+          hasIcons ? iconSize : 0,
+        );
+        final Color cursor =
+            style.cursorColor?.resolve(state) ??
+            icons.color ??
+            textStyle.color ??
+            const Color(0xFF000000);
+        final EdgeInsets padding =
+            (style.contentPadding?.resolve(state) ?? EdgeInsets.zero).resolve(
+              Directionality.of(context),
+            );
+        final double minimumTextWidth = math.min(
+          lineHeight,
+          box.maxWidth / (sideCount + 1),
+        );
+        final double horizontalRoom = math.max(
+          0,
+          box.maxWidth - minimumTextWidth - sideCount * iconSize,
+        );
+        final double horizontalFit = padding.horizontal == 0
+            ? 1
+            : math.min(1, horizontalRoom / padding.horizontal);
+        final double verticalFit =
+            !box.hasBoundedHeight || padding.vertical == 0
+            ? 1
+            : math.min(
+                1,
+                math.max(0, box.maxHeight - lineHeight) / padding.vertical,
+              );
+        return AnimatedPadding(
+          duration: duration,
+          curve: style.animationCurve ?? Curves.easeInOut,
+          padding: EdgeInsets.fromLTRB(
+            padding.left * horizontalFit,
+            padding.top * verticalFit,
+            padding.right * horizontalFit,
+            padding.bottom * verticalFit,
+          ),
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              final double unscaledHeight = math.max(
+                unscaledTextHeight,
+                unscaledHintHeight,
+              );
+              final TextScaler fittedTextScaler =
+                  !constraints.hasBoundedHeight || unscaledHeight == 0
+                  ? textScaler
+                  : textScaler.clamp(
+                      maxScaleFactor: constraints.maxHeight / unscaledHeight,
+                    );
+              final double fittedIconSize = math.min(
+                iconSize,
+                constraints.maxHeight,
+              );
+              final double textWidth = math.min(
+                lineHeight,
+                constraints.maxWidth / (sideCount + 1),
+              );
+              final double fittedSpacing = sideCount == 0
+                  ? spacing
+                  : math.min(
+                      spacing,
+                      math.max(
+                            0,
+                            constraints.maxWidth -
+                                textWidth -
+                                sideCount * fittedIconSize,
+                          ) /
+                          sideCount,
+                    );
+              final double sideWidth = sideCount == 0
+                  ? 0
+                  : math.max(
+                      0,
+                      (constraints.maxWidth -
+                              textWidth -
+                              sideCount * fittedSpacing) /
+                          sideCount,
+                    );
+              Widget side(Widget child) => ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: sideWidth,
+                  maxHeight: constraints.maxHeight,
+                ),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: AlignmentDirectional(0, alignY),
+                  child: child,
+                ),
+              );
+              Widget editable = EditableText(
+                key: _editableKey,
+                rendererIgnoresPointer: true,
+                controller: _controller,
+                focusNode: _focusNode,
+                readOnly: widget.readOnly || !widget.enabled,
+                style: textStyle,
+                textScaler: fittedTextScaler,
+                cursorColor: cursor,
+                backgroundCursorColor: cursor,
+                selectionColor: style.selectionColor?.resolve(state),
+                cursorWidth: math.min(
+                  style.cursorWidth ?? 2,
+                  constraints.maxWidth,
+                ),
+                cursorHeight: style.cursorHeight == null
+                    ? null
+                    : math.min(style.cursorHeight!, constraints.maxHeight),
+                cursorRadius: style.cursorRadius,
+                obscureText: widget.obscureText && !_revealed,
+                obscuringCharacter: widget.obscuringCharacter,
+                keyboardType: widget.keyboardType,
+                maxLines: widget.maxLines,
+                minLines: widget.minLines,
+                expands: widget.expands,
+                autofocus: widget.autofocus && widget.enabled,
+                autocorrect: widget.autocorrect,
+                enableSuggestions: widget.enableSuggestions,
+                enableInteractiveSelection: widget.enableInteractiveSelection,
+                selectAllOnFocus: widget.selectAllOnFocus,
+                showCursor: widget.enabled ? widget.showCursor : false,
+                textAlign: widget.textAlign,
+                textDirection: widget.textDirection,
+                locale: Localizations.maybeLocaleOf(context),
+                onChanged: _changed,
+                onSubmitted: widget.onSubmitted,
+                onEditingComplete: widget.onEditingComplete,
+                onTapOutside: widget.onTapOutside,
+                onTapUpOutside: widget.onTapUpOutside,
+                groupId: widget.groupId,
+                scrollController: widget.scrollController,
+                scrollPhysics: widget.scrollPhysics,
+                scrollPadding: style.scrollPadding ?? EdgeInsets.zero,
+                autofillHints: widget.autofillHints,
+                selectionControls: widget.selectionControls,
+                contextMenuBuilder: widget.contextMenuBuilder,
+                undoController: widget.undoController,
+                restorationId: widget.restorationId,
+              );
+              editable = Stack(
+                alignment: AlignmentDirectional(-1, alignY),
+                children: <Widget>[
+                  if (_controller.text.isEmpty && widget.hintText != null)
+                    IgnorePointer(
+                      child: Text(
+                        widget.hintText!,
+                        style: hintStyle,
+                        textScaler: fittedTextScaler,
+                        maxLines: multiline ? widget.maxLines : 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  editable,
+                ],
+              );
+              final ButtonStyle actionStyle =
+                  (style.actionStyle ?? const ButtonStyle()).merge(
+                    _compactAction,
+                  );
+              Widget action(Widget button) =>
+                  side(IconButtonTheme(data: actionStyle, child: button));
+              final List<Widget> row = <Widget>[
+                if (widget.prefixIcon != null) side(widget.prefixIcon!),
+                if (widget.prefix != null) side(widget.prefix!),
+                Expanded(child: editable),
+                if (widget.suffix != null) side(widget.suffix!),
+                if (widget.suffixIcon != null) side(widget.suffixIcon!),
+                if (widget.showClearButton &&
+                    _controller.text.isNotEmpty &&
+                    !widget.readOnly &&
+                    widget.enabled)
+                  action(
+                    IconButton(
+                      onPressed: () {
+                        _controller.clear();
+                        widget.onChanged?.call('');
+                        _focusNode.requestFocus();
+                      },
+                      tooltip: strings.clearButtonTooltip,
+                      icon: const CloseGlyph(),
+                    ),
+                  ),
+                if (widget.showObscureTextToggle && widget.obscureText)
+                  action(
+                    IconButton(
+                      onPressed: widget.enabled
+                          ? () => setState(() => _revealed = !_revealed)
+                          : null,
+                      tooltip: _revealed
+                          ? strings.hidePasswordTooltip
+                          : strings.showPasswordTooltip,
+                      icon: EyeGlyph(obscured: !_revealed),
+                    ),
+                  ),
+              ];
+
+              return IconTheme.merge(
+                data: IconThemeData(size: fittedIconSize),
+                child: Row(
+                  crossAxisAlignment: alignY < 0
+                      ? CrossAxisAlignment.start
+                      : alignY > 0
+                      ? CrossAxisAlignment.end
+                      : CrossAxisAlignment.center,
+                  children: <Widget>[
+                    for (int i = 0; i < row.length; i++) ...<Widget>[
+                      if (i > 0 && fittedSpacing != 0)
+                        SizedBox(width: fittedSpacing),
+                      row[i],
+                    ],
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -434,103 +830,16 @@ class _TextFieldState extends State<TextField>
         );
         T? token<T>(T? Function(TextFieldStyle) select) =>
             resolvePlain<TextFieldStyle, T>(<TextFieldStyle>[style], select);
-        final TextStyle textStyle = DefaultTextStyle.of(context).style
-            .merge(style.textStyle?.resolve(state));
-        final Color cursor =
-            style.cursorColor?.resolve(state) ??
-            IconTheme.of(context).color ??
-            textStyle.color ??
-            const Color(0xFF000000);
-        Widget editable = EditableText(
-          key: _editableKey,
-          rendererIgnoresPointer: true,
-          controller: _controller,
-          focusNode: _focusNode,
-          readOnly: widget.readOnly || !widget.enabled,
-          style: textStyle,
-          cursorColor: cursor,
-          backgroundCursorColor: cursor,
-          selectionColor: style.selectionColor?.resolve(state),
-          cursorWidth: style.cursorWidth ?? 2,
-          cursorHeight: style.cursorHeight,
-          cursorRadius: style.cursorRadius,
-          obscureText: widget.obscureText && !_revealed,
-          obscuringCharacter: widget.obscuringCharacter,
-          keyboardType: widget.keyboardType,
-          maxLines: widget.maxLines,
-          minLines: widget.minLines,
-          expands: widget.expands,
-          autofocus: widget.autofocus && widget.enabled,
-          autocorrect: widget.autocorrect,
-          enableSuggestions: widget.enableSuggestions,
-          enableInteractiveSelection: widget.enableInteractiveSelection,
-          selectAllOnFocus: widget.selectAllOnFocus,
-          showCursor: widget.enabled ? widget.showCursor : false,
-          textAlign: widget.textAlign,
-          textDirection: widget.textDirection,
-          onChanged: _changed,
-          onSubmitted: widget.onSubmitted,
-          onEditingComplete: widget.onEditingComplete,
-          onTapOutside: widget.onTapOutside,
-          onTapUpOutside: widget.onTapUpOutside,
-          groupId: widget.groupId,
-          scrollController: widget.scrollController,
-          scrollPhysics: widget.scrollPhysics,
-          scrollPadding: style.scrollPadding ?? EdgeInsets.zero,
-          autofillHints: widget.autofillHints,
-          selectionControls: widget.selectionControls,
-          contextMenuBuilder: widget.contextMenuBuilder,
-          undoController: widget.undoController,
-          restorationId: widget.restorationId,
-        );
-        editable = Stack(
-          alignment: AlignmentDirectional.centerStart,
-          children: <Widget>[
-            if (_controller.text.isEmpty && widget.hintText != null)
-              IgnorePointer(
-                child: _styledText(
-                  widget.hintText!,
-                  style.hintStyle?.resolve(state),
-                ),
-              ),
-            editable,
-          ],
-        );
-        editable = _selectionGestures.buildGestureDetector(
-          behavior: HitTestBehavior.translucent,
-          child: editable,
-        );
+        final bool multiline = widget.expands || widget.maxLines != 1;
+        final double alignY =
+            (widget.textAlignVertical ??
+                    (multiline
+                        ? TextAlignVertical.top
+                        : TextAlignVertical.center))
+                .y;
         final double spacing = style.spacing ?? 0;
-        final List<Widget> row = <Widget>[
-          if (widget.prefixIcon != null) widget.prefixIcon!,
-          if (widget.prefix != null) widget.prefix!,
-          Expanded(child: editable),
-          if (widget.suffix != null) widget.suffix!,
-          if (widget.suffixIcon != null) widget.suffixIcon!,
-          if (widget.showClearButton &&
-              _controller.text.isNotEmpty &&
-              !widget.readOnly &&
-              widget.enabled)
-            IconButton(
-              onPressed: () {
-                _controller.clear();
-                widget.onChanged?.call('');
-                _focusNode.requestFocus();
-              },
-              tooltip: strings.clearButtonTooltip,
-              icon: const CloseGlyph(),
-            ),
-          if (widget.showObscureTextToggle && widget.obscureText)
-            IconButton(
-              onPressed: widget.enabled
-                  ? () => setState(() => _revealed = !_revealed)
-                  : null,
-              tooltip: _revealed
-                  ? strings.hidePasswordTooltip
-                  : strings.showPasswordTooltip,
-              icon: EyeGlyph(obscured: !_revealed),
-            ),
-        ];
+        final BoxConstraints size = _sizeConstraints(style, state, multiline);
+        final bool fill = widget.expands && !size.hasBoundedHeight;
         Widget field = AnimatedSurface(
           duration: duration,
           curve: style.animationCurve ?? Curves.easeInOut,
@@ -538,38 +847,38 @@ class _TextFieldState extends State<TextField>
           foregroundDecoration:
               widget.foregroundDecoration ??
               style.foregroundDecoration?.resolve(state),
-          padding: style.contentPadding?.resolve(state),
           clipBehavior:
               (widget.decoration ?? style.decoration?.resolve(state)) == null
               ? Clip.none
               : style.clipBehavior ?? Clip.none,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              for (int i = 0; i < row.length; i++) ...<Widget>[
-                if (i > 0 && spacing != 0) SizedBox(width: spacing),
-                row[i],
-              ],
-            ],
+          child: _inputContent(
+            context,
+            style,
+            state,
+            strings,
+            duration,
+            multiline,
+            alignY,
           ),
+        );
+        if (size.minHeight > 0 || size.hasBoundedHeight) {
+          field = ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: size.minHeight,
+              maxHeight: size.maxHeight,
+            ),
+            child: field,
+          );
+        }
+        field = _selectionGestures.buildGestureDetector(
+          behavior: HitTestBehavior.translucent,
+          child: field,
         );
         field = TextFieldTapRegion(
           groupId: widget.groupId,
           child: ExcludeFocus(
             excluding: !widget.enabled,
-            child: IgnorePointer(
-              ignoring: !widget.enabled,
-              child: Listener(
-                behavior: HitTestBehavior.translucent,
-                onPointerDown: widget.enabled
-                    ? (PointerDownEvent event) {
-                        _focusNode.requestFocus();
-                        widget.onTap?.call();
-                      }
-                    : null,
-                child: field,
-              ),
-            ),
+            child: IgnorePointer(ignoring: !widget.enabled, child: field),
           ),
         );
         final Widget? label =
@@ -610,7 +919,7 @@ class _TextFieldState extends State<TextField>
                       ),
                     ),
                   ),
-                  child!,
+                  if (fill) Flexible(child: child!) else child!,
                 ],
               ),
             );
@@ -623,7 +932,7 @@ class _TextFieldState extends State<TextField>
                     ? label
                     : ExcludeSemantics(child: label),
                 if (spacing != 0) SizedBox(height: spacing),
-                field,
+                if (fill) Flexible(child: field) else field,
               ],
             );
           }
@@ -639,7 +948,7 @@ class _TextFieldState extends State<TextField>
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              field,
+              if (fill) Flexible(child: field) else field,
               if (spacing != 0) SizedBox(height: spacing),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -663,6 +972,21 @@ class _TextFieldState extends State<TextField>
                 ],
               ),
             ],
+          );
+        }
+        if (size != const BoxConstraints()) {
+          // Explicit sizes hold even when the parent offers more space.
+          field = Align(
+            alignment: AlignmentDirectional.centerStart,
+            widthFactor: 1,
+            heightFactor: 1,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minWidth: size.minWidth,
+                maxWidth: size.maxWidth,
+              ),
+              child: field,
+            ),
           );
         }
         final IconThemeData? icons = token<IconThemeData>(
@@ -722,6 +1046,7 @@ class TextFormField extends FormField<String> {
     bool enableSuggestions = true,
     bool enableInteractiveSelection = true,
     TextAlign textAlign = TextAlign.start,
+    TextAlignVertical? textAlignVertical,
     TextDirection? textDirection,
     Iterable<String>? autofillHints,
     super.restorationId,
@@ -737,6 +1062,8 @@ class TextFormField extends FormField<String> {
     String? counterText,
     bool showClearButton = false,
     bool showObscureTextToggle = false,
+    double? width,
+    double? height,
     TextFieldStyle? style,
     BoxDecoration? decoration,
     BoxDecoration? foregroundDecoration,
@@ -773,6 +1100,7 @@ class TextFormField extends FormField<String> {
              enableSuggestions: enableSuggestions,
              enableInteractiveSelection: enableInteractiveSelection,
              textAlign: textAlign,
+             textAlignVertical: textAlignVertical,
              textDirection: textDirection,
              autofillHints: autofillHints,
              restorationId: restorationId,
@@ -788,6 +1116,8 @@ class TextFormField extends FormField<String> {
              counterText: counterText,
              showClearButton: showClearButton,
              showObscureTextToggle: showObscureTextToggle,
+             width: width,
+             height: height,
              style: style,
              decoration: decoration,
              foregroundDecoration: foregroundDecoration,

@@ -282,6 +282,7 @@ class ScaffoldMessengerState extends State<ScaffoldMessenger>
     return ScaffoldFeatureController<SnackBar, SnackBarClosedReason>._(
       entry,
       () {
+        if (!mounted) return;
         if (_current == entry) {
           hideCurrentSnackBar();
         } else if (_queue.remove(entry)) {
@@ -324,6 +325,8 @@ class ScaffoldMessengerState extends State<ScaffoldMessenger>
   }
 
   void _showCurrent() {
+    _dragging = false;
+    _stopTimeout();
     _closingReason = null;
     _configure();
     _portal.show();
@@ -337,6 +340,12 @@ class ScaffoldMessengerState extends State<ScaffoldMessenger>
       entry.visible = true;
       entry.snackBar.onVisible?.call();
     }
+    if (!mounted ||
+        _current != entry ||
+        _closingReason != null ||
+        !_transition.isCompleted) {
+      return;
+    }
     _stopTimeout();
     if (!entry.snackBar.persist && !_accessible && !_dragging) {
       // Stream is exposed by dart:core; its subscription type is not exposed
@@ -348,7 +357,9 @@ class ScaffoldMessengerState extends State<ScaffoldMessenger>
             (int count) => count,
           ).take(1).listen((int _) {
             _cancelTimeout = null;
-            hideCurrentSnackBar(reason: SnackBarClosedReason.timeout);
+            if (mounted && _current == entry) {
+              hideCurrentSnackBar(reason: SnackBarClosedReason.timeout);
+            }
           });
       _cancelTimeout = () {
         subscription.cancel();
@@ -377,7 +388,7 @@ class ScaffoldMessengerState extends State<ScaffoldMessenger>
   void hideCurrentSnackBar({
     SnackBarClosedReason reason = SnackBarClosedReason.hide,
   }) {
-    if (_current == null || _closingReason != null) return;
+    if (!mounted || _current == null || _closingReason != null) return;
     _stopTimeout();
     _closingReason = reason;
     if (_transition.isDismissed) {
@@ -391,7 +402,7 @@ class ScaffoldMessengerState extends State<ScaffoldMessenger>
   void removeCurrentSnackBar({
     SnackBarClosedReason reason = SnackBarClosedReason.remove,
   }) {
-    if (_current == null) return;
+    if (!mounted || _current == null) return;
     _stopTimeout();
     _closingReason = reason;
     if (_transition.isDismissed) {
@@ -403,6 +414,7 @@ class ScaffoldMessengerState extends State<ScaffoldMessenger>
 
   /// Removes queued notifications and animates the current one out.
   void clearSnackBars() {
+    if (!mounted) return;
     while (_queue.length > 1) {
       _queue.removeLast().complete(SnackBarClosedReason.remove);
     }
@@ -426,6 +438,7 @@ class ScaffoldMessengerState extends State<ScaffoldMessenger>
     for (final _SnackBarEntry entry in _queue) {
       entry.complete(SnackBarClosedReason.remove);
     }
+    _queue.clear();
     super.dispose();
   }
 
@@ -436,8 +449,9 @@ class ScaffoldMessengerState extends State<ScaffoldMessenger>
         entry.snackBar.style?.merge(SnackBarTheme.of(context)) ??
         SnackBarTheme.of(context);
     Widget child = _SnackBarScope(
-      close: (SnackBarClosedReason reason) =>
-          hideCurrentSnackBar(reason: reason),
+      close: (SnackBarClosedReason reason) {
+        if (mounted && _current == entry) hideCurrentSnackBar(reason: reason);
+      },
       child: KeyedSubtree(key: ObjectKey(entry), child: entry.snackBar),
     );
     child = Dismissible(
@@ -450,25 +464,27 @@ class ScaffoldMessengerState extends State<ScaffoldMessenger>
         const Duration(milliseconds: 200),
       ),
       onUpdate: (DismissUpdateDetails details) {
+        if (_current != entry) return;
+        if (details.progress == 0) {
+          _resumeAfterDrag(entry);
+          return;
+        }
         if (!_dragging) {
           _dragging = true;
           _stopTimeout();
         }
       },
-      onDismissed: (DismissDirection direction) =>
-          removeCurrentSnackBar(reason: SnackBarClosedReason.swipe),
+      onDismissed: (DismissDirection direction) {
+        if (mounted && _current == entry) {
+          removeCurrentSnackBar(reason: SnackBarClosedReason.swipe);
+        }
+      },
       confirmDismiss: (DismissDirection direction) async => true,
       child: child,
     );
     child = Listener(
-      onPointerUp: (_) {
-        if (_dragging) {
-          _dragging = false;
-          if (_closingReason == null && _transition.isCompleted) {
-            _startLifetime();
-          }
-        }
-      },
+      onPointerUp: (_) => _resumeAfterDrag(entry),
+      onPointerCancel: (_) => _resumeAfterDrag(entry),
       child: child,
     );
     child = RepaintBoundary(child: child);
@@ -492,6 +508,12 @@ class ScaffoldMessengerState extends State<ScaffoldMessenger>
         ),
       ),
     );
+  }
+
+  void _resumeAfterDrag(_SnackBarEntry entry) {
+    if (!mounted || _current != entry || !_dragging) return;
+    _dragging = false;
+    if (_closingReason == null && _transition.isCompleted) _startLifetime();
   }
 
   @override

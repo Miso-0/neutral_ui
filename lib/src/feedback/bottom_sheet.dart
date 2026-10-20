@@ -80,7 +80,7 @@ class BottomSheet extends StatefulWidget {
 }
 
 class _BottomSheetState extends State<BottomSheet>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   final GlobalKey _surfaceKey = GlobalKey();
   AnimationController? _ownedController;
   AnimationController get _controller =>
@@ -151,10 +151,21 @@ class _BottomSheetState extends State<BottomSheet>
   @override
   void didUpdateWidget(BottomSheet oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.animationController != widget.animationController) {
+      _settlingClosed = false;
+    }
     if (oldWidget.animationController == null &&
         widget.animationController != null) {
       _ownedController?.dispose();
       _ownedController = null;
+    }
+    if (oldWidget.animationController != null &&
+        widget.animationController == null) {
+      _ownedController = AnimationController(
+        vsync: this,
+        value: oldWidget.animationController!.value,
+        duration: const Duration(milliseconds: 250),
+      );
     }
   }
 

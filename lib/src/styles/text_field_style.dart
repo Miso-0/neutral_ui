@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../foundation/state_property.dart';
+import 'button_style.dart';
 
 /// Placement of a field's label relative to its editable text.
 enum TextFieldLabelBehavior {
@@ -28,6 +29,10 @@ class TextFieldStyle {
     this.errorStyle,
     this.counterStyle,
     this.contentPadding,
+    this.minimumSize,
+    this.fixedSize,
+    this.maximumSize,
+    this.actionStyle,
     this.cursorColor,
     this.selectionColor,
     this.mouseCursor,
@@ -70,6 +75,31 @@ class TextFieldStyle {
 
   /// The contentPadding token.
   final StateProperty<EdgeInsetsGeometry?>? contentPadding;
+
+  /// The minimum size of the input box, excluding label and supporting text.
+  ///
+  /// The width bound also applies to the label and supporting text, which
+  /// share the box's width.
+  final StateProperty<Size?>? minimumSize;
+
+  /// The exact size of the input box, clamped by [minimumSize] and
+  /// [maximumSize]. A non-finite dimension leaves that axis unconstrained.
+  ///
+  /// The height applies to single-line fields only. Multi-line fields take
+  /// their height from their line counts, or from the parent when they
+  /// expand, within [minimumSize] and [maximumSize]; pass the field's
+  /// `height` for an exact multi-line height.
+  final StateProperty<Size?>? fixedSize;
+
+  /// The maximum size of the input box, excluding label and supporting text.
+  final StateProperty<Size?>? maximumSize;
+
+  /// The style of the clear and password reveal actions.
+  ///
+  /// Actions are compact by default, with no padding and no minimum or tap
+  /// target size. Their content fits the input box's available height and
+  /// width. The enclosing icon button theme does not apply to them.
+  final ButtonStyle? actionStyle;
 
   /// The cursorColor token.
   final StateProperty<Color?>? cursorColor;
@@ -124,6 +154,10 @@ class TextFieldStyle {
     StateProperty<TextStyle?>? errorStyle,
     StateProperty<TextStyle?>? counterStyle,
     StateProperty<EdgeInsetsGeometry?>? contentPadding,
+    StateProperty<Size?>? minimumSize,
+    StateProperty<Size?>? fixedSize,
+    StateProperty<Size?>? maximumSize,
+    ButtonStyle? actionStyle,
     StateProperty<Color?>? cursorColor,
     StateProperty<Color?>? selectionColor,
     StateProperty<MouseCursor?>? mouseCursor,
@@ -148,6 +182,10 @@ class TextFieldStyle {
     errorStyle: errorStyle ?? this.errorStyle,
     counterStyle: counterStyle ?? this.counterStyle,
     contentPadding: contentPadding ?? this.contentPadding,
+    minimumSize: minimumSize ?? this.minimumSize,
+    fixedSize: fixedSize ?? this.fixedSize,
+    maximumSize: maximumSize ?? this.maximumSize,
+    actionStyle: actionStyle ?? this.actionStyle,
     cursorColor: cursorColor ?? this.cursorColor,
     selectionColor: selectionColor ?? this.selectionColor,
     mouseCursor: mouseCursor ?? this.mouseCursor,
@@ -177,6 +215,10 @@ class TextFieldStyle {
       errorStyle: errorStyle ?? other.errorStyle,
       counterStyle: counterStyle ?? other.counterStyle,
       contentPadding: contentPadding ?? other.contentPadding,
+      minimumSize: minimumSize ?? other.minimumSize,
+      fixedSize: fixedSize ?? other.fixedSize,
+      maximumSize: maximumSize ?? other.maximumSize,
+      actionStyle: actionStyle?.merge(other.actionStyle) ?? other.actionStyle,
       cursorColor: cursorColor ?? other.cursorColor,
       selectionColor: selectionColor ?? other.selectionColor,
       mouseCursor: mouseCursor ?? other.mouseCursor,
@@ -207,6 +249,10 @@ class TextFieldStyle {
           errorStyle == other.errorStyle &&
           counterStyle == other.counterStyle &&
           contentPadding == other.contentPadding &&
+          minimumSize == other.minimumSize &&
+          fixedSize == other.fixedSize &&
+          maximumSize == other.maximumSize &&
+          actionStyle == other.actionStyle &&
           cursorColor == other.cursorColor &&
           selectionColor == other.selectionColor &&
           mouseCursor == other.mouseCursor &&
@@ -233,6 +279,10 @@ class TextFieldStyle {
     errorStyle,
     counterStyle,
     contentPadding,
+    minimumSize,
+    fixedSize,
+    maximumSize,
+    actionStyle,
     cursorColor,
     selectionColor,
     mouseCursor,
@@ -251,5 +301,5 @@ class TextFieldStyle {
 
   @override
   String toString() =>
-      'TextFieldStyle(decoration: $decoration, foregroundDecoration: $foregroundDecoration, textStyle: $textStyle, hintStyle: $hintStyle, labelStyle: $labelStyle, helperStyle: $helperStyle, errorStyle: $errorStyle, counterStyle: $counterStyle, contentPadding: $contentPadding, cursorColor: $cursorColor, selectionColor: $selectionColor, mouseCursor: $mouseCursor, iconTheme: $iconTheme, labelBehavior: $labelBehavior, labelScale: $labelScale, spacing: $spacing, cursorWidth: $cursorWidth, cursorHeight: $cursorHeight, cursorRadius: $cursorRadius, clipBehavior: $clipBehavior, scrollPadding: $scrollPadding, animationDuration: $animationDuration, animationCurve: $animationCurve)';
+      'TextFieldStyle(decoration: $decoration, foregroundDecoration: $foregroundDecoration, textStyle: $textStyle, hintStyle: $hintStyle, labelStyle: $labelStyle, helperStyle: $helperStyle, errorStyle: $errorStyle, counterStyle: $counterStyle, contentPadding: $contentPadding, minimumSize: $minimumSize, fixedSize: $fixedSize, maximumSize: $maximumSize, actionStyle: $actionStyle, cursorColor: $cursorColor, selectionColor: $selectionColor, mouseCursor: $mouseCursor, iconTheme: $iconTheme, labelBehavior: $labelBehavior, labelScale: $labelScale, spacing: $spacing, cursorWidth: $cursorWidth, cursorHeight: $cursorHeight, cursorRadius: $cursorRadius, clipBehavior: $clipBehavior, scrollPadding: $scrollPadding, animationDuration: $animationDuration, animationCurve: $animationCurve)';
 }

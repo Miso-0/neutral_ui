@@ -9,6 +9,36 @@ import 'package:pure_ui/src/foundation/animated_surface.dart';
 import '../helpers/pump.dart';
 
 void main() {
+  test('range tick decorations require divisions', () {
+    const BoxDecoration decoration = BoxDecoration(color: Color(0xff123456));
+    expect(
+      () => RangeSlider(
+        values: const RangeValues(0.2, 0.8),
+        onChanged: null,
+        tickMarkDecoration: decoration,
+      ),
+      throwsAssertionError,
+    );
+    expect(
+      () => RangeSlider(
+        values: const RangeValues(0.2, 0.8),
+        onChanged: null,
+        activeTickMarkDecoration: decoration,
+      ),
+      throwsAssertionError,
+    );
+    expect(
+      () => RangeSlider(
+        values: const RangeValues(0.2, 0.8),
+        onChanged: null,
+        divisions: 10,
+        tickMarkDecoration: decoration,
+        activeTickMarkDecoration: decoration,
+      ),
+      returnsNormally,
+    );
+  });
+
   testWidgets(
     'selected disabled chips retain the check and selection semantics',
     (WidgetTester tester) async {

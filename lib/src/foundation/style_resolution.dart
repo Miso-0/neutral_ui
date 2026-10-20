@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart';
+
 import 'interaction_state.dart';
 import 'state_property.dart';
 
@@ -53,4 +55,27 @@ T? resolveStatefulOrDefault<S, T>(
     (S? layer) => layer != null && select(layer) != null,
   );
   return provided ? null : fallback();
+}
+
+/// Converts minimum, maximum and fixed size tokens into box constraints.
+///
+/// [fixed] is clamped between [minimum] and [maximum]; a non-finite fixed
+/// dimension leaves that axis to the minimum and maximum bounds.
+BoxConstraints sizeConstraints({Size? minimum, Size? maximum, Size? fixed}) {
+  final Size min = minimum ?? Size.zero;
+  final Size max = maximum ?? Size.infinite;
+  BoxConstraints constraints = BoxConstraints(
+    minWidth: min.width,
+    minHeight: min.height,
+    maxWidth: max.width,
+    maxHeight: max.height,
+  );
+  if (fixed != null) {
+    final Size size = constraints.constrain(fixed);
+    constraints = constraints.tighten(
+      width: size.width.isFinite ? size.width : null,
+      height: size.height.isFinite ? size.height : null,
+    );
+  }
+  return constraints;
 }
