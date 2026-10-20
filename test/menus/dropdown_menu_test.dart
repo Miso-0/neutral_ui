@@ -21,6 +21,20 @@ const List<DropdownMenuEntry<int>> entries = <DropdownMenuEntry<int>>[
 Finder option(String label) =>
     find.descendant(of: find.byType(MenuPanel), matching: find.text(label));
 
+Finder visibleLabel(String label) => find.byElementPredicate((Element element) {
+  final Widget widget = element.widget;
+  if (widget is! Text || widget.data != label) return false;
+  bool visible = true;
+  element.visitAncestorElements((Element ancestor) {
+    if (ancestor.widget case Visibility(visible: false)) {
+      visible = false;
+      return false;
+    }
+    return true;
+  });
+  return visible;
+});
+
 Future<void> openField(WidgetTester tester) async {
   await tester.tap(find.byType(EditableText));
   await tester.pump();
@@ -32,6 +46,112 @@ Future<void> submitField(WidgetTester tester) async {
 }
 
 void main() {
+  test('an entry requires a label or a label widget', () {
+    expect(() => DropdownMenuEntry<int>(value: 1), throwsAssertionError);
+    const DropdownMenuEntry<int> entry = DropdownMenuEntry<int>(
+      value: 1,
+      labelWidget: Text('Visual apple'),
+    );
+    expect(entry.label, isNull);
+    const DropdownMenuEntry<int> explicitNull = DropdownMenuEntry<int>(
+      value: 2,
+      label: null,
+      labelWidget: Text('Visual banana'),
+    );
+    expect(explicitNull.label, isNull);
+  });
+
+  for (final bool selectOnly in <bool>[false, true]) {
+    testWidgets(
+      'widget-only labels size and display selections (selectOnly: $selectOnly)',
+      (WidgetTester tester) async {
+        final TextEditingController controller = TextEditingController();
+        final MenuController menu = MenuController();
+        final List<int?> selected = <int?>[];
+        addTearDown(controller.dispose);
+        await pumpNeutral(
+          tester,
+          DropdownMenu<int>(
+            dropdownMenuEntries: const <DropdownMenuEntry<int>>[
+              DropdownMenuEntry<int>(
+                value: 1,
+                labelWidget: SizedBox(
+                  width: 160,
+                  height: 24,
+                  child: Text('Visual apple'),
+                ),
+              ),
+              DropdownMenuEntry<int>(
+                value: 2,
+                labelWidget: SizedBox(
+                  width: 120,
+                  height: 24,
+                  child: Text('Visual banana'),
+                ),
+              ),
+            ],
+            initialSelection: 1,
+            controller: controller,
+            menuController: menu,
+            requestFocusOnTap: true,
+            selectOnly: selectOnly,
+            showTrailingIcon: false,
+            onSelected: selected.add,
+          ),
+        );
+        expect(tester.getSize(find.byType(DropdownMenu<int>)).width, 160);
+        expect(visibleLabel('Visual apple'), findsOneWidget);
+        expect(visibleLabel('Visual banana'), findsNothing);
+        expect(controller.text, isEmpty);
+
+        menu.open();
+        await tester.pump();
+        await tester.tap(option('Visual banana'));
+        await tester.pumpAndSettle();
+        expect(selected, <int?>[2]);
+        expect(visibleLabel('Visual apple'), findsNothing);
+        expect(visibleLabel('Visual banana'), findsOneWidget);
+        expect(controller.text, isEmpty);
+        expect(menu.isOpen, isFalse);
+      },
+    );
+  }
+
+  testWidgets('a text label still controls filtering and selected field text', (
+    WidgetTester tester,
+  ) async {
+    final TextEditingController controller = TextEditingController();
+    addTearDown(controller.dispose);
+    await pumpNeutral(
+      tester,
+      DropdownMenu<int>(
+        dropdownMenuEntries: const <DropdownMenuEntry<int>>[
+          DropdownMenuEntry<int>(
+            value: 1,
+            label: 'Apple',
+            labelWidget: Text('Visual apple'),
+          ),
+          DropdownMenuEntry<int>(value: 2, labelWidget: Text('Visual banana')),
+        ],
+        controller: controller,
+        requestFocusOnTap: true,
+        enableFilter: true,
+      ),
+    );
+    await tester.enterText(find.byType(EditableText), 'APP');
+    await tester.pump();
+    expect(option('Visual apple'), findsOneWidget);
+    expect(option('Visual banana'), findsNothing);
+    await tester.enterText(find.byType(EditableText), '');
+    await tester.pump();
+    expect(option('Visual apple'), findsOneWidget);
+    expect(option('Visual banana'), findsOneWidget);
+    await tester.tap(option('Visual apple'));
+    await tester.pumpAndSettle();
+    expect(controller.text, 'Apple');
+    expect(visibleLabel('Visual apple'), findsNothing);
+  });
+
   const Color idleColor = Color(0xFF000000);
   const Color hoverColor = Color(0xFFFFFFFF);
 

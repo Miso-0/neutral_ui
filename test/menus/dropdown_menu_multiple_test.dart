@@ -174,6 +174,70 @@ void main() {
   });
 
   testWidgets(
+    'mixed selections display widget and text labels in entry order',
+    (WidgetTester tester) async {
+      const List<DropdownMenuEntry<int>> mixedEntries =
+          <DropdownMenuEntry<int>>[
+            DropdownMenuEntry<int>(value: 1, label: 'Apple'),
+            DropdownMenuEntry<int>(
+              value: 2,
+              labelWidget: Text('Visual banana'),
+            ),
+            DropdownMenuEntry<int>(value: 3, label: 'Cherry'),
+          ];
+      late StateSetter rebuild;
+      bool customSelection = false;
+      List<int>? received;
+      await pumpNeutral(
+        tester,
+        StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            rebuild = setState;
+            return DropdownMenu<int>.multiple(
+              dropdownMenuEntries: mixedEntries,
+              selected: const <int>{3, 2, 1},
+              onSelectionChanged: (Set<int> selected) {},
+              requestFocusOnTap: true,
+              selectionBuilder: customSelection
+                  ? (
+                      BuildContext context,
+                      List<DropdownMenuEntry<int>> selected,
+                    ) {
+                      received = selected
+                          .map((DropdownMenuEntry<int> entry) => entry.value)
+                          .toList();
+                      return const Text('Custom mixed selection');
+                    }
+                  : null,
+            );
+          },
+        ),
+      );
+      final Finder summary = find.byType(Wrap);
+      expect(summary, findsOneWidget);
+      expect(
+        tester
+            .widgetList<Text>(
+              find.descendant(of: summary, matching: find.byType(Text)),
+            )
+            .map((Text text) => text.data)
+            .join(),
+        'Apple, Visual banana, Cherry',
+      );
+      expect(
+        tester.widget<EditableText>(find.byType(EditableText)).controller.text,
+        isEmpty,
+      );
+
+      rebuild(() => customSelection = true);
+      await tester.pump();
+      expect(received, <int>[1, 2, 3]);
+      expect(find.text('Custom mixed selection'), findsOneWidget);
+      expect(summary, findsNothing);
+    },
+  );
+
+  testWidgets(
     'options expose checked state and disabled options do not toggle',
     (WidgetTester tester) async {
       final SemanticsHandle semantics = tester.ensureSemantics();

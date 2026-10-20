@@ -369,13 +369,22 @@ class _GalleryState extends State<_Gallery> {
 
   static const List<DropdownMenuEntry<String>> _cities =
       <DropdownMenuEntry<String>>[
-        DropdownMenuEntry<String>(value: 'Cape Town', label: 'Cape Town'),
-        DropdownMenuEntry<String>(value: 'Johannesburg', label: 'Johannesburg'),
-        DropdownMenuEntry<String>(value: 'Durban', label: 'Durban'),
-        DropdownMenuEntry<String>(value: 'Pretoria', label: 'Pretoria'),
+        DropdownMenuEntry<String>(
+          value: 'Cape Town',
+          labelWidget: Text('Cape Town'),
+        ),
+        DropdownMenuEntry<String>(
+          value: 'Johannesburg',
+          labelWidget: Text('Johannesburg'),
+        ),
+        DropdownMenuEntry<String>(value: 'Durban', labelWidget: Text('Durban')),
+        DropdownMenuEntry<String>(
+          value: 'Pretoria',
+          labelWidget: Text('Pretoria'),
+        ),
         DropdownMenuEntry<String>(
           value: 'Bloemfontein',
-          label: 'Bloemfontein',
+          labelWidget: Text('Bloemfontein'),
           enabled: false,
         ),
       ];
@@ -547,15 +556,19 @@ class _GalleryState extends State<_Gallery> {
             ),
           ),
           _menuDemo(
-            'Filter the list as you type',
+            'Search with a results builder',
             DropdownMenu<String>(
               key: const ValueKey<String>('filter-menu'),
               semanticLabel: 'Filter cities',
               hintText: 'Find a city',
               width: 270,
               requestFocusOnTap: true,
-              enableFilter: true,
-              dropdownMenuEntries: _cities,
+              searchBuilder: (BuildContext context, String query) => _cities
+                  .where(
+                    (DropdownMenuEntry<String> entry) =>
+                        entry.value.toLowerCase().contains(query.toLowerCase()),
+                  )
+                  .toList(),
               onSelected: (String? value) => _record('City: $value'),
             ),
           ),
@@ -608,7 +621,7 @@ class _GalleryState extends State<_Gallery> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              entry.label,
+                              entry.label ?? '',
                               style: const TextStyle(
                                 color: _accent,
                                 fontSize: 11,

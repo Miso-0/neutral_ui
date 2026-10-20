@@ -30,6 +30,12 @@ typedef SearchCallback<T> = int? Function(
   String query,
 );
 
+/// Builds matching dropdown entries for the current search query.
+typedef DropdownSearchBuilder<T> = List<DropdownMenuEntry<T>> Function(
+  BuildContext context,
+  String query,
+);
+
 /// Builds a controlled multiple selection, for example as removable chips.
 typedef DropdownSelectionBuilder<T> = Widget Function(
   BuildContext context,
@@ -51,25 +57,32 @@ enum DropdownMenuCloseBehavior {
 /// An option in a [DropdownMenu].
 @immutable
 class DropdownMenuEntry<T> {
-  /// Creates an option with an accessible, searchable [label].
+  /// Creates an option with a text [label], a [labelWidget], or both.
   const DropdownMenuEntry({
     required this.value,
-    required this.label,
+    this.label,
     this.labelWidget,
     this.leadingIcon,
     this.trailingIcon,
     this.enabled = true,
     this.style,
     this.decoration,
-  });
+  }) : assert(
+         label != null || labelWidget != null,
+         'Provide a label or labelWidget.',
+       );
 
   /// The value delivered when this option is selected.
   final T value;
 
   /// The text used for filtering, searching and the selected field value.
-  final String label;
+  ///
+  /// May be null when [labelWidget] supplies the visual content.
+  final String? label;
 
   /// Alternative visual content for the menu row.
+  ///
+  /// Also displays the selection when [label] is null or empty.
   final Widget? labelWidget;
 
   /// Content before the row label.
@@ -98,7 +111,8 @@ class DropdownMenu<T> extends StatefulWidget {
   /// Creates a single selection dropdown.
   const DropdownMenu({
     super.key,
-    required this.dropdownMenuEntries,
+    this.dropdownMenuEntries = const <Never>[],
+    this.searchBuilder,
     this.initialSelection,
     this.onSelected,
     this.controller,
@@ -137,7 +151,8 @@ class DropdownMenu<T> extends StatefulWidget {
   /// Creates a dropdown whose selection is controlled by [selected].
   const DropdownMenu.multiple({
     super.key,
-    required this.dropdownMenuEntries,
+    this.dropdownMenuEntries = const <Never>[],
+    this.searchBuilder,
     required Set<T> this.selected,
     required this.onSelectionChanged,
     this.emptySelectionAllowed = true,
@@ -174,7 +189,21 @@ class DropdownMenu<T> extends StatefulWidget {
        _multiple = true;
 
   /// All available options, including disabled options.
+  ///
+  /// Optional when [searchBuilder] supplies the options. Entries here can also
+  /// describe selections that are absent from the current search results.
   final List<DropdownMenuEntry<T>> dropdownMenuEntries;
+
+  /// Builds the options to display for the search text.
+  ///
+  /// Called with an empty query when opening the menu and after a multiple
+  /// selection. Its results replace [filterCallback] and the built-in label
+  /// filtering and matching, regardless of [enableFilter]. When [enableSearch]
+  /// is true, typing highlights an enabled result for keyboard selection.
+  /// [searchCallback] can override the highlighted result.
+  ///
+  /// Without a builder, [dropdownMenuEntries] and the label-based callbacks apply.
+  final DropdownSearchBuilder<T>? searchBuilder;
 
   /// The initial single selection; changing this value updates the field.
   final T? initialSelection;
@@ -306,6 +335,9 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
   bool _filterActive = false;
   bool _searchActive = false;
   String _query = '';
+  List<DropdownMenuEntry<T>> _searchEntries = <DropdownMenuEntry<T>>[];
+  Map<T, DropdownMenuEntry<T>> _retainedEntries = <T, DropdownMenuEntry<T>>{};
+  bool _entriesInitialized = false;
 
   @override
   void initState() {
@@ -320,9 +352,20 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
     anchorFocusNode.addListener(_focusChanged);
     _selectedValue = widget.initialSelection;
     if (!widget._multiple && _selectedEntry != null) {
-      _writeText(_selectedEntry!.label);
+      _writeText(_selectedEntry!.label ?? '');
     }
     _query = _textController.text;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _refreshSearchEntries();
+    if (!_entriesInitialized && !widget._multiple && _selectedEntry != null) {
+      _writeText(_selectedEntry!.label ?? '');
+    }
+    _entriesInitialized = true;
+    if (_searchActive) _search();
   }
 
   @override
@@ -341,28 +384,68 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
       _textController = widget.controller ?? TextEditingController(text: text);
       _textController.addListener(_textChanged);
     }
-    if (oldWidget.initialSelection != widget.initialSelection ||
-        oldWidget._multiple != widget._multiple) {
+    final bool selectionChanged =
+        oldWidget.initialSelection != widget.initialSelection ||
+        oldWidget._multiple != widget._multiple;
+    if (selectionChanged) {
       _selectedValue = widget.initialSelection;
+    }
+    _refreshSearchEntries();
+    if (selectionChanged) {
       _writeText(widget._multiple ? '' : _selectedEntry?.label ?? '');
     }
-    _entryKeys.removeWhere(
-      (DropdownMenuEntry<T> entry, GlobalKey key) =>
-          !widget.dropdownMenuEntries.contains(entry),
-    );
-    _entryStates.removeWhere((
-      DropdownMenuEntry<T> entry,
-      WidgetStatesController controller,
-    ) {
-      if (widget.dropdownMenuEntries.contains(entry)) return false;
-      controller.dispose();
-      return true;
-    });
+    if (_searchActive) _search();
     if (!widget.enabled && menuOpen) {
       WidgetsBinding.instance.addPostFrameCallback((Duration timeStamp) {
         if (mounted) closeMenu();
       });
     }
+  }
+
+  List<DropdownMenuEntry<T>> get _allEntries {
+    if (widget.searchBuilder == null) return widget.dropdownMenuEntries;
+    final Map<T, DropdownMenuEntry<T>> entries = <T, DropdownMenuEntry<T>>{
+      for (final DropdownMenuEntry<T> entry in widget.dropdownMenuEntries)
+        entry.value: entry,
+      for (final DropdownMenuEntry<T> entry in _searchEntries)
+        entry.value: entry,
+    };
+    for (final DropdownMenuEntry<T> entry in _retainedEntries.values) {
+      entries.putIfAbsent(entry.value, () => entry);
+    }
+    return entries.values.toList();
+  }
+
+  bool _isSelectedEntry(DropdownMenuEntry<T> entry) => widget._multiple
+      ? widget.selected!.contains(entry.value)
+      : entry.value == _selectedValue;
+
+  void _refreshSearchEntries({Set<T>? selectedValues}) {
+    bool isSelected(DropdownMenuEntry<T> entry) =>
+        selectedValues?.contains(entry.value) ?? _isSelectedEntry(entry);
+    final Map<T, DropdownMenuEntry<T>> retained = <T, DropdownMenuEntry<T>>{
+      for (final DropdownMenuEntry<T> entry in _allEntries)
+        if (isSelected(entry)) entry.value: entry,
+    };
+    _searchEntries =
+        widget.searchBuilder?.call(context, _query) ?? <DropdownMenuEntry<T>>[];
+    for (final DropdownMenuEntry<T> entry in _searchEntries) {
+      if (isSelected(entry)) retained[entry.value] = entry;
+    }
+    _retainedEntries = retained;
+    _highlighted = _visibleMatch(_highlighted);
+    final Set<DropdownMenuEntry<T>> entries = _allEntries.toSet();
+    _entryKeys.removeWhere(
+      (DropdownMenuEntry<T> entry, GlobalKey key) => !entries.contains(entry),
+    );
+    _entryStates.removeWhere((
+      DropdownMenuEntry<T> entry,
+      WidgetStatesController controller,
+    ) {
+      if (entries.contains(entry)) return false;
+      controller.dispose();
+      return true;
+    });
   }
 
   void _textChanged() {
@@ -404,13 +487,13 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
   }
 
   DropdownMenuEntry<T>? get _selectedEntry {
-    for (final DropdownMenuEntry<T> entry in widget.dropdownMenuEntries) {
+    for (final DropdownMenuEntry<T> entry in _allEntries) {
       if (entry.value == _selectedValue) return entry;
     }
     return null;
   }
 
-  List<DropdownMenuEntry<T>> get _selectedEntries => widget.dropdownMenuEntries
+  List<DropdownMenuEntry<T>> get _selectedEntries => _allEntries
       .where(
         (DropdownMenuEntry<T> entry) =>
             widget.selected?.contains(entry.value) ?? false,
@@ -420,10 +503,39 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
   String get _summary => widget._multiple
       ? _selectedEntries
             .map((DropdownMenuEntry<T> entry) => entry.label)
+            .whereType<String>()
+            .where((String label) => label.isNotEmpty)
             .join(', ')
       : _selectedEntry?.label ?? '';
 
+  Widget? get _selectedLabelWidget {
+    if (!widget._multiple) {
+      final DropdownMenuEntry<T>? entry = _selectedEntry;
+      return (entry?.label?.isEmpty ?? true) ? entry?.labelWidget : null;
+    }
+    if (widget.selectionBuilder != null) return null;
+    final List<DropdownMenuEntry<T>> entries = _selectedEntries;
+    if (!entries.any(
+      (DropdownMenuEntry<T> entry) =>
+          (entry.label?.isEmpty ?? true) && entry.labelWidget != null,
+    )) {
+      return null;
+    }
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: <Widget>[
+        for (int index = 0; index < entries.length; index++) ...<Widget>[
+          if (index > 0) const Text(', '),
+          (entries[index].label?.isEmpty ?? true)
+              ? entries[index].labelWidget ?? const SizedBox.shrink()
+              : Text(entries[index].label ?? ''),
+        ],
+      ],
+    );
+  }
+
   List<DropdownMenuEntry<T>> get _visibleEntries {
+    if (widget.searchBuilder != null) return _searchEntries;
     if (!_filterActive || !widget.enableFilter) {
       return widget.dropdownMenuEntries;
     }
@@ -434,9 +546,17 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
     return widget.dropdownMenuEntries
         .where(
           (DropdownMenuEntry<T> entry) =>
-              entry.label.toLowerCase().contains(query),
+              (entry.label ?? '').toLowerCase().contains(query),
         )
         .toList();
+  }
+
+  DropdownMenuEntry<T>? _visibleMatch(DropdownMenuEntry<T>? entry) {
+    if (entry == null) return null;
+    for (final DropdownMenuEntry<T> candidate in _visibleEntries) {
+      if (candidate.value == entry.value && candidate.enabled) return candidate;
+    }
+    return null;
   }
 
   bool get _isButton {
@@ -465,10 +585,14 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
     setState(() {
       _filterActive = false;
       _searchActive = false;
+      if (widget.searchBuilder != null) {
+        _query = '';
+        _refreshSearchEntries();
+      }
       final DropdownMenuEntry<T>? selected = widget._multiple
           ? (_selectedEntries.isEmpty ? null : _selectedEntries.first)
           : _selectedEntry;
-      _highlighted = selected?.enabled == true ? selected : null;
+      _highlighted = _visibleMatch(selected);
     });
     _scrollToHighlight();
   }
@@ -486,6 +610,7 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
       _query = text;
       _filterActive = widget.enableFilter;
       _searchActive = widget.enableSearch;
+      if (widget.searchBuilder != null) _refreshSearchEntries();
       _search();
     });
     _scrollToHighlight();
@@ -510,7 +635,9 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
     }
     final String query = _query.toLowerCase();
     bool matches(DropdownMenuEntry<T> entry) =>
-        entry.enabled && entry.label.toLowerCase().contains(query);
+        entry.enabled &&
+        (widget.searchBuilder != null ||
+            (entry.label ?? '').toLowerCase().contains(query));
     if (_highlighted != null &&
         entries.contains(_highlighted) &&
         matches(_highlighted!)) {
@@ -541,7 +668,7 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
       _highlighted = entries[next];
       _filterActive = false;
       _searchActive = false;
-      if (!widget._multiple) _writeText(_highlighted!.label);
+      if (!widget._multiple) _writeText(_highlighted!.label ?? '');
     });
     _scrollToHighlight();
   }
@@ -593,6 +720,9 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
         _searchActive = false;
         _highlighted = entry;
         _writeText('');
+        if (widget.searchBuilder != null) {
+          _refreshSearchEntries(selectedValues: selection);
+        }
       });
       final ValueChanged<Set<T>> onSelectionChanged =
           widget.onSelectionChanged!;
@@ -603,7 +733,7 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
         _highlighted = entry;
         _filterActive = false;
         _searchActive = false;
-        _writeText(entry.label);
+        _writeText(entry.label ?? '');
       });
       final ValueChanged<T?>? onSelected = widget.onSelected;
       _notifySelection(() => onSelected?.call(entry.value));
@@ -676,25 +806,7 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
             isExpanded: menuOpen,
             leading: leading,
             trailing: trailing,
-            child: _textBox(
-              Text(
-                widget._multiple
-                    ? (_summary.isEmpty || widget.selectionBuilder != null
-                          ? widget.hintText ?? ''
-                          : _summary)
-                    : (_textController.text.isEmpty
-                          ? widget.hintText ?? ''
-                          : _textController.text),
-                textAlign: widget.textAlign,
-                style: _fieldTextStyle(
-                  layers,
-                  state,
-                  hint: widget._multiple || _textController.text.isEmpty,
-                ),
-              ),
-              layers,
-              state,
-            ),
+            child: _textBox(_fieldLabel(layers, state), layers, state),
           )
         : _editableField(layers, surfaceStyle, leading, trailing);
     if (!isButton) {
@@ -857,7 +969,7 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
         statesController: controller,
         leading: leading,
         trailing: entry.trailingIcon,
-        child: entry.labelWidget ?? Text(entry.label),
+        child: entry.labelWidget ?? Text(entry.label ?? ''),
       ),
     );
   }
@@ -882,6 +994,34 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
         ),
       );
 
+  Widget _fieldLabel(List<DropdownStyle?> layers, InteractionState state) {
+    final Widget? selection = _textController.text.isEmpty
+        ? _selectedLabelWidget
+        : null;
+    if (selection != null) {
+      return DefaultTextStyle.merge(
+        style: _fieldTextStyle(layers, state),
+        textAlign: widget.textAlign,
+        child: selection,
+      );
+    }
+    return Text(
+      widget._multiple
+          ? (_summary.isEmpty || widget.selectionBuilder != null
+                ? widget.hintText ?? ''
+                : _summary)
+          : (_textController.text.isEmpty
+                ? widget.hintText ?? ''
+                : _textController.text),
+      textAlign: widget.textAlign,
+      style: _fieldTextStyle(
+        layers,
+        state,
+        hint: widget._multiple || _textController.text.isEmpty,
+      ),
+    );
+  }
+
   Widget _textBox(
     Widget child,
     List<DropdownStyle?> layers,
@@ -889,13 +1029,18 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
   ) => Stack(
     alignment: AlignmentDirectional.centerStart,
     children: <Widget>[
-      for (final DropdownMenuEntry<T> entry in widget.dropdownMenuEntries)
+      for (final DropdownMenuEntry<T> entry in _allEntries)
         Visibility(
           visible: false,
           maintainSize: true,
           maintainAnimation: true,
           maintainState: true,
-          child: Text(entry.label, style: _fieldTextStyle(layers, state)),
+          child: (entry.label?.isEmpty ?? true) && entry.labelWidget != null
+              ? DefaultTextStyle.merge(
+                  style: _fieldTextStyle(layers, state),
+                  child: entry.labelWidget!,
+                )
+              : Text(entry.label ?? '', style: _fieldTextStyle(layers, state)),
         ),
       Visibility(
         visible: false,
@@ -933,12 +1078,6 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
           ) ??
           textStyle.color ??
           const Color(0xFF000000);
-      final String placeholder =
-          widget._multiple &&
-              widget.selectionBuilder == null &&
-              _summary.isNotEmpty
-          ? _summary
-          : widget.hintText ?? '';
       final Decoration? decoration = surface.decoration?.resolve(state);
       final Decoration? foreground = surface.foregroundDecoration?.resolve(
         state,
@@ -953,13 +1092,7 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
           alignment: AlignmentDirectional.centerStart,
           children: <Widget>[
             if (_textController.text.isEmpty)
-              IgnorePointer(
-                child: Text(
-                  placeholder,
-                  style: _fieldTextStyle(layers, state, hint: true),
-                  textAlign: widget.textAlign,
-                ),
-              ),
+              IgnorePointer(child: _fieldLabel(layers, state)),
             EditableText(
               // Avoid scrolling a visible field merely to add EditableText's
               // default outer margin, which would dismiss its anchored panel.

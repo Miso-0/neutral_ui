@@ -1,5 +1,6 @@
 ## 0.10.0
 
+- Allow widget-only dropdown entries and add `searchBuilder` for query-driven results independent of text labels.
 - Prepare the first pub.dev release under the `neutral_ui` name, with hosted installation instructions, a runnable quick-start and gallery documentation.
 - Add package repository and issue links, discovery topics and the MIT license.
 - Rename the package to `neutral_ui` and its entrypoint to `package:neutral_ui/neutral_ui.dart`.

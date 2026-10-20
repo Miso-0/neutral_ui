@@ -256,6 +256,27 @@ WidgetsApp(
 
 `DropdownMenu<T>` provides an editable selection field with `DropdownMenuEntry<T>` entries. `enableFilter` narrows the list with a case-insensitive contains match; `enableSearch` highlights a match while keeping all entries visible. Supply `filterCallback` or `searchCallback` to customize either behavior. `selectOnly` uses a button trigger. Desktop fields request focus by default; use `requestFocusOnTap` to choose the behavior explicitly. `initialSelection` initializes the text and updates it when that parameter changes. A `TextEditingController`, `FocusNode` and `MenuController` can be supplied externally.
 
+For custom search, supply `searchBuilder(context, query)` to return the matching entries yourself. Its results bypass `filterCallback` and label filtering and matching. With `enableSearch`, typing highlights an enabled result for Enter; `searchCallback` can choose the highlighted result. The builder receives an empty query when opening the menu and after a multiple selection. `dropdownMenuEntries` is optional with a builder and can supply initial selections outside the results.
+
+Entries accept either `label`, `labelWidget`, or both. The `label` property is nullable. With only `labelWidget`, `label` remains null, the selected field displays that widget, and the text controller stays empty. Search your own data in the builder without extracting text from the widgets:
+
+```dart
+DropdownMenu<String>(
+  searchBuilder: (BuildContext context, String query) => <String>[
+    'Cape Town',
+    'Johannesburg',
+    'Durban',
+  ]
+      .where((String city) => city.toLowerCase().contains(query.toLowerCase()))
+      .map((String city) => DropdownMenuEntry<String>(
+            value: city,
+            labelWidget: Text(city),
+          ))
+      .toList(),
+  onSelected: (String? city) {},
+)
+```
+
 `DropdownMenu.multiple` is controlled by `selected: Set<T>` and `onSelectionChanged`. The menu stays open by default, clears the search query after a toggle, and rejects removal of the last value when `emptySelectionAllowed` is false. Use `selectionBuilder` to render chips; otherwise selected labels appear as a joined summary. `DropdownMenuCloseBehavior.all` and `self` close the current menu after selection, while `none` keeps it open.
 
 `PopupMenuButton<T>` builds its entries each time it opens. Use `PopupMenuItem`, `CheckedPopupMenuItem` and `PopupMenuDivider`. Its `position` is `PopupMenuPosition.over` by default, with `under` placing it below the trigger. `PopupMenuButtonState.showButtonMenu()` opens it programmatically. Checked entries display the supplied checked state; update that state in your callback. Selection closes the menu, calls the item's `onTap`, then calls `onSelected` for a non-null value. A null-value item calls only `onTap`; dismissing calls `onCanceled`. `PopupMenuEntry.height` is omitted because panel layout measures the actual entry widgets.
