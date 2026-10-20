@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
-import 'package:pure_ui/src/menus/menu_layout.dart';
+import 'package:neutral_ui/neutral_ui.dart';
+import 'package:neutral_ui/src/menus/menu_layout.dart';
 
 void main() {
   const Size overlay = Size(400, 300);

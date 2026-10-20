@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../styles/chip_style.dart';
-import 'pure_theme.dart';
+import 'neutral_theme.dart';
 
 /// Overrides chip tokens within a subtree.
 class ChipTheme extends InheritedTheme {
@@ -13,7 +13,7 @@ class ChipTheme extends InheritedTheme {
 
   /// Returns the nearest local tokens or the application's component style.
   static ChipStyle of(BuildContext context) =>
-      maybeOf(context) ?? PureTheme.of(context).chipStyle;
+      maybeOf(context) ?? NeutralTheme.of(context).chipStyle;
 
   /// Returns local tokens when this component theme is present.
   static ChipStyle? maybeOf(BuildContext context) =>

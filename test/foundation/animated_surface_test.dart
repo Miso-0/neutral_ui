@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/src/foundation/animated_surface.dart';
+import 'package:neutral_ui/src/foundation/animated_surface.dart';
 
 import '../helpers/pump.dart';
 

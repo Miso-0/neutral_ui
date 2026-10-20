@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
-import 'package:pure_ui/src/foundation/animated_surface.dart';
+import 'package:neutral_ui/neutral_ui.dart';
+import 'package:neutral_ui/src/foundation/animated_surface.dart';
 
 import '../helpers/pump.dart';
 
@@ -163,7 +163,7 @@ void main() {
   for (final _ToggleCase component in cases) {
     for (final bool componentTheme in <bool>[false, true]) {
       testWidgets(
-        '${component.name} decorations override ${componentTheme ? 'component' : 'PureTheme'} in every state and selection frame',
+        '${component.name} decorations override ${componentTheme ? 'component' : 'NeutralTheme'} in every state and selection frame',
         (WidgetTester tester) async {
           useTraditionalFocus();
           final FocusNode focus = FocusNode();
@@ -193,7 +193,7 @@ void main() {
               );
             },
           );
-          await pumpPure(
+          await pumpNeutral(
             tester,
             componentTheme ? component.theme(_themeStyle(), control) : control,
             theme: component.global(_themeStyle()),
@@ -284,7 +284,7 @@ void main() {
         WidgetTester tester,
       ) async {
         final bool body = part == 'decoration';
-        await pumpPure(
+        await pumpNeutral(
           tester,
           component.control(
             value: false,
@@ -322,7 +322,7 @@ void main() {
     (WidgetTester tester) async {
       bool selected = false;
       late StateSetter update;
-      await pumpPure(
+      await pumpNeutral(
         tester,
         StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
@@ -354,7 +354,7 @@ void main() {
   testWidgets(
     'checkbox only paints its box even when the style defines a thumb',
     (WidgetTester tester) async {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         const Checkbox(
           key: _controlKey,

@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
+import 'package:neutral_ui/neutral_ui.dart';
 
 import '../helpers/pump.dart';
 
@@ -28,7 +28,7 @@ void main() {
     WidgetTester tester,
   ) async {
     int? selected = 1;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) => Row(
@@ -56,7 +56,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final List<int?> changes = <int?>[];
-    await pumpPure(
+    await pumpNeutral(
       tester,
       Radio<int>(
         value: 1,
@@ -73,7 +73,7 @@ void main() {
     'radio without a source and explicit disabled radio ignore taps',
     (WidgetTester tester) async {
       int calls = 0;
-      await pumpPure(
+      await pumpNeutral(
         tester,
         Row(
           mainAxisSize: MainAxisSize.min,
@@ -104,7 +104,7 @@ void main() {
     (WidgetTester tester) async {
       int? selected = 1;
       final SemanticsHandle semantics = tester.ensureSemantics();
-      await pumpPure(
+      await pumpNeutral(
         tester,
         StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) =>
@@ -145,7 +145,7 @@ void main() {
       final FocusNode second = FocusNode();
       addTearDown(first.dispose);
       addTearDown(second.dispose);
-      await pumpPure(
+      await pumpNeutral(
         tester,
         StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) =>
@@ -191,7 +191,7 @@ void main() {
       groupValue: 1,
       onChanged: registryChanges.add,
     );
-    await pumpPure(
+    await pumpNeutral(
       tester,
       RadioGroup<int>(
         groupValue: 3,
@@ -218,7 +218,7 @@ void main() {
   ) async {
     int? explicit;
     int ancestorCalls = 0;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       RadioGroup<int>(
         groupValue: 2,
@@ -240,9 +240,9 @@ void main() {
   ) async {
     final _Registry<int> first = _Registry<int>(onChanged: (int? next) {});
     final _Registry<int> second = _Registry<int>(onChanged: (int? next) {});
-    await pumpPure(tester, Radio<int>(value: 1, groupRegistry: first));
+    await pumpNeutral(tester, Radio<int>(value: 1, groupRegistry: first));
     expect(first.clients, hasLength(1));
-    await pumpPure(tester, Radio<int>(value: 1, groupRegistry: second));
+    await pumpNeutral(tester, Radio<int>(value: 1, groupRegistry: second));
     expect(first.clients, isEmpty);
     expect(second.clients, hasLength(1));
     await tester.pumpWidget(const SizedBox.shrink());
@@ -255,9 +255,9 @@ void main() {
     final FocusNode external = FocusNode();
     addTearDown(external.dispose);
     final _Registry<int> registry = _Registry<int>(onChanged: (int? next) {});
-    await pumpPure(tester, Radio<int>(value: 1, groupRegistry: registry));
+    await pumpNeutral(tester, Radio<int>(value: 1, groupRegistry: registry));
     final FocusNode owned = registry.clients.single.focusNode;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       Radio<int>(value: 1, groupRegistry: registry, focusNode: external),
     );
@@ -271,7 +271,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final SemanticsHandle semantics = tester.ensureSemantics();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       Radio<int>(
         value: 1,

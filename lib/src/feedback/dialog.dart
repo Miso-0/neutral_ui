@@ -4,7 +4,7 @@ import '../buttons/text_button.dart';
 import '../foundation/animated_surface.dart';
 import '../foundation/decoration_override.dart';
 import '../foundation/motion.dart';
-import '../localizations/pure_localizations.dart';
+import '../localizations/neutral_localizations.dart';
 import '../menus/key_activators.dart';
 import '../styles/dialog_style.dart';
 import '../theme/feedback_themes.dart';
@@ -103,7 +103,7 @@ class Dialog extends StatelessWidget {
       scopesRoute: true,
       namesRoute: true,
       explicitChildNodes: true,
-      label: PureLocalizations.of(context).dialogLabel,
+      label: NeutralLocalizations.of(context).dialogLabel,
       child: AnimatedPadding(
         padding: outside,
         duration: reducedMotionDuration(
@@ -226,7 +226,8 @@ class AlertDialog extends StatelessWidget {
       clipBehavior: clipBehavior,
       child: Semantics(
         namesRoute: true,
-        label: semanticLabel ?? PureLocalizations.of(context).alertDialogLabel,
+        label:
+            semanticLabel ?? NeutralLocalizations.of(context).alertDialogLabel,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -328,7 +329,7 @@ class SimpleDialog extends StatelessWidget {
       clipBehavior: clipBehavior,
       child: Semantics(
         namesRoute: true,
-        label: semanticLabel ?? PureLocalizations.of(context).dialogLabel,
+        label: semanticLabel ?? NeutralLocalizations.of(context).dialogLabel,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -436,7 +437,7 @@ Future<T?> showDialog<T>({
           barrierColor ?? resolved.barrierColor ?? const Color(0x00000000),
       barrierLabel:
           barrierLabel ??
-          PureLocalizations.of(context).modalBarrierDismissLabel,
+          NeutralLocalizations.of(context).modalBarrierDismissLabel,
       settings: routeSettings,
       anchorPoint: anchorPoint,
       traversalEdgeBehavior:

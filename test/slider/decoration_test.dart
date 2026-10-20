@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
+import 'package:neutral_ui/neutral_ui.dart';
 
 import '../helpers/pump.dart';
 
@@ -86,7 +86,7 @@ List<Decoration> _painted(WidgetTester tester) => tester
 void main() {
   for (final bool componentTheme in <bool>[false, true]) {
     testWidgets(
-      'all slider parts override ${componentTheme ? 'component' : 'PureTheme'} decorations in every state',
+      'all slider parts override ${componentTheme ? 'component' : 'NeutralTheme'} decorations in every state',
       (WidgetTester tester) async {
         useTraditionalFocus();
         final FocusNode focus = FocusNode();
@@ -115,7 +115,7 @@ void main() {
             },
           ),
         );
-        await pumpPure(
+        await pumpNeutral(
           tester,
           componentTheme
               ? SliderTheme(data: _themeStyle(), child: control)
@@ -197,7 +197,7 @@ void main() {
         ),
         _ => throw StateError('Unknown part: $part'),
       };
-      await pumpPure(tester, _decorated(style: style));
+      await pumpNeutral(tester, _decorated(style: style));
       expect(
         tester.takeException(),
         isA<FlutterError>().having(
@@ -248,7 +248,7 @@ void main() {
   testWidgets(
     'const slider accepts applicable decorations and unrelated inline tokens',
     (WidgetTester tester) async {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         const Slider(
           value: 0.5,

@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import '../styles/date_picker_style.dart';
 import '../styles/time_picker_style.dart';
-import 'pure_theme.dart';
+import 'neutral_theme.dart';
 
 /// Overrides datePicker tokens within a subtree.
 class DatePickerTheme extends InheritedTheme {
@@ -14,7 +14,7 @@ class DatePickerTheme extends InheritedTheme {
 
   /// Returns the nearest local tokens or the application's component style.
   static DatePickerStyle of(BuildContext context) =>
-      maybeOf(context) ?? PureTheme.of(context).datePickerStyle;
+      maybeOf(context) ?? NeutralTheme.of(context).datePickerStyle;
 
   /// Returns local tokens when this component theme is present.
   static DatePickerStyle? maybeOf(BuildContext context) =>
@@ -49,7 +49,7 @@ class TimePickerTheme extends InheritedTheme {
 
   /// Returns the nearest local tokens or the application's component style.
   static TimePickerStyle of(BuildContext context) =>
-      maybeOf(context) ?? PureTheme.of(context).timePickerStyle;
+      maybeOf(context) ?? NeutralTheme.of(context).timePickerStyle;
 
   /// Returns local tokens when this component theme is present.
   static TimePickerStyle? maybeOf(BuildContext context) =>

@@ -8,7 +8,7 @@ import '../styles/dropdown_style.dart';
 ///
 /// The turn amount comes from [DropdownStyle.iconTurns] and defaults to a half
 /// turn. Timing follows the trigger's button style, defaulting to 200 ms with
-/// [Curves.easeInOut] like every other PureUI transition.
+/// [Curves.easeInOut] like every other NeutralUI transition.
 class DropdownIcon extends StatelessWidget {
   /// Creates a rotating icon resolved against [layers].
   const DropdownIcon({

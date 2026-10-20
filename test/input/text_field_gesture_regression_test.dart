@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
+import 'package:neutral_ui/neutral_ui.dart';
 
 import '../helpers/pump.dart';
 
@@ -10,7 +10,7 @@ void main() {
     WidgetTester tester,
   ) async {
     int taps = 0;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       SizedBox(width: 280, child: TextField(onTap: () => taps++)),
     );
@@ -33,7 +33,7 @@ void main() {
       text: 'Select this text by dragging',
     );
     addTearDown(text.dispose);
-    await pumpPure(
+    await pumpNeutral(
       tester,
       SizedBox(
         width: 280,
@@ -58,7 +58,7 @@ void main() {
       final FocusNode focus = FocusNode();
       addTearDown(focus.dispose);
       int taps = 0;
-      await pumpPure(
+      await pumpNeutral(
         tester,
         SizedBox(
           width: 280,
@@ -93,7 +93,7 @@ void main() {
     addTearDown(text.dispose);
     int taps = 0;
     final List<String> changes = <String>[];
-    await pumpPure(
+    await pumpNeutral(
       tester,
       SizedBox(
         width: 280,
@@ -122,7 +122,7 @@ void main() {
       (WidgetTester tester) async {
         final SearchController controller = SearchController();
         addTearDown(controller.dispose);
-        await pumpPureApp(
+        await pumpNeutralApp(
           tester,
           SizedBox(
             width: 300,

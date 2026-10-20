@@ -5,7 +5,7 @@ import '../foundation/decoration_override.dart';
 import '../foundation/interaction_state.dart';
 import '../foundation/motion.dart';
 import '../foundation/style_resolution.dart';
-import '../localizations/pure_localizations.dart';
+import '../localizations/neutral_localizations.dart';
 import '../styles/badge_style.dart';
 import '../theme/navigation_themes.dart';
 
@@ -70,7 +70,7 @@ class Badge extends StatelessWidget {
     final Widget? content = _count == null
         ? label
         : Text(
-            PureLocalizations.of(context)
+            NeutralLocalizations.of(context)
                 .formatBadgeCount(_count, maxCount: maxCount),
           );
     final bool large = content != null;

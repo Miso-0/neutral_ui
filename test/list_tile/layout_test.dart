@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
+import 'package:neutral_ui/neutral_ui.dart';
 
 import '../helpers/pump.dart';
 
@@ -8,7 +8,7 @@ void main() {
   testWidgets('tiles have no implicit height, slot gaps, or padding', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       const SizedBox(
         width: 200.0,
@@ -59,18 +59,18 @@ void main() {
           ),
         ),
       );
-      await pumpPure(tester, tile());
+      await pumpNeutral(tester, tile());
       expect(
         tester.getSize(find.byKey(const ValueKey<String>('title'))).width,
         200.0,
       );
-      await pumpPure(tester, tile(leading: true));
+      await pumpNeutral(tester, tile(leading: true));
       expect(
         tester.getTopLeft(find.byKey(const ValueKey<String>('title'))).dx -
             tester.getTopLeft(find.byType(ListTile)).dx,
         38.0,
       );
-      await pumpPure(tester, tile(trailing: true));
+      await pumpNeutral(tester, tile(trailing: true));
       expect(
         tester.getSize(find.byKey(const ValueKey<String>('title'))).width,
         180.0,
@@ -87,7 +87,7 @@ void main() {
       bool subtitle = false,
       bool threeLine = false,
     }) async {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         SizedBox(
           width: 200.0,
@@ -123,7 +123,7 @@ void main() {
   testWidgets(
     'every slot keeps vertical padding and subtitle spacing is explicit',
     (WidgetTester tester) async {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         const SizedBox(
           width: 200.0,
@@ -174,7 +174,7 @@ void main() {
     'threeLine alignment puts adjacent slots at the top only in three-line mode',
     (WidgetTester tester) async {
       for (final bool threeLine in <bool>[false, true]) {
-        await pumpPure(
+        await pumpNeutral(
           tester,
           SizedBox(
             width: 200.0,
@@ -210,7 +210,7 @@ void main() {
     WidgetTester tester,
   ) async {
     for (final TextDirection direction in TextDirection.values) {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         const SizedBox(
           width: 200.0,
@@ -245,7 +245,7 @@ void main() {
   testWidgets(
     'a slider subtitle receives a bounded width without intrinsic layout',
     (WidgetTester tester) async {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         SizedBox(
           width: 300.0,

@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
+import 'package:neutral_ui/neutral_ui.dart';
 
 import '../helpers/pump.dart';
 
@@ -15,7 +15,7 @@ void main() {
     addTearDown(focus.dispose);
     final List<String> changes = <String>[];
     String? submitted;
-    await pumpPureApp(
+    await pumpNeutralApp(
       tester,
       SizedBox(
         width: 300,
@@ -62,7 +62,7 @@ void main() {
     final TextEditingController text = TextEditingController(text: 'first');
     addTearDown(text.dispose);
     String? saved;
-    await pumpPureApp(
+    await pumpNeutralApp(
       tester,
       Form(
         key: form,
@@ -96,7 +96,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final List<InteractionState> states = <InteractionState>[];
-    await pumpPureApp(
+    await pumpNeutralApp(
       tester,
       SizedBox(
         width: 300,
@@ -140,11 +140,11 @@ void main() {
         width: 200,
         child: TextField(controller: controller, maxLength: 3),
       );
-      await pumpPureApp(tester, field(first));
+      await pumpNeutralApp(tester, field(first));
       await tester.enterText(find.byType(EditableText), 'long');
       await tester.pump();
       expect(first.text, 'lon');
-      await pumpPureApp(tester, field(second));
+      await pumpNeutralApp(tester, field(second));
       await tester.pumpAndSettle();
       expect(
         tester.widget<EditableText>(find.byType(EditableText)).controller,

@@ -1,6 +1,6 @@
-# PureUI
+# NeutralUI
 
-PureUI is a zero-dependency headless Flutter design system. It supplies controlled values, pointer and keyboard interaction, semantics, layout slots, and composable themes. Your application supplies its visual language. The library imports only Flutter's `widgets.dart`, local code, and `dart:math`.
+NeutralUI is a zero-dependency headless Flutter design system. It supplies controlled values, pointer and keyboard interaction, semantics, layout slots, and composable themes. Your application supplies its visual language. The library imports only Flutter's `widgets.dart`, local code, and `dart:math`.
 
 Requires Flutter 3.47 or newer and Dart 3.13.4 or newer. Version 0.10.0 is tested with Flutter 3.47.5.
 
@@ -8,15 +8,15 @@ Requires Flutter 3.47 or newer and Dart 3.13.4 or newer. Version 0.10.0 is teste
 
 ```yaml
 dependencies:
-  pure_ui:
-    path: ../pure_ui
+  neutral_ui:
+    path: ../neutral_ui
 ```
 
 ```dart
 import 'package:flutter/widgets.dart';
-import 'package:pure_ui/pure_ui.dart';
+import 'package:neutral_ui/neutral_ui.dart';
 
-PureTheme(
+NeutralTheme(
   data: const ThemeData(
     elevatedButtonStyle: ButtonStyle(
       padding: StateProperty.all(EdgeInsets.all(16)),
@@ -30,7 +30,7 @@ PureTheme(
 )
 ```
 
-PureUI uses Material's familiar names: `ElevatedButton`, `OutlinedButton`, `TextButton`, `IconButton`, `Checkbox`, `Switch`, `Radio`, `ListTile`, `Slider`, `DropdownButton`, `DropdownMenu`, `PopupMenuButton`, `ButtonStyle`, `ThemeData`, and the component theme names. When importing `material.dart` as well, use a prefix for PureUI (`import 'package:pure_ui/pure_ui.dart' as pure;`) or hide conflicting names. `widgets.dart` can be imported unprefixed alongside PureUI.
+NeutralUI uses Material's familiar names: `ElevatedButton`, `OutlinedButton`, `TextButton`, `IconButton`, `Checkbox`, `Switch`, `Radio`, `ListTile`, `Slider`, `DropdownButton`, `DropdownMenu`, `PopupMenuButton`, `ButtonStyle`, `ThemeData`, and the component theme names. When importing `material.dart` as well, use a prefix for NeutralUI (`import 'package:neutral_ui/neutral_ui.dart' as neutral;`) or hide conflicting names. `widgets.dart` can be imported unprefixed alongside NeutralUI.
 
 ## State and styling
 
@@ -56,7 +56,7 @@ Decoration transitions blend fill, border and shadow colors in premultiplied-alp
 
 ## Decorations
 
-Pass a `BoxDecoration` directly to a widget when a painted part should keep the same decoration in every interaction state, including hover, focus, pressed, selected and disabled. The parameter overrides that part's inline style, component theme, PureTheme slot and defaults. Other tokens, such as text styles, indicators and sizes, continue to resolve normally.
+Pass a `BoxDecoration` directly to a widget when a painted part should keep the same decoration in every interaction state, including hover, focus, pressed, selected and disabled. The parameter overrides that part's inline style, component theme, NeutralTheme slot and defaults. Other tokens, such as text styles, indicators and sizes, continue to resolve normally.
 
 ```dart
 ElevatedButton(
@@ -103,14 +103,14 @@ ListTile(
 
 ## Four ways to override a theme
 
-`PureTheme.of(context)` returns the nearest `ThemeData`, or `const ThemeData()`. `PureTheme.maybeOf(context)` returns null if absent. ThemeData owns 31 style slots: `elevatedButtonStyle`, `outlinedButtonStyle`, `textButtonStyle`, `iconButtonStyle`, `checkboxStyle`, `switchStyle`, `radioStyle`, `listTileStyle`, `sliderStyle`, `dropdownButtonStyle`, `dropdownMenuStyle`, `popupMenuStyle`, `tooltipStyle`, `dialogStyle`, `bottomSheetStyle`, `snackBarStyle`, `textFieldStyle`, `autocompleteStyle`, `searchStyle`, `datePickerStyle`, `timePickerStyle`, `filledButtonStyle`, `floatingActionButtonStyle`, `segmentedButtonStyle`, `toggleButtonsStyle`, `chipStyle`, `tabBarStyle`, `navigationStyle`, `expansionTileStyle`, `progressIndicatorStyle`, `badgeStyle`.
+`NeutralTheme.of(context)` returns the nearest `ThemeData`, or `const ThemeData()`. `NeutralTheme.maybeOf(context)` returns null if absent. ThemeData owns 31 style slots: `elevatedButtonStyle`, `outlinedButtonStyle`, `textButtonStyle`, `iconButtonStyle`, `checkboxStyle`, `switchStyle`, `radioStyle`, `listTileStyle`, `sliderStyle`, `dropdownButtonStyle`, `dropdownMenuStyle`, `popupMenuStyle`, `tooltipStyle`, `dialogStyle`, `bottomSheetStyle`, `snackBarStyle`, `textFieldStyle`, `autocompleteStyle`, `searchStyle`, `datePickerStyle`, `timePickerStyle`, `filledButtonStyle`, `floatingActionButtonStyle`, `segmentedButtonStyle`, `toggleButtonsStyle`, `chipStyle`, `tabBarStyle`, `navigationStyle`, `expansionTileStyle`, `progressIndicatorStyle`, `badgeStyle`.
 
-1. Set app-wide tokens with `PureTheme(data: ThemeData(...), child: ...)`.
-2. Inherit app-wide tokens and override some in a subtree with `PureTheme.merge(data: ThemeData(...), child: ...)`.
+1. Set app-wide tokens with `NeutralTheme(data: ThemeData(...), child: ...)`.
+2. Inherit app-wide tokens and override some in a subtree with `NeutralTheme.merge(data: ThemeData(...), child: ...)`.
 3. Override one component using `ElevatedButtonTheme`, `OutlinedButtonTheme`, `TextButtonTheme`, `IconButtonTheme`, `CheckboxTheme`, `SwitchTheme`, `RadioTheme`, `ListTileTheme`, `SliderTheme`, `DropdownButtonTheme`, `DropdownMenuTheme`, or `PopupMenuTheme`.
 4. Set `style:` on a control, including `style: ElevatedButtonTheme.of(context).copyWith(...)`.
 
-Each component theme has `of`, `maybeOf`, and `merge`. A regular component theme replaces the entire enclosing component style. Its `merge` constructor helper inherits unset tokens from the enclosing component theme or the PureTheme slot. Inline styles resolve over the nearest component theme. Explicit behavioral widget parameters, such as slider `allowedInteraction`, take precedence over style tokens.
+Each component theme has `of`, `maybeOf`, and `merge`. A regular component theme replaces the entire enclosing component style. Its `merge` constructor helper inherits unset tokens from the enclosing component theme or the NeutralTheme slot. Inline styles resolve over the nearest component theme. Explicit behavioral widget parameters, such as slider `allowedInteraction`, take precedence over style tokens.
 
 ```dart
 ElevatedButtonTheme.merge(
@@ -127,7 +127,7 @@ ElevatedButtonTheme.merge(
 )
 ```
 
-Style `merge` is receiver-first: `overrides.merge(base)` fills only unset fields from `base`. `copyWith` preserves fields when its argument is null. All styles and ThemeData support value equality. PureTheme and every component theme extend `InheritedTheme`; use `InheritedTheme.capture` or `captureAll` when inserting a route or overlay into a different subtree.
+Style `merge` is receiver-first: `overrides.merge(base)` fills only unset fields from `base`. `copyWith` preserves fields when its argument is null. All styles and ThemeData support value equality. NeutralTheme and every component theme extend `InheritedTheme`; use `InheritedTheme.capture` or `captureAll` when inserting a route or overlay into a different subtree.
 
 ## Tokens
 
@@ -187,7 +187,7 @@ Menus need an `Overlay` ancestor: use `WidgetsApp` with `home`/`routes`, or wrap
 ```dart
 WidgetsApp(
   color: const Color(0xFFFFFFFF),
-  builder: (BuildContext context, Widget? child) => PureTheme(
+  builder: (BuildContext context, Widget? child) => NeutralTheme(
     data: const ThemeData(),
     child: Overlay(
       initialEntries: <OverlayEntry>[
@@ -232,17 +232,17 @@ To verify the package, run `flutter analyze` and `flutter test`, followed by `fl
 
 ## Application, overlays and calendar foundations
 
-`PureApp` supplies a Navigator, `PureTheme`, a `HeroControllerScope` and the default PureUI localization delegate. It accepts `home`, `routes`, `onGenerateRoute`, `navigatorKey` and a `builder` for wrapping routes. Like `WidgetsApp`, it requires an application `color`. Custom localization delegates precede the English default.
+`NeutralApp` supplies a Navigator, `NeutralTheme`, a `HeroControllerScope` and the default NeutralUI localization delegate. It accepts `home`, `routes`, `onGenerateRoute`, `navigatorKey` and a `builder` for wrapping routes. Like `WidgetsApp`, it requires an application `color`. Custom localization delegates precede the English default.
 
 ```dart
-PureApp(
+NeutralApp(
   color: const Color(0xFFF4F7F3),
   theme: const ThemeData(),
   home: const Center(child: Text('Hello')),
 )
 ```
 
-For an application without navigation, `PureApp.builder(color: ..., builder: ...)` provides an Overlay and keeps its content mounted when the app rebuilds. Route-based components require the regular constructor.
+For an application without navigation, `NeutralApp.builder(color: ..., builder: ...)` provides an Overlay and keeps its content mounted when the app rebuilds. Route-based components require the regular constructor.
 
 Menus use the root overlay by default. Set `MenuStyle(overlayLocation: OverlayLocation.nearest)` to select the closest overlay. Outside taps dismiss and activate underlying controls by default; `outsideTapBehavior: OutsideTapBehavior.consume` consumes that gesture. Nested menu panels share a tap group, so interacting with a nested panel keeps its parent open. Focus returns to the anchor at the end of dismissal only while focus still belongs to the closing panel.
 
@@ -259,7 +259,7 @@ Menus use the root overlay by default. Set `MenuStyle(overlayLocation: OverlayLo
 
 `MenuStyle.offset.dx` is directional: positive values move toward the reading direction's end. A positive vertical gap stays outside the anchor when the panel flips upward.
 
-`PureLocalizations.of(context)` returns English strings even without a localization delegate. Override `DefaultPureLocalizations` and install a delegate to customize text, month and weekday names, compact date parsing, date/time formatting and accessibility labels. No `intl` dependency is required. `GregorianCalendarDelegate` implements `CalendarDelegate<DateTime>`; custom calendars can replace its date arithmetic and formatting. `DateUtils`, `DateTimeRange`, `TimeOfDay`, picker modes and `DayPeriod` supply widgets-only value types for future pickers.
+`NeutralLocalizations.of(context)` returns English strings even without a localization delegate. Override `DefaultNeutralLocalizations` and install a delegate to customize text, month and weekday names, compact date parsing, date/time formatting and accessibility labels. No `intl` dependency is required. `GregorianCalendarDelegate` implements `CalendarDelegate<DateTime>`; custom calendars can replace its date arithmetic and formatting. `DateUtils`, `DateTimeRange`, `TimeOfDay`, picker modes and `DayPeriod` supply widgets-only value types for future pickers.
 
 The painted `CloseGlyph`, `SearchGlyph`, `CalendarGlyph`, `ClockGlyph`, `EditGlyph` and `ArrowGlyph` follow the ambient `IconTheme`. `ChevronGlyph` and `ArrowGlyph` accept `GlyphDirection`; `start` and `end` mirror with text direction, while `left` and `right` stay physical. Glyphs are decorative and excluded from semantics.
 
@@ -268,7 +268,7 @@ The painted `CloseGlyph`, `SearchGlyph`, `CalendarGlyph`, `ClockGlyph`, `EditGly
 
 `Tooltip` supports hover, long press, tap and visible keyboard focus. It accepts plain `message` or `richMessage`, the framework trigger/delay/feedback parameters, and a `TooltipStyle`. A `GlobalKey<TooltipState>` exposes `ensureTooltipVisible()` and `dismiss()`. `TooltipVisibility` controls a subtree. Escape dismisses the current tooltip; inline motion tokens can be changed while it is shown.
 
-`Dialog`, `AlertDialog`, `SimpleDialog` and `SimpleDialogOption` use `DialogStyle` and `DialogTheme`. `showDialog<T>` requires a Navigator such as the regular `PureApp`, captures inherited themes, closes on Escape or a dismissible barrier, traps Tab focus and returns the value passed to `Navigator.pop`. DialogStyle controls surface decoration, layout, the optional barrier blur, and independent entrance/exit motion.
+`Dialog`, `AlertDialog`, `SimpleDialog` and `SimpleDialogOption` use `DialogStyle` and `DialogTheme`. `showDialog<T>` requires a Navigator such as the regular `NeutralApp`, captures inherited themes, closes on Escape or a dismissible barrier, traps Tab focus and returns the value passed to `Navigator.pop`. DialogStyle controls surface decoration, layout, the optional barrier blur, and independent entrance/exit motion.
 
 ```dart
 final bool? accepted = await showDialog<bool>(

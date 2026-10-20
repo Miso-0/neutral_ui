@@ -5,7 +5,7 @@ import '../styles/navigation_style.dart';
 import '../styles/expansion_tile_style.dart';
 import '../styles/progress_indicator_style.dart';
 import '../styles/badge_style.dart';
-import 'pure_theme.dart';
+import 'neutral_theme.dart';
 
 /// Overrides tabBar tokens within a subtree.
 class TabBarTheme extends InheritedTheme {
@@ -17,7 +17,7 @@ class TabBarTheme extends InheritedTheme {
 
   /// Returns the nearest local tokens or the application's component style.
   static TabBarStyle of(BuildContext context) =>
-      maybeOf(context) ?? PureTheme.of(context).tabBarStyle;
+      maybeOf(context) ?? NeutralTheme.of(context).tabBarStyle;
 
   /// Returns local tokens when this component theme is present.
   static TabBarStyle? maybeOf(BuildContext context) =>
@@ -52,7 +52,7 @@ class NavigationTheme extends InheritedTheme {
 
   /// Returns the nearest local tokens or the application's component style.
   static NavigationStyle of(BuildContext context) =>
-      maybeOf(context) ?? PureTheme.of(context).navigationStyle;
+      maybeOf(context) ?? NeutralTheme.of(context).navigationStyle;
 
   /// Returns local tokens when this component theme is present.
   static NavigationStyle? maybeOf(BuildContext context) =>
@@ -211,7 +211,7 @@ class ExpansionTileTheme extends InheritedTheme {
 
   /// Returns the nearest local tokens or the application's component style.
   static ExpansionTileStyle of(BuildContext context) =>
-      maybeOf(context) ?? PureTheme.of(context).expansionTileStyle;
+      maybeOf(context) ?? NeutralTheme.of(context).expansionTileStyle;
 
   /// Returns local tokens when this component theme is present.
   static ExpansionTileStyle? maybeOf(BuildContext context) =>
@@ -251,7 +251,7 @@ class ProgressIndicatorTheme extends InheritedTheme {
 
   /// Returns the nearest local tokens or the application's component style.
   static ProgressIndicatorStyle of(BuildContext context) =>
-      maybeOf(context) ?? PureTheme.of(context).progressIndicatorStyle;
+      maybeOf(context) ?? NeutralTheme.of(context).progressIndicatorStyle;
 
   /// Returns local tokens when this component theme is present.
   static ProgressIndicatorStyle? maybeOf(BuildContext context) => context
@@ -288,7 +288,7 @@ class BadgeTheme extends InheritedTheme {
 
   /// Returns the nearest local tokens or the application's component style.
   static BadgeStyle of(BuildContext context) =>
-      maybeOf(context) ?? PureTheme.of(context).badgeStyle;
+      maybeOf(context) ?? NeutralTheme.of(context).badgeStyle;
 
   /// Returns local tokens when this component theme is present.
   static BadgeStyle? maybeOf(BuildContext context) =>

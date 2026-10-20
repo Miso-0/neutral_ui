@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../styles/button_style.dart';
-import 'pure_theme.dart';
+import 'neutral_theme.dart';
 
 /// Overrides elevatedButton tokens for a subtree.
 ///
@@ -18,9 +18,9 @@ class ElevatedButtonTheme extends InheritedTheme {
   /// The component tokens inherited by this subtree.
   final ButtonStyle data;
 
-  /// Returns the nearest component theme or its PureTheme style.
+  /// Returns the nearest component theme or its NeutralTheme style.
   static ButtonStyle of(BuildContext context) {
-    return maybeOf(context) ?? PureTheme.of(context).elevatedButtonStyle;
+    return maybeOf(context) ?? NeutralTheme.of(context).elevatedButtonStyle;
   }
 
   /// Returns the nearest local component theme, if present.
@@ -69,9 +69,9 @@ class OutlinedButtonTheme extends InheritedTheme {
   /// The component tokens inherited by this subtree.
   final ButtonStyle data;
 
-  /// Returns the nearest component theme or its PureTheme style.
+  /// Returns the nearest component theme or its NeutralTheme style.
   static ButtonStyle of(BuildContext context) {
-    return maybeOf(context) ?? PureTheme.of(context).outlinedButtonStyle;
+    return maybeOf(context) ?? NeutralTheme.of(context).outlinedButtonStyle;
   }
 
   /// Returns the nearest local component theme, if present.
@@ -116,9 +116,9 @@ class TextButtonTheme extends InheritedTheme {
   /// The component tokens inherited by this subtree.
   final ButtonStyle data;
 
-  /// Returns the nearest component theme or its PureTheme style.
+  /// Returns the nearest component theme or its NeutralTheme style.
   static ButtonStyle of(BuildContext context) {
-    return maybeOf(context) ?? PureTheme.of(context).textButtonStyle;
+    return maybeOf(context) ?? NeutralTheme.of(context).textButtonStyle;
   }
 
   /// Returns the nearest local component theme, if present.
@@ -160,9 +160,9 @@ class IconButtonTheme extends InheritedTheme {
   /// The component tokens inherited by this subtree.
   final ButtonStyle data;
 
-  /// Returns the nearest component theme or its PureTheme style.
+  /// Returns the nearest component theme or its NeutralTheme style.
   static ButtonStyle of(BuildContext context) {
-    return maybeOf(context) ?? PureTheme.of(context).iconButtonStyle;
+    return maybeOf(context) ?? NeutralTheme.of(context).iconButtonStyle;
   }
 
   /// Returns the nearest local component theme, if present.
@@ -207,7 +207,7 @@ class FilledButtonTheme extends InheritedTheme {
 
   /// Returns the nearest local tokens or the application's component style.
   static ButtonStyle of(BuildContext context) =>
-      maybeOf(context) ?? PureTheme.of(context).filledButtonStyle;
+      maybeOf(context) ?? NeutralTheme.of(context).filledButtonStyle;
 
   /// Returns local tokens when this component theme is present.
   static ButtonStyle? maybeOf(BuildContext context) =>
@@ -247,7 +247,7 @@ class FloatingActionButtonTheme extends InheritedTheme {
 
   /// Returns the nearest local tokens or the application's component style.
   static ButtonStyle of(BuildContext context) =>
-      maybeOf(context) ?? PureTheme.of(context).floatingActionButtonStyle;
+      maybeOf(context) ?? NeutralTheme.of(context).floatingActionButtonStyle;
 
   /// Returns local tokens when this component theme is present.
   static ButtonStyle? maybeOf(BuildContext context) => context
@@ -288,7 +288,7 @@ class SegmentedButtonTheme extends InheritedTheme {
 
   /// Returns the nearest local tokens or the application's component style.
   static ButtonStyle of(BuildContext context) =>
-      maybeOf(context) ?? PureTheme.of(context).segmentedButtonStyle;
+      maybeOf(context) ?? NeutralTheme.of(context).segmentedButtonStyle;
 
   /// Returns local tokens when this component theme is present.
   static ButtonStyle? maybeOf(BuildContext context) =>
@@ -328,7 +328,7 @@ class ToggleButtonsTheme extends InheritedTheme {
 
   /// Returns the nearest local tokens or the application's component style.
   static ButtonStyle of(BuildContext context) =>
-      maybeOf(context) ?? PureTheme.of(context).toggleButtonsStyle;
+      maybeOf(context) ?? NeutralTheme.of(context).toggleButtonsStyle;
 
   /// Returns local tokens when this component theme is present.
   static ButtonStyle? maybeOf(BuildContext context) =>

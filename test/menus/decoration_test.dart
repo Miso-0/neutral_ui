@@ -1,10 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
-import 'package:pure_ui/src/foundation/animated_surface.dart';
-import 'package:pure_ui/src/menus/menu_item_button.dart';
-import 'package:pure_ui/src/menus/menu_panel.dart';
+import 'package:neutral_ui/neutral_ui.dart';
+import 'package:neutral_ui/src/foundation/animated_surface.dart';
+import 'package:neutral_ui/src/menus/menu_item_button.dart';
+import 'package:neutral_ui/src/menus/menu_panel.dart';
 
 import '../helpers/pump.dart';
 
@@ -119,7 +119,7 @@ void main() {
             ),
           ],
         );
-        await pumpPure(
+        await pumpNeutral(
           tester,
           componentTheme
               ? DropdownButtonTheme(data: _dropdownTheme, child: dropdown)
@@ -196,7 +196,7 @@ void main() {
               menuDecoration: _panelDecoration,
               style: const DropdownStyle(itemStyle: _themedButton),
             );
-      await pumpPure(
+      await pumpNeutral(
         tester,
         DropdownMenuTheme(data: _dropdownTheme, child: dropdown),
         theme: _globalTheme,
@@ -217,7 +217,7 @@ void main() {
   testWidgets('popup decorates trigger, panel, regular and checked rows', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       PopupMenuTheme(
         data: _popupTheme,
@@ -289,7 +289,7 @@ void main() {
           child: const Text('Actions'),
         ),
       };
-      await pumpPure(tester, dropdown, theme: _globalTheme);
+      await pumpNeutral(tester, dropdown, theme: _globalTheme);
       expect(_surface(tester, _anchor).decoration, _triggerDecoration);
       expect(tester.takeException(), isNull);
     });
@@ -344,7 +344,7 @@ void main() {
                   const <PopupMenuEntry<int>>[],
             ),
           };
-          await pumpPure(tester, dropdown);
+          await pumpNeutral(tester, dropdown);
           final Object? error = tester.takeException();
           expect(error, isA<FlutterError>());
           expect(
@@ -419,7 +419,7 @@ void main() {
           child: const Text('Actions'),
         ),
       };
-      await pumpPure(tester, dropdown);
+      await pumpNeutral(tester, dropdown);
       if (kind == 'popup' || kind == 'checked') {
         await tester.tap(_anchor);
         await tester.pump();

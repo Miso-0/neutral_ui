@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
+import 'package:neutral_ui/neutral_ui.dart';
 
 class _PersistentCounter extends StatefulWidget {
   const _PersistentCounter({super.key});
@@ -32,7 +32,7 @@ void main() {
       final GlobalKey<_PersistentCounterState> counter =
           GlobalKey<_PersistentCounterState>();
       late BuildContext contentContext;
-      Widget app(ThemeData theme, String label) => PureApp.builder(
+      Widget app(ThemeData theme, String label) => NeutralApp.builder(
         color: const Color(0xFFFFFFFF),
         theme: theme,
         builder: (BuildContext context) {
@@ -54,7 +54,7 @@ void main() {
       final List<ThemeData> overlayThemes = <ThemeData>[];
       final OverlayEntry extra = OverlayEntry(
         builder: (BuildContext context) {
-          overlayThemes.add(PureTheme.of(context));
+          overlayThemes.add(NeutralTheme.of(context));
           return const Positioned(
             left: 20,
             top: 200,
@@ -86,12 +86,12 @@ void main() {
     (WidgetTester tester) async {
       const Key appKey = ValueKey<String>('app');
       Widget app(bool navigator) => navigator
-          ? const PureApp(
+          ? const NeutralApp(
               key: appKey,
               color: Color(0xFFFFFFFF),
               home: Text('Navigator home'),
             )
-          : PureApp.builder(
+          : NeutralApp.builder(
               key: appKey,
               color: const Color(0xFFFFFFFF),
               builder: (BuildContext context) => const Text('Builder home'),
@@ -134,7 +134,7 @@ void main() {
       ),
     );
     await tester.pumpWidget(
-      PureApp(
+      NeutralApp(
         color: const Color(0xFFFFFFFF),
         navigatorKey: navigator,
         home: hero(Alignment.topLeft),

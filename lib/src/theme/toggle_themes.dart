@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../styles/toggle_style.dart';
-import 'pure_theme.dart';
+import 'neutral_theme.dart';
 
 /// Overrides checkbox tokens for a subtree.
 ///
@@ -14,9 +14,9 @@ class CheckboxTheme extends InheritedTheme {
   /// The component tokens inherited by this subtree.
   final ToggleStyle data;
 
-  /// Returns the nearest component theme or its PureTheme style.
+  /// Returns the nearest component theme or its NeutralTheme style.
   static ToggleStyle of(BuildContext context) {
-    return maybeOf(context) ?? PureTheme.of(context).checkboxStyle;
+    return maybeOf(context) ?? NeutralTheme.of(context).checkboxStyle;
   }
 
   /// Returns the nearest local component theme, if present.
@@ -58,9 +58,9 @@ class SwitchTheme extends InheritedTheme {
   /// The component tokens inherited by this subtree.
   final ToggleStyle data;
 
-  /// Returns the nearest component theme or its PureTheme style.
+  /// Returns the nearest component theme or its NeutralTheme style.
   static ToggleStyle of(BuildContext context) {
-    return maybeOf(context) ?? PureTheme.of(context).switchStyle;
+    return maybeOf(context) ?? NeutralTheme.of(context).switchStyle;
   }
 
   /// Returns the nearest local component theme, if present.
@@ -102,9 +102,9 @@ class RadioTheme extends InheritedTheme {
   /// The component tokens inherited by this subtree.
   final ToggleStyle data;
 
-  /// Returns the nearest component theme or its PureTheme style.
+  /// Returns the nearest component theme or its NeutralTheme style.
   static ToggleStyle of(BuildContext context) {
-    return maybeOf(context) ?? PureTheme.of(context).radioStyle;
+    return maybeOf(context) ?? NeutralTheme.of(context).radioStyle;
   }
 
   /// Returns the nearest local component theme, if present.

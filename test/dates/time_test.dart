@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/src/dates/dates.dart';
+import 'package:neutral_ui/src/dates/dates.dart';
 
 void main() {
   test('AM and PM hours include midnight and noon', () {

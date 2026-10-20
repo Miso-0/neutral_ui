@@ -1,13 +1,13 @@
 import 'package:flutter/widgets.dart';
 
-import '../localizations/pure_localizations.dart';
-import '../theme/pure_theme.dart';
+import '../localizations/neutral_localizations.dart';
+import '../theme/neutral_theme.dart';
 import '../theme/theme_data.dart';
 
-/// A widgets-layer application with PureUI themes, strings and navigation.
-class PureApp extends StatefulWidget {
+/// A widgets-layer application with NeutralUI themes, strings and navigation.
+class NeutralApp extends StatefulWidget {
   /// Creates an application with a Navigator and widgets-layer page routes.
-  const PureApp({
+  const NeutralApp({
     super.key,
     required this.color,
     this.theme = const ThemeData(),
@@ -33,7 +33,7 @@ class PureApp extends StatefulWidget {
   }) : _contentBuilder = null;
 
   /// Creates a navigator-free application with an Overlay around its content.
-  const PureApp.builder({
+  const NeutralApp.builder({
     super.key,
     required this.color,
     required WidgetBuilder builder,
@@ -86,7 +86,7 @@ class PureApp extends StatefulWidget {
   /// Observers attached to the application's Navigator.
   final List<NavigatorObserver> navigatorObservers;
 
-  /// Wraps the Navigator in application-specific widgets below PureTheme.
+  /// Wraps the Navigator in application-specific widgets below NeutralTheme.
   final TransitionBuilder? builder;
 
   final WidgetBuilder? _contentBuilder;
@@ -125,10 +125,10 @@ class PureApp extends StatefulWidget {
   final bool debugShowCheckedModeBanner;
 
   @override
-  State<PureApp> createState() => _PureAppState();
+  State<NeutralApp> createState() => _NeutralAppState();
 }
 
-class _PureAppState extends State<PureApp> {
+class _NeutralAppState extends State<NeutralApp> {
   final HeroController _heroController = HeroController();
 
   @override
@@ -152,7 +152,7 @@ class _PureAppState extends State<PureApp> {
               Animation<double> secondaryAnimation,
             ) => builder(context),
           ),
-      builder: (BuildContext context, Widget? child) => PureTheme(
+      builder: (BuildContext context, Widget? child) => NeutralTheme(
         data: widget.theme,
         child: Builder(
           builder: (BuildContext context) => widget._contentBuilder != null
@@ -165,7 +165,7 @@ class _PureAppState extends State<PureApp> {
       locale: widget.locale,
       localizationsDelegates: <LocalizationsDelegate<dynamic>>[
         ...widget.localizationsDelegates,
-        PureLocalizations.delegate,
+        NeutralLocalizations.delegate,
       ],
       supportedLocales: widget.supportedLocales,
       localeResolutionCallback: widget.localeResolutionCallback,

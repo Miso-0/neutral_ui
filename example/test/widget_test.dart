@@ -4,8 +4,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
-import 'package:pure_ui_example/main.dart';
+import 'package:neutral_ui/neutral_ui.dart';
+import 'package:neutral_ui_example/main.dart';
 
 void main() {
   testWidgets(
@@ -100,7 +100,7 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(const GalleryApp());
     await tester.pumpAndSettle();
-    expect(find.text('pureui'), findsOneWidget);
+    expect(find.text('neutralui'), findsOneWidget);
     expect(find.text('Create project'), findsOneWidget);
     await tester.tap(find.text('Create project'));
     await tester.pumpAndSettle();
@@ -115,7 +115,7 @@ void main() {
     await tester.tap(rtl);
     await tester.pumpAndSettle();
     expect(
-      Directionality.of(tester.element(find.text('pureui'))),
+      Directionality.of(tester.element(find.text('neutralui'))),
       TextDirection.rtl,
     );
     await tester.ensureVisible(find.text('05 / Local themes'));

@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
+import 'package:neutral_ui/neutral_ui.dart';
 
 import '../helpers/pump.dart';
 
@@ -10,7 +10,7 @@ void main() {
     'dropdown notifies once after exit even with repeated activation',
     (WidgetTester tester) async {
       final List<String> calls = <String>[];
-      await pumpPure(
+      await pumpNeutral(
         tester,
         DropdownButton<int>(
           items: <DropdownMenuItem<int>>[
@@ -50,7 +50,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final List<String> calls = <String>[];
-    await pumpPure(
+    await pumpNeutral(
       tester,
       PopupMenuButton<int>(
         itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[

@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
-import 'package:pure_ui/src/menus/menu_item_button.dart';
+import 'package:neutral_ui/neutral_ui.dart';
+import 'package:neutral_ui/src/menus/menu_item_button.dart';
 
 import '../helpers/pump.dart';
 
@@ -12,7 +12,7 @@ void main() {
       final FocusNode focus = FocusNode();
       addTearDown(focus.dispose);
       InteractionState? latest;
-      await pumpPure(
+      await pumpNeutral(
         tester,
         InteractionDetector(
           isFocused: true,
@@ -24,7 +24,7 @@ void main() {
       );
       expect(latest!.isFocused, isTrue);
       useTraditionalFocus();
-      await pumpPure(
+      await pumpNeutral(
         tester,
         InteractionDetector(
           isFocused: false,
@@ -48,7 +48,7 @@ void main() {
     final SemanticsHandle semantics = tester.ensureSemantics();
     final WidgetStatesController states = WidgetStatesController();
     addTearDown(states.dispose);
-    await pumpPure(
+    await pumpNeutral(
       tester,
       MenuItemButton(
         isExpanded: true,
@@ -87,7 +87,7 @@ void main() {
   ) async {
     final WidgetStatesController states = WidgetStatesController();
     addTearDown(states.dispose);
-    await pumpPure(
+    await pumpNeutral(
       tester,
       MenuItemButton(
         isExpanded: true,

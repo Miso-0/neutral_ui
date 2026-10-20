@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
+import 'package:neutral_ui/neutral_ui.dart';
 
 import '../helpers/pump.dart';
 
@@ -9,7 +9,7 @@ void main() {
     WidgetTester tester,
   ) async {
     const Color color = Color(0xFF087F6D);
-    await pumpPure(
+    await pumpNeutral(
       tester,
       const IconTheme(
         data: IconThemeData(size: 20, color: color, opacity: 0.5),
@@ -68,7 +68,7 @@ void main() {
               ),
             )
             .painter!;
-        Future<void> pump(TextDirection textDirection) => pumpPure(
+        Future<void> pump(TextDirection textDirection) => pumpNeutral(
           tester,
           Row(
             mainAxisSize: MainAxisSize.min,

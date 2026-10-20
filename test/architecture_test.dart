@@ -19,7 +19,7 @@ void main() {
         expect(
           uri == 'package:flutter/widgets.dart' ||
               uri == 'dart:math' ||
-              uri.startsWith('package:pure_ui/') ||
+              uri.startsWith('package:neutral_ui/') ||
               !uri.contains(':'),
           isTrue,
           reason: '${file.path} imports $uri',

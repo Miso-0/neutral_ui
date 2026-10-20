@@ -1,5 +1,5 @@
-name: pure_ui_example
-description: A visual theme gallery for PureUI headless Flutter controls.
+name: neutral_ui_example
+description: A visual theme gallery for NeutralUI headless Flutter controls.
 publish_to: none
 version: 1.0.0+1
 
@@ -9,7 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  pure_ui:
+  neutral_ui:
     path: ../
 
 dev_dependencies:

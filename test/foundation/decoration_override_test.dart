@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
-import 'package:pure_ui/src/foundation/decoration_override.dart';
+import 'package:neutral_ui/neutral_ui.dart';
+import 'package:neutral_ui/src/foundation/decoration_override.dart';
 
 void main() {
   const BoxDecoration decoration = BoxDecoration(color: Color(0xFF112233));

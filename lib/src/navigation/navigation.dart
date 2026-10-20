@@ -5,7 +5,7 @@ import '../feedback/tooltip.dart';
 import '../foundation/interaction_state.dart';
 import '../foundation/motion.dart';
 import '../foundation/style_resolution.dart';
-import '../localizations/pure_localizations.dart';
+import '../localizations/neutral_localizations.dart';
 import '../styles/button_style.dart';
 import '../styles/navigation_style.dart';
 import '../theme/navigation_themes.dart';
@@ -291,7 +291,7 @@ class NavigationDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Semantics(
     container: true,
-    label: PureLocalizations.of(context).drawerLabel,
+    label: NeutralLocalizations.of(context).drawerLabel,
     child: _NavigationGroup(
       axis: Axis.vertical,
       selectedIndex: selectedIndex,

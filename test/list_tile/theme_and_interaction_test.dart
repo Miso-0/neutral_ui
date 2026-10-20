@@ -1,8 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
-import 'package:pure_ui/src/foundation/animated_surface.dart';
+import 'package:neutral_ui/neutral_ui.dart';
+import 'package:neutral_ui/src/foundation/animated_surface.dart';
 
 import '../helpers/pump.dart';
 
@@ -17,7 +17,7 @@ void main() {
       decoration: StateProperty<Decoration?>.all(global),
       minTileHeight: 80.0,
     );
-    await pumpPure(
+    await pumpNeutral(
       tester,
       const ListTile(title: Text('Tile')),
       theme: const ThemeData(listTileStyle: globalStyle),
@@ -26,7 +26,7 @@ void main() {
       tester.widget<AnimatedSurface>(find.byType(AnimatedSurface)).decoration,
       global,
     );
-    await pumpPure(
+    await pumpNeutral(
       tester,
       const ListTileTheme(
         data: ListTileStyle(decoration: StateProperty<Decoration?>.all(local)),
@@ -50,7 +50,7 @@ void main() {
     'ListTileTheme.merge inherits tokens through nested component themes',
     (WidgetTester tester) async {
       const BoxDecoration decoration = BoxDecoration(color: Color(0xFF000001));
-      await pumpPure(
+      await pumpNeutral(
         tester,
         ListTileTheme.merge(
           data: const ListTileStyle(contentPadding: EdgeInsets.all(6.0)),
@@ -96,7 +96,7 @@ void main() {
         return const SizedBox(width: 10.0, height: 10.0);
       },
     );
-    await pumpPure(
+    await pumpNeutral(
       tester,
       ListTile(
         leading: slot('leading'),
@@ -137,7 +137,7 @@ void main() {
     addTearDown(focus.dispose);
     int taps = 0;
     int presses = 0;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       ListTile(
         title: const Text('Tile'),
@@ -186,7 +186,7 @@ void main() {
         onFocusChange: focuses.add,
         style: style,
       );
-      await pumpPure(tester, tile());
+      await pumpNeutral(tester, tile());
       final TestGesture mouse = await hover(tester, find.byType(ListTile));
       focus.requestFocus();
       await tester.pumpAndSettle();
@@ -203,7 +203,7 @@ void main() {
       );
       expect(hovers, <bool>[true]);
       expect(focuses, contains(true));
-      await pumpPure(tester, tile(enabled: false));
+      await pumpNeutral(tester, tile(enabled: false));
       expect(states.last.isDisabled, isTrue);
       expect(states.last.isHovered, isFalse);
       expect(controller.value, contains(WidgetState.disabled));

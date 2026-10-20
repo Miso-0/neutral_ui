@@ -7,7 +7,7 @@ import '../foundation/interaction_state.dart';
 import '../foundation/motion.dart';
 import '../foundation/style_resolution.dart';
 import '../foundation/tap_target.dart';
-import '../localizations/pure_localizations.dart';
+import '../localizations/neutral_localizations.dart';
 import '../styles/button_style.dart';
 import '../styles/date_picker_style.dart';
 
@@ -248,7 +248,7 @@ class PickerMonthView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PureLocalizations l = PureLocalizations.of(context);
+    final NeutralLocalizations l = NeutralLocalizations.of(context);
     final int offset = calendarDelegate.firstDayOffset(
       month.year,
       month.month,

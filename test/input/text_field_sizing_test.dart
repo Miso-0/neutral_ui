@@ -1,8 +1,8 @@
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
-import 'package:pure_ui/src/foundation/animated_surface.dart';
+import 'package:neutral_ui/neutral_ui.dart';
+import 'package:neutral_ui/src/foundation/animated_surface.dart';
 
 import '../helpers/pump.dart';
 
@@ -56,7 +56,7 @@ void main() {
     (WidgetTester tester) async {
       final TextEditingController text = TextEditingController(text: 'secret');
       addTearDown(text.dispose);
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         TextField(
           width: 280,
@@ -117,7 +117,7 @@ void main() {
     ) async {
       final TextEditingController text = TextEditingController(text: 'secret');
       addTearDown(text.dispose);
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         TextField(
           width: 180,
@@ -156,7 +156,7 @@ void main() {
             text: 'secret',
           );
           addTearDown(text.dispose);
-          await pumpPureApp(
+          await pumpNeutralApp(
             tester,
             TextField(
               width: width,
@@ -205,7 +205,7 @@ void main() {
     (WidgetTester tester) async {
       final TextEditingController text = TextEditingController(text: 'query');
       addTearDown(text.dispose);
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         TextField(
           width: 220,
@@ -240,7 +240,7 @@ void main() {
         text: 'abcdefghij',
       );
       addTearDown(text.dispose);
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         TextField(
           width: 240,
@@ -268,7 +268,7 @@ void main() {
     testWidgets(
       'text scale 2 fits height $height and remains full size when room permits',
       (WidgetTester tester) async {
-        await pumpPureApp(
+        await pumpNeutralApp(
           tester,
           Builder(
             builder: (BuildContext context) => MediaQuery(
@@ -301,7 +301,7 @@ void main() {
       addTearDown(text.dispose);
       addTearDown(focus.dispose);
       addTearDown(scroll.dispose);
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         TextField(
           width: 120,
@@ -340,7 +340,7 @@ void main() {
       addTearDown(text.dispose);
       addTearDown(scroll.dispose);
       addTearDown(focus.dispose);
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         TextField(
           width: 200,
@@ -372,9 +372,9 @@ void main() {
         fixedSize: StateProperty<Size?>.all(Size(200, 60)),
         maximumSize: StateProperty<Size?>.all(Size(180, 50)),
       );
-      await pumpPureApp(tester, const TextField(style: tokens));
+      await pumpNeutralApp(tester, const TextField(style: tokens));
       expect(_box(tester).size, const Size(180, 50));
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         const TextField(width: 150, height: 30, style: tokens),
       );
@@ -386,7 +386,7 @@ void main() {
   testWidgets('parent bounds still constrain a requested larger input box', (
     WidgetTester tester,
   ) async {
-    await pumpPureApp(
+    await pumpNeutralApp(
       tester,
       const SizedBox(
         width: 130,
@@ -402,7 +402,7 @@ void main() {
   testWidgets(
     'explicit width also bounds the label and supporting text under a wider parent',
     (WidgetTester tester) async {
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         const SizedBox(
           width: 350,
@@ -439,7 +439,7 @@ void main() {
         addTearDown(focus.dispose);
         double height = 30;
         late StateSetter update;
-        await pumpPureApp(
+        await pumpNeutralApp(
           tester,
           StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
@@ -493,7 +493,7 @@ void main() {
   testWidgets(
     'TextFormField forwards explicit size and vertical alignment to its input box',
     (WidgetTester tester) async {
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         TextFormField(
           width: 180,

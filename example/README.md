@@ -1,4 +1,4 @@
-# pure_ui_example
+# neutral_ui_example
 
 A new Flutter project.
 

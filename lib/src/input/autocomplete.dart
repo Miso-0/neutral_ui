@@ -34,7 +34,7 @@ class Autocomplete<T extends Object> extends StatefulWidget {
   /// Converts an option to field text.
   final AutocompleteOptionToString<T> displayStringForOption;
 
-  /// Overrides the default PureUI text field.
+  /// Overrides the default NeutralUI text field.
   final AutocompleteFieldViewBuilder? fieldViewBuilder;
 
   /// Reports selection after the options exit finishes.
@@ -102,7 +102,8 @@ class _AutocompleteState<T extends Object> extends State<Autocomplete<T>>
     _text =
         widget.textEditingController ??
         TextEditingController.fromValue(widget.initialValue);
-    _focus = widget.focusNode ?? FocusNode(debugLabel: 'PureUI autocomplete');
+    _focus =
+        widget.focusNode ?? FocusNode(debugLabel: 'NeutralUI autocomplete');
     _lastText = _text.text;
     _text.addListener(_textChanged);
   }
@@ -130,7 +131,8 @@ class _AutocompleteState<T extends Object> extends State<Autocomplete<T>>
     }
     if (oldWidget.focusNode != widget.focusNode) {
       if (oldWidget.focusNode == null) _focus.dispose();
-      _focus = widget.focusNode ?? FocusNode(debugLabel: 'PureUI autocomplete');
+      _focus =
+          widget.focusNode ?? FocusNode(debugLabel: 'NeutralUI autocomplete');
     }
   }
 

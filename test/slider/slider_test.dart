@@ -2,8 +2,8 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
-import 'package:pure_ui/src/foundation/animated_surface.dart';
+import 'package:neutral_ui/neutral_ui.dart';
+import 'package:neutral_ui/src/foundation/animated_surface.dart';
 
 import '../helpers/pump.dart';
 
@@ -33,7 +33,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final List<String> events = <String>[];
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _sized(
         Slider(
@@ -53,7 +53,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final List<double> values = <double>[];
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _sized(
         Slider(
@@ -86,7 +86,7 @@ void main() {
     final SliderStyle style = _style.copyWith(
       padding: const EdgeInsetsDirectional.only(start: 20, end: 10),
     );
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _sized(
         Slider(value: 0, style: style, onChanged: (double v) => found = v),
@@ -104,7 +104,7 @@ void main() {
       int starts = 0;
       int ends = 0;
       final List<double> values = <double>[];
-      await pumpPure(
+      await pumpNeutral(
         tester,
         _sized(
           Slider(
@@ -138,7 +138,7 @@ void main() {
     int starts = 0;
     int ends = 0;
     final List<double> values = <double>[];
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _sized(
         Slider(
@@ -164,7 +164,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final List<double> values = <double>[];
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _sized(
         Slider(
@@ -190,7 +190,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final List<double> values = <double>[];
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _sized(
         Slider(
@@ -217,7 +217,7 @@ void main() {
     WidgetTester tester,
   ) async {
     int changes = 0;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       SliderTheme(
         data: const SliderStyle(allowedInteraction: SliderInteraction.tapOnly),
@@ -241,12 +241,12 @@ void main() {
     WidgetTester tester,
   ) async {
     int changes = 0;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _sized(Slider(value: 0.5, style: _style, onChanged: null)),
     );
     await tester.tapAt(_at(tester, 0.75));
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _sized(
         Slider(
@@ -266,7 +266,7 @@ void main() {
   testWidgets(
     'unbounded width uses preferredWidth and compact height defaults',
     (WidgetTester tester) async {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         Row(
           mainAxisSize: MainAxisSize.min,
@@ -274,7 +274,7 @@ void main() {
         ),
       );
       expect(tester.getSize(find.byType(Slider)), const Size(144, 48));
-      await pumpPure(
+      await pumpNeutral(
         tester,
         Row(
           mainAxisSize: MainAxisSize.min,
@@ -297,7 +297,7 @@ void main() {
   testWidgets('parent height constraints keep visual geometry centered', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       SizedBox(
         width: 200,
@@ -316,7 +316,7 @@ void main() {
   testWidgets('unbounded preferred width respects parent minimum width', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       Row(
         mainAxisSize: MainAxisSize.min,
@@ -347,7 +347,7 @@ void main() {
         (InteractionState state) => state.isPressed ? const Size(30, 30) : null,
       ),
     );
-    await pumpPure(
+    await pumpNeutral(
       tester,
       SliderTheme(
         data: const SliderStyle(
@@ -379,7 +379,7 @@ void main() {
   testWidgets('SliderTheme.merge inherits global tokens', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       SliderTheme.merge(
         data: const SliderStyle(tapTargetSize: Size(48, 64)),
@@ -399,7 +399,7 @@ void main() {
     final FocusNode node = FocusNode();
     addTearDown(node.dispose);
     final List<double> values = <double>[];
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _sized(
         Slider(
@@ -417,7 +417,7 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
     expect(values, <double>[0.7, 0.7, 0.3]);
     values.clear();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _sized(
         Slider(
@@ -442,7 +442,7 @@ void main() {
     final FocusNode node = FocusNode();
     addTearDown(node.dispose);
     final List<String> events = <String>[];
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _sized(
         Slider(
@@ -469,7 +469,7 @@ void main() {
   ) async {
     final SemanticsHandle handle = tester.ensureSemantics();
     final List<double> values = <double>[];
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _sized(
         Slider(
@@ -503,7 +503,7 @@ void main() {
   ) async {
     const BoxDecoration active = BoxDecoration(color: Color(0xFF444444));
     const BoxDecoration inactive = BoxDecoration(color: Color(0xFF555555));
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _sized(
         Slider(
@@ -546,7 +546,7 @@ void main() {
       InteractionState? state;
       double? value;
       String? label;
-      await pumpPure(
+      await pumpNeutral(
         tester,
         _sized(
           Slider(
@@ -585,7 +585,7 @@ void main() {
     late StateSetter update;
     bool enabled = true;
     int ends = 0;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
@@ -637,7 +637,7 @@ void main() {
             onChangeEnd: onEnd,
           ),
         );
-        await pumpPure(
+        await pumpNeutral(
           tester,
           StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
@@ -649,7 +649,7 @@ void main() {
                 );
               }
               if (source == 'global') {
-                return PureTheme(
+                return NeutralTheme(
                   data: ThemeData(
                     sliderStyle: SliderStyle(allowedInteraction: interaction),
                   ),
@@ -707,7 +707,7 @@ void main() {
         addTearDown(above.dispose);
         addTearDown(below.dispose);
         final List<double> values = <double>[];
-        await pumpPure(
+        await pumpNeutral(
           tester,
           MediaQuery(
             data: const MediaQueryData(
@@ -747,7 +747,10 @@ void main() {
     WidgetTester tester,
   ) async {
     final List<double> values = <double>[];
-    await pumpPure(tester, _sized(Slider(value: 0.5, onChanged: values.add)));
+    await pumpNeutral(
+      tester,
+      _sized(Slider(value: 0.5, onChanged: values.add)),
+    );
     final BuildContext actionContext = tester.element(
       find.descendant(
         of: find.byType(Slider),
@@ -769,7 +772,7 @@ void main() {
     WidgetTester tester,
   ) async {
     double value = 0.5;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
@@ -804,7 +807,7 @@ void main() {
     'default semantics use percentages and disabled values omit actions',
     (WidgetTester tester) async {
       final SemanticsHandle handle = tester.ensureSemantics();
-      await pumpPure(
+      await pumpNeutral(
         tester,
         _sized(const Slider(value: 15, min: 10, max: 30, onChanged: null)),
       );
@@ -822,7 +825,7 @@ void main() {
     WidgetTester tester,
   ) async {
     int ends = 0;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _sized(
         Slider(

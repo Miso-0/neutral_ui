@@ -1,3 +1,8 @@
+## Unreleased
+
+- Rename the package to `neutral_ui` and its entrypoint to `package:neutral_ui/neutral_ui.dart`.
+- Rename the application, theme and localization APIs to `NeutralApp`, `NeutralTheme`, `NeutralLocalizations`, `DefaultNeutralLocalizations` and `NeutralLocalizationsDelegate`.
+
 ## 0.10.0
 
 - Fit text-field padding, typography, cursors and side controls to explicit dimensions and parent bounds, with matching sizing on TextFormField.
@@ -40,8 +45,8 @@
 - Add configurable outside-tap consumption and nearest/root overlay selection; pass-through remains the default.
 - Breaking: MenuStyle.offset.dx is directional in RTL, and menus now fade and scale over 150 ms on entry and 100 ms on exit by default. Set transitionDuration to Duration.zero for immediate transitions.
 - Add reverse motion tokens, reduced-motion and spring helpers, repaint isolation and cached menu widths measured outside transition frames.
-- Add PureLocalizations with overridable English strings, calendar delegates, date utilities and date/time value types without intl.
-- Add PureApp for themed navigation and PureApp.builder for navigator-free overlays; migrate the gallery.
+- Add NeutralLocalizations with overridable English strings, calendar delegates, date utilities and date/time value types without intl.
+- Add NeutralApp for themed navigation and NeutralApp.builder for navigator-free overlays; migrate the gallery.
 - Add directional chevrons and arrows plus close, search, calendar, clock and edit glyphs, with a foundations gallery section.
 
 ## 0.4.0
@@ -78,6 +83,6 @@
 
 - Introduce nine headless Flutter controls with accessible pointer and keyboard interaction.
 - Add immutable interaction states, state properties and composable style tokens.
-- Add PureTheme, ThemeData and nine component themes with inherited theme capture.
+- Add NeutralTheme, ThemeData and nine component themes with inherited theme capture.
 - Support controlled selection, loading, RTL, radio groups and slider interaction modes.
 - Include a themed WidgetsApp gallery with macOS and web runners.

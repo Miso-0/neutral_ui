@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import '../foundation/animated_surface.dart';
 import '../foundation/decoration_override.dart';
 import '../foundation/motion.dart';
-import '../localizations/pure_localizations.dart';
+import '../localizations/neutral_localizations.dart';
 import '../menus/key_activators.dart';
 import '../styles/bottom_sheet_style.dart';
 import '../theme/feedback_themes.dart';
@@ -215,7 +215,7 @@ class _BottomSheetState extends State<BottomSheet>
               onVerticalDragEnd: _end,
               child: Center(
                 child: Semantics(
-                  label: PureLocalizations.of(context).bottomSheetLabel,
+                  label: NeutralLocalizations.of(context).bottomSheetLabel,
                   child: SizedBox(
                     width: handleSize.width,
                     height: handleSize.height,
@@ -255,7 +255,7 @@ class _BottomSheetState extends State<BottomSheet>
     content = Semantics(
       scopesRoute: true,
       namesRoute: true,
-      label: PureLocalizations.of(context).bottomSheetLabel,
+      label: NeutralLocalizations.of(context).bottomSheetLabel,
       explicitChildNodes: true,
       child: RepaintBoundary(child: content),
     );
@@ -334,7 +334,7 @@ Future<T?> showModalBottomSheet<T>({
       requestFocus: requestFocus,
       label:
           barrierLabel ??
-          PureLocalizations.of(context).modalBarrierDismissLabel,
+          NeutralLocalizations.of(context).modalBarrierDismissLabel,
       color: barrierColor ?? resolved.barrierColor,
       duration: reducedMotionDuration(
         context,

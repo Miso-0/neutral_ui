@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
-import 'package:pure_ui/src/foundation/animated_surface.dart';
+import 'package:neutral_ui/neutral_ui.dart';
+import 'package:neutral_ui/src/foundation/animated_surface.dart';
 
 import '../helpers/pump.dart';
 
@@ -11,7 +11,7 @@ void main() {
   ) async {
     bool? value = false;
     final List<bool?> changes = <bool?>[];
-    await pumpPure(
+    await pumpNeutral(
       tester,
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) => Checkbox(
@@ -37,7 +37,7 @@ void main() {
     'two-state checkbox requests false from true and stays controlled',
     (WidgetTester tester) async {
       bool? requested;
-      await pumpPure(
+      await pumpNeutral(
         tester,
         Checkbox(value: true, onChanged: (bool? next) => requested = next),
       );
@@ -52,7 +52,7 @@ void main() {
     WidgetTester tester,
   ) async {
     int calls = 0;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       Checkbox(value: false, onChanged: (bool? next) => calls += 1),
     );
@@ -67,7 +67,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final SemanticsHandle semantics = tester.ensureSemantics();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       const Checkbox(value: true, onChanged: null, semanticLabel: 'Choice'),
     );
@@ -90,7 +90,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final SemanticsHandle semantics = tester.ensureSemantics();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       Checkbox(value: null, tristate: true, onChanged: (bool? next) {}),
     );
@@ -111,7 +111,7 @@ void main() {
     WidgetTester tester,
   ) async {
     bool value = false;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) => Checkbox(
@@ -159,7 +159,7 @@ void main() {
     WidgetTester tester,
   ) async {
     bool? value = true;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) => Checkbox(

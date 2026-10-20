@@ -8,7 +8,7 @@ import '../foundation/glyphs.dart';
 import '../foundation/interaction_state.dart';
 import '../foundation/motion.dart';
 import '../foundation/style_resolution.dart';
-import '../localizations/pure_localizations.dart';
+import '../localizations/neutral_localizations.dart';
 import '../styles/button_style.dart';
 import '../styles/chip_style.dart';
 import '../theme/chip_theme.dart';
@@ -305,7 +305,7 @@ class _Chip extends StatelessWidget {
     if (onDeleted != null) {
       final String message =
           deleteButtonTooltipMessage ??
-          PureLocalizations.of(context).deleteButtonTooltip;
+          NeutralLocalizations.of(context).deleteButtonTooltip;
       final Widget? glyph =
           deleteIcon ??
           resolveStatefulOrDefault<ChipStyle, Widget>(

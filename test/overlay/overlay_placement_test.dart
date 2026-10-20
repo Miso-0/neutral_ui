@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/src/overlay/overlay_placement.dart';
+import 'package:neutral_ui/src/overlay/overlay_placement.dart';
 
 void main() {
   const Size overlay = Size(400, 300);

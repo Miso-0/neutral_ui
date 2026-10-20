@@ -11,7 +11,7 @@ import '../foundation/glyphs.dart';
 import '../foundation/motion.dart';
 import '../foundation/state_property.dart';
 import '../input/text_field.dart';
-import '../localizations/pure_localizations.dart';
+import '../localizations/neutral_localizations.dart';
 import '../styles/button_style.dart';
 import '../styles/text_field_style.dart';
 import '../styles/time_picker_style.dart';
@@ -147,7 +147,7 @@ class TimePickerState extends State<TimePicker> with TickerProviderStateMixin {
   }
 
   void _syncText() {
-    final PureLocalizations l = PureLocalizations.of(context);
+    final NeutralLocalizations l = NeutralLocalizations.of(context);
     _hours.text = l.formatHour(_time, alwaysUse24HourFormat: _use24);
     _minutes.text = l.formatMinute(_time);
   }
@@ -258,7 +258,7 @@ class TimePickerState extends State<TimePicker> with TickerProviderStateMixin {
 
   int? _parseNumber(String? value) {
     String text = value?.trim() ?? '';
-    final PureLocalizations l = PureLocalizations.of(context);
+    final NeutralLocalizations l = NeutralLocalizations.of(context);
     for (int digit = 0; digit < 10; digit++) {
       text = text.replaceAll(l.formatDecimal(digit), digit.toString());
     }
@@ -277,7 +277,7 @@ class TimePickerState extends State<TimePicker> with TickerProviderStateMixin {
     return valid
         ? null
         : widget.errorInvalidText ??
-              PureLocalizations.of(context).invalidTimeLabel;
+              NeutralLocalizations.of(context).invalidTimeLabel;
   }
 
   @override
@@ -298,18 +298,18 @@ class TimePickerState extends State<TimePicker> with TickerProviderStateMixin {
     label: label,
     value: text,
     increasedValue: hour
-        ? PureLocalizations.of(context).formatHour(
+        ? NeutralLocalizations.of(context).formatHour(
             _time.replacing(hour: (_time.hour + 1) % 24),
             alwaysUse24HourFormat: _use24,
           )
-        : PureLocalizations.of(context)
+        : NeutralLocalizations.of(context)
               .formatMinute(_time.replacing(minute: (_time.minute + 1) % 60)),
     decreasedValue: hour
-        ? PureLocalizations.of(context).formatHour(
+        ? NeutralLocalizations.of(context).formatHour(
             _time.replacing(hour: (_time.hour - 1) % 24),
             alwaysUse24HourFormat: _use24,
           )
-        : PureLocalizations.of(context)
+        : NeutralLocalizations.of(context)
               .formatMinute(_time.replacing(minute: (_time.minute - 1) % 60)),
     onIncrease: () => _adjust(hour, 1),
     onDecrease: () => _adjust(hour, -1),
@@ -334,7 +334,7 @@ class TimePickerState extends State<TimePicker> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final PureLocalizations l = PureLocalizations.of(context);
+    final NeutralLocalizations l = NeutralLocalizations.of(context);
     final TimePickerStyle style = _style;
     assert(
       debugCheckDecorationOverride(
@@ -472,7 +472,7 @@ class TimePickerState extends State<TimePicker> with TickerProviderStateMixin {
               ? l.timePickerHourModeAnnouncement
               : l.timePickerMinuteModeAnnouncement,
           child: SizedBox.square(
-            key: const ValueKey<String>('pure-time-dial'),
+            key: const ValueKey<String>('neutral-time-dial'),
             dimension: extent,
             child: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
@@ -511,7 +511,7 @@ class TimePickerState extends State<TimePicker> with TickerProviderStateMixin {
                               builder: (BuildContext context, Widget? child) =>
                                   CustomPaint(
                                     key: const ValueKey<String>(
-                                      'pure-time-hand',
+                                      'neutral-time-hand',
                                     ),
                                     painter: _DialHandPainter(
                                       turns: _angle.value,
@@ -576,7 +576,7 @@ class TimePickerState extends State<TimePicker> with TickerProviderStateMixin {
     int index,
     bool inner,
     TimePickerStyle style,
-    PureLocalizations l,
+    NeutralLocalizations l,
   ) {
     final double angle = index / 12 * 2 * math.pi;
     final double radius = size.shortestSide / 2 * (inner ? .55 : .84);
@@ -724,7 +724,7 @@ class _TimePickerDialogState extends State<TimePickerDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final PureLocalizations l = PureLocalizations.of(context);
+    final NeutralLocalizations l = NeutralLocalizations.of(context);
     return Dialog(
       child: SingleChildScrollView(
         child: Column(

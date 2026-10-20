@@ -1,9 +1,9 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
-import 'package:pure_ui/src/buttons/selection_button.dart';
-import 'package:pure_ui/src/foundation/animated_surface.dart';
+import 'package:neutral_ui/neutral_ui.dart';
+import 'package:neutral_ui/src/buttons/selection_button.dart';
+import 'package:neutral_ui/src/foundation/animated_surface.dart';
 
 import '../helpers/pump.dart';
 
@@ -25,7 +25,7 @@ void main() {
     WidgetTester tester,
   ) async {
     int calls = 0;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       Column(
         mainAxisSize: MainAxisSize.min,
@@ -79,7 +79,7 @@ void main() {
       final FocusNode first = FocusNode(), last = FocusNode();
       addTearDown(first.dispose);
       addTearDown(last.dispose);
-      await pumpPure(
+      await pumpNeutral(
         tester,
         StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) =>
@@ -125,7 +125,7 @@ void main() {
     addTearDown(first.dispose);
     addTearDown(second.dispose);
     int? pressed;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       ToggleButtons(
         isSelected: const <bool>[false, true],
@@ -150,7 +150,7 @@ void main() {
     (WidgetTester tester) async {
       bool selected = false;
       int deleted = 0;
-      await pumpPure(
+      await pumpNeutral(
         tester,
         StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) => InputChip(
@@ -189,7 +189,7 @@ void main() {
   testWidgets(
     'disabled choice chips cannot select and delete tooltip is localized',
     (WidgetTester tester) async {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         Column(
           mainAxisSize: MainAxisSize.min,
@@ -239,7 +239,7 @@ void main() {
     (WidgetTester tester) async {
       final TabController controller = TabController(length: 3, vsync: tester);
       addTearDown(controller.dispose);
-      await pumpPure(
+      await pumpNeutral(
         tester,
         SizedBox(
           width: 300,
@@ -295,7 +295,7 @@ void main() {
   ) async {
     final TabController controller = TabController(length: 12, vsync: tester);
     addTearDown(controller.dispose);
-    await pumpPure(
+    await pumpNeutral(
       tester,
       SizedBox(
         width: 220,
@@ -322,7 +322,7 @@ void main() {
     WidgetTester tester,
   ) async {
     int selected = 0;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       SizedBox(
         width: 240,
@@ -359,7 +359,7 @@ void main() {
     WidgetTester tester,
   ) async {
     int? selected;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       NavigationDrawer(
         onDestinationSelected: (int value) => selected = value,
@@ -388,7 +388,7 @@ void main() {
     final ExpansibleController controller = ExpansibleController();
     addTearDown(controller.dispose);
     final List<bool> changes = <bool>[];
-    await pumpPure(
+    await pumpNeutral(
       tester,
       SizedBox(
         width: 240,
@@ -417,7 +417,7 @@ void main() {
       'range slider $direction tracks drags and thumbs do not cross',
       (WidgetTester tester) async {
         RangeValues values = const RangeValues(0.25, 0.75);
-        await pumpPure(
+        await pumpNeutral(
           tester,
           SizedBox(
             width: 220,
@@ -462,7 +462,7 @@ void main() {
     final FocusNode start = FocusNode(), end = FocusNode();
     addTearDown(start.dispose);
     addTearDown(end.dispose);
-    await pumpPure(
+    await pumpNeutral(
       tester,
       SizedBox(
         width: 220,
@@ -494,7 +494,7 @@ void main() {
     'discrete range thumb follows raw drag then springs to its division',
     (WidgetTester tester) async {
       RangeValues values = const RangeValues(0.2, 0.8);
-      await pumpPure(
+      await pumpNeutral(
         tester,
         SizedBox(
           width: 220,
@@ -537,7 +537,7 @@ void main() {
   testWidgets('Badge.count caps and paints using ambient tokens', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       const IconTheme(
         data: IconThemeData(color: Color(0xff123456)),
@@ -560,7 +560,7 @@ void main() {
     (WidgetTester tester) async {
       double value = 0.2;
       late StateSetter update;
-      await pumpPure(
+      await pumpNeutral(
         tester,
         SizedBox(
           width: 200,
@@ -598,7 +598,7 @@ void main() {
   ) async {
     final TabController controller = TabController(length: 2, vsync: tester);
     addTearDown(controller.dispose);
-    await pumpPureApp(
+    await pumpNeutralApp(
       tester,
       Column(
         mainAxisSize: MainAxisSize.min,

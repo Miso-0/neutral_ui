@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:pure_ui/pure_ui.dart';
+import 'package:neutral_ui/neutral_ui.dart';
 
 const Color _ink = Color(0xFF142C2A);
 const Color _muted = Color(0xFF657B77);
@@ -593,7 +593,7 @@ class _RoadmapSectionsState extends State<RoadmapSections> {
                 ),
                 if (_range != null)
                   Text(
-                    '${PureLocalizations.of(context).formatShortDate(_range!.start)} to ${PureLocalizations.of(context).formatShortDate(_range!.end)}',
+                    '${NeutralLocalizations.of(context).formatShortDate(_range!.start)} to ${NeutralLocalizations.of(context).formatShortDate(_range!.end)}',
                   ),
               ],
             ),

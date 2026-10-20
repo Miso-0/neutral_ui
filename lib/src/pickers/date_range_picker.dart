@@ -6,7 +6,7 @@ import '../dates/date.dart';
 import '../feedback/dialog.dart';
 import '../foundation/glyphs.dart';
 import '../foundation/motion.dart';
-import '../localizations/pure_localizations.dart';
+import '../localizations/neutral_localizations.dart';
 import '../menus/key_activators.dart';
 import '../styles/date_picker_style.dart';
 import '../theme/picker_themes.dart';
@@ -225,7 +225,7 @@ class _CalendarDateRangePickerState extends State<CalendarDateRangePicker> {
   @override
   Widget build(BuildContext context) {
     final DatePickerStyle style = _style;
-    final PureLocalizations l = PureLocalizations.of(context);
+    final NeutralLocalizations l = NeutralLocalizations.of(context);
     return Container(
       width: style.monthWidth ?? 336,
       decoration: style.decoration,
@@ -444,7 +444,7 @@ class _DateRangePickerDialogState extends State<DateRangePickerDialog> {
       _rangeError = valid
           ? null
           : widget.errorInvalidRangeText ??
-                PureLocalizations.of(context).invalidDateRangeLabel;
+                NeutralLocalizations.of(context).invalidDateRangeLabel;
     });
     return valid;
   }
@@ -458,7 +458,7 @@ class _DateRangePickerDialogState extends State<DateRangePickerDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final PureLocalizations l = PureLocalizations.of(context);
+    final NeutralLocalizations l = NeutralLocalizations.of(context);
     final DatePickerStyle style = (widget.style ?? const DatePickerStyle())
         .merge(DatePickerTheme.of(context));
     final bool canToggle =

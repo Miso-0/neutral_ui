@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../styles/slider_style.dart';
-import 'pure_theme.dart';
+import 'neutral_theme.dart';
 
 /// Overrides slider tokens for a subtree.
 ///
@@ -14,9 +14,9 @@ class SliderTheme extends InheritedTheme {
   /// The component tokens inherited by this subtree.
   final SliderStyle data;
 
-  /// Returns the nearest component theme or its PureTheme style.
+  /// Returns the nearest component theme or its NeutralTheme style.
   static SliderStyle of(BuildContext context) {
-    return maybeOf(context) ?? PureTheme.of(context).sliderStyle;
+    return maybeOf(context) ?? NeutralTheme.of(context).sliderStyle;
   }
 
   /// Returns the nearest local component theme, if present.

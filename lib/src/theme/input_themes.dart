@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import '../styles/text_field_style.dart';
 import '../styles/autocomplete_style.dart';
 import '../styles/search_style.dart';
-import 'pure_theme.dart';
+import 'neutral_theme.dart';
 
 /// Overrides textField tokens within a subtree.
 class TextFieldTheme extends InheritedTheme {
@@ -15,7 +15,7 @@ class TextFieldTheme extends InheritedTheme {
 
   /// Returns the nearest local tokens or the application's component style.
   static TextFieldStyle of(BuildContext context) =>
-      maybeOf(context) ?? PureTheme.of(context).textFieldStyle;
+      maybeOf(context) ?? NeutralTheme.of(context).textFieldStyle;
 
   /// Returns local tokens when this component theme is present.
   static TextFieldStyle? maybeOf(BuildContext context) =>
@@ -54,7 +54,7 @@ class AutocompleteTheme extends InheritedTheme {
 
   /// Returns the nearest local tokens or the application's component style.
   static AutocompleteStyle of(BuildContext context) =>
-      maybeOf(context) ?? PureTheme.of(context).autocompleteStyle;
+      maybeOf(context) ?? NeutralTheme.of(context).autocompleteStyle;
 
   /// Returns local tokens when this component theme is present.
   static AutocompleteStyle? maybeOf(BuildContext context) =>
@@ -90,7 +90,7 @@ class SearchTheme extends InheritedTheme {
 
   /// Returns the nearest local tokens or the application's component style.
   static SearchStyle of(BuildContext context) =>
-      maybeOf(context) ?? PureTheme.of(context).searchStyle;
+      maybeOf(context) ?? NeutralTheme.of(context).searchStyle;
 
   /// Returns local tokens when this component theme is present.
   static SearchStyle? maybeOf(BuildContext context) =>

@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:pure_ui/pure_ui.dart';
+import 'package:neutral_ui/neutral_ui.dart';
 
 import 'sections/roadmap_sections.dart';
 
@@ -297,7 +297,7 @@ ThemeData _theme() => ThemeData(
   ),
 );
 
-/// A PureApp gallery with all visual tokens supplied by a central theme.
+/// A NeutralApp gallery with all visual tokens supplied by a central theme.
 class GalleryApp extends StatefulWidget {
   /// Creates the gallery application.
   const GalleryApp({super.key});
@@ -311,9 +311,9 @@ class _GalleryAppState extends State<GalleryApp> {
   bool _reducedMotion = false;
 
   @override
-  Widget build(BuildContext context) => PureApp(
+  Widget build(BuildContext context) => NeutralApp(
     color: _canvas,
-    title: 'PureUI gallery',
+    title: 'NeutralUI gallery',
     debugShowCheckedModeBanner: false,
     textStyle: const TextStyle(
       color: _ink,
@@ -748,7 +748,7 @@ class _GalleryState extends State<_Gallery> {
   );
 
   Widget _foundations() {
-    final PureLocalizations strings = PureLocalizations.of(context);
+    final NeutralLocalizations strings = NeutralLocalizations.of(context);
     final DateTime date = DateTime(2026, 10, 16);
     return _section(
       '08',
@@ -837,7 +837,7 @@ class _GalleryState extends State<_Gallery> {
                       ),
                       const SizedBox(width: 10),
                       const Text(
-                        'pureui',
+                        'neutralui',
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
@@ -874,7 +874,7 @@ class _GalleryState extends State<_Gallery> {
                   ),
                   const SizedBox(height: 10),
                   const Text(
-                    'PUREUI / COMPONENT GALLERY',
+                    'NEUTRALUI / COMPONENT GALLERY',
                     style: TextStyle(
                       color: _accent,
                       fontSize: 11,
@@ -1278,7 +1278,7 @@ class _GalleryState extends State<_Gallery> {
                   ),
                   const SizedBox(height: 24),
                   const Text(
-                    'PureUI 0.10 / Flutter widgets, your visual language.',
+                    'NeutralUI 0.10 / Flutter widgets, your visual language.',
                     style: TextStyle(color: _muted, fontSize: 12),
                   ),
                 ],
@@ -1291,7 +1291,7 @@ class _GalleryState extends State<_Gallery> {
   );
 }
 
-/// Paints gallery content glyphs in the ambient icon theme, like PureUI's glyphs.
+/// Paints gallery content glyphs in the ambient icon theme, like NeutralUI's glyphs.
 Widget _galleryGlyph(
   BuildContext context,
   CustomPainter Function(Color color, TextDirection direction) painter,

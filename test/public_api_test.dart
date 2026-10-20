@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
+import 'package:neutral_ui/neutral_ui.dart';
 
 void main() {
   test('public API coexists with widgets without import prefixes', () {
@@ -122,10 +122,10 @@ void main() {
       ClockGlyph,
       EditGlyph,
       ArrowGlyph,
-      PureApp,
-      PureLocalizations,
-      DefaultPureLocalizations,
-      PureLocalizationsDelegate,
+      NeutralApp,
+      NeutralLocalizations,
+      DefaultNeutralLocalizations,
+      NeutralLocalizationsDelegate,
       CalendarDelegate<DateTime>,
       GregorianCalendarDelegate,
       DateUtils,
@@ -148,7 +148,7 @@ void main() {
       OverlayLocation,
       OutsideTapBehavior,
       ThemeData,
-      PureTheme,
+      NeutralTheme,
       ButtonStyle,
       ToggleStyle,
       ListTileStyle,

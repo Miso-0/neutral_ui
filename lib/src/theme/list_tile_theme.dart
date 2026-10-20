@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../styles/list_tile_style.dart';
-import 'pure_theme.dart';
+import 'neutral_theme.dart';
 
 /// Overrides listTile tokens for a subtree.
 ///
@@ -14,9 +14,9 @@ class ListTileTheme extends InheritedTheme {
   /// The component tokens inherited by this subtree.
   final ListTileStyle data;
 
-  /// Returns the nearest component theme or its PureTheme style.
+  /// Returns the nearest component theme or its NeutralTheme style.
   static ListTileStyle of(BuildContext context) {
-    return maybeOf(context) ?? PureTheme.of(context).listTileStyle;
+    return maybeOf(context) ?? NeutralTheme.of(context).listTileStyle;
   }
 
   /// Returns the nearest local component theme, if present.

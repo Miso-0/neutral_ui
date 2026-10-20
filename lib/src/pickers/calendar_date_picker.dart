@@ -6,7 +6,7 @@ import '../dates/date.dart';
 import '../foundation/decoration_override.dart';
 import '../foundation/glyphs.dart';
 import '../foundation/motion.dart';
-import '../localizations/pure_localizations.dart';
+import '../localizations/neutral_localizations.dart';
 import '../menus/key_activators.dart';
 import '../styles/date_picker_style.dart';
 import '../styles/button_style.dart';
@@ -265,7 +265,7 @@ class _CalendarDatePickerState extends State<CalendarDatePicker> {
         styleValue: widget.style?.decoration,
       ),
     );
-    final PureLocalizations l = PureLocalizations.of(context);
+    final NeutralLocalizations l = NeutralLocalizations.of(context);
     final Duration duration = reducedMotionDuration(
       context,
       style.animationDuration ?? const Duration(milliseconds: 200),
@@ -545,7 +545,7 @@ class _YearPickerState extends State<YearPicker> {
   Widget build(BuildContext context) {
     final DatePickerStyle style = (widget.style ?? const DatePickerStyle())
         .merge(DatePickerTheme.of(context));
-    final PureLocalizations l = PureLocalizations.of(context);
+    final NeutralLocalizations l = NeutralLocalizations.of(context);
     return GridView.builder(
       controller: _scroll,
       padding: EdgeInsets.zero,

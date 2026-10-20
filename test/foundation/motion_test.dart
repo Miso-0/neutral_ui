@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/src/foundation/motion.dart';
+import 'package:neutral_ui/src/foundation/motion.dart';
 
 void main() {
   testWidgets('durations and springs respect reduced motion', (

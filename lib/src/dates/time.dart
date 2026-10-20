@@ -3,7 +3,7 @@
 
 import 'package:flutter/widgets.dart';
 
-import '../localizations/pure_localizations.dart';
+import '../localizations/neutral_localizations.dart';
 
 /// Whether a time falls before or after noon.
 enum DayPeriod {
@@ -59,7 +59,7 @@ class TimeOfDay implements Comparable<TimeOfDay> {
       TimeOfDay(hour: hour ?? this.hour, minute: minute ?? this.minute);
 
   /// Formats using the ambient localizations and 24-hour preference.
-  String format(BuildContext context) => PureLocalizations.of(context)
+  String format(BuildContext context) => NeutralLocalizations.of(context)
       .formatTimeOfDay(
         this,
         alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context),

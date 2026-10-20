@@ -1,9 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
-import 'package:pure_ui/src/menus/menu_host.dart';
-import 'package:pure_ui/src/menus/menu_item_button.dart';
-import 'package:pure_ui/src/menus/menu_panel.dart';
+import 'package:neutral_ui/neutral_ui.dart';
+import 'package:neutral_ui/src/menus/menu_host.dart';
+import 'package:neutral_ui/src/menus/menu_item_button.dart';
+import 'package:neutral_ui/src/menus/menu_panel.dart';
 
 import '../helpers/pump.dart';
 
@@ -96,7 +96,7 @@ void main() {
       MenuController? controller = external;
       final GlobalKey<_HostState> key = GlobalKey<_HostState>();
       late StateSetter update;
-      await pumpPure(
+      await pumpNeutral(
         tester,
         StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
@@ -126,7 +126,7 @@ void main() {
     MenuController controller = first;
     final GlobalKey<_HostState> key = GlobalKey<_HostState>();
     late StateSetter update;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
@@ -150,7 +150,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final MenuController controller = MenuController();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _Host(
         controller: controller,
@@ -174,7 +174,7 @@ void main() {
     FocusNode? focusNode = external;
     final GlobalKey<_HostState> key = GlobalKey<_HostState>();
     late StateSetter update;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
@@ -198,7 +198,7 @@ void main() {
     final int routes =
         WidgetsBinding.instance.pointerRouter.debugGlobalRouteCount;
     final MenuController controller = MenuController();
-    await pumpPure(tester, _Host(controller: controller));
+    await pumpNeutral(tester, _Host(controller: controller));
     expect(WidgetsBinding.instance.pointerRouter.debugGlobalRouteCount, routes);
     controller.open();
     await tester.pumpAndSettle();
@@ -221,7 +221,7 @@ void main() {
     final MenuController root = MenuController();
     final MenuController nested = MenuController();
     int selected = 0;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _Host(
         controller: root,
@@ -263,7 +263,7 @@ void main() {
     final FocusNode option = FocusNode();
     addTearDown(other.dispose);
     addTearDown(option.dispose);
-    await pumpPure(
+    await pumpNeutral(
       tester,
       Column(
         mainAxisSize: MainAxisSize.min,
@@ -298,7 +298,7 @@ void main() {
     final FocusNode option = FocusNode();
     addTearDown(anchor.dispose);
     addTearDown(option.dispose);
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _Host(controller: controller, focusNode: anchor, optionFocusNode: option),
     );
@@ -319,7 +319,7 @@ void main() {
   ) async {
     final MenuController controller = MenuController();
     int activated = 0;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       Column(
         mainAxisSize: MainAxisSize.min,
@@ -351,7 +351,7 @@ void main() {
     final MenuController controller = MenuController();
     bool enabled = true;
     late StateSetter update;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
@@ -376,7 +376,7 @@ void main() {
   ) async {
     final MenuController controller = MenuController();
     final GlobalKey<NavigatorState> navigator = GlobalKey<NavigatorState>();
-    await pumpPureApp(
+    await pumpNeutralApp(
       tester,
       _Host(controller: controller),
       navigatorKey: navigator,
@@ -398,7 +398,7 @@ void main() {
   ) async {
     for (final OverlayLocation location in OverlayLocation.values) {
       final MenuController controller = MenuController();
-      await pumpPure(
+      await pumpNeutral(
         tester,
         SizedBox(
           width: 100,
@@ -431,7 +431,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final MenuController controller = MenuController();
-    await pumpPure(tester, _Host(controller: controller));
+    await pumpNeutral(tester, _Host(controller: controller));
     double opacity() => tester
         .widget<FadeTransition>(
           find
@@ -494,7 +494,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final MenuController controller = MenuController();
-    await pumpPureApp(
+    await pumpNeutralApp(
       tester,
       _Host(controller: controller),
       disableAnimations: true,
@@ -521,7 +521,7 @@ void main() {
   ) async {
     final MenuController parent = MenuController();
     final MenuController nested = MenuController();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _Host(
         controller: parent,
@@ -559,7 +559,7 @@ void main() {
   ) async {
     final MenuController controller = MenuController();
     Animation<double>? transition;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _Host(
         controller: controller,
@@ -590,7 +590,7 @@ void main() {
     'measured menu width ignores dividers and stays stable on reversal',
     (WidgetTester tester) async {
       final MenuController controller = MenuController();
-      await pumpPure(
+      await pumpNeutral(
         tester,
         _Host(
           controller: controller,
@@ -619,7 +619,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final MenuController controller = MenuController();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _Host(
         controller: controller,
@@ -653,7 +653,7 @@ void main() {
   ) async {
     final MenuController controller = MenuController();
     int intrinsicQueries = 0;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _Host(
         controller: controller,
@@ -680,7 +680,7 @@ void main() {
   ) async {
     final MenuController controller = MenuController();
     int intrinsicQueries = 0;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _Host(
         controller: controller,

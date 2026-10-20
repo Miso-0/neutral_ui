@@ -2,8 +2,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
-import 'package:pure_ui/src/foundation/animated_surface.dart';
+import 'package:neutral_ui/neutral_ui.dart';
+import 'package:neutral_ui/src/foundation/animated_surface.dart';
 
 import '../helpers/pump.dart';
 
@@ -144,7 +144,7 @@ void main() {
       ) async {
         int pressed = 0;
         int longPressed = 0;
-        await pumpPure(
+        await pumpNeutral(
           tester,
           variant.create(
             _Options(
@@ -165,7 +165,7 @@ void main() {
         WidgetTester tester,
       ) async {
         int calls = 0;
-        await pumpPure(
+        await pumpNeutral(
           tester,
           variant.create(_Options(onLongPress: () => calls++)),
         );
@@ -183,7 +183,7 @@ void main() {
       ) async {
         final SemanticsHandle semantics = tester.ensureSemantics();
         InteractionState? current;
-        await pumpPure(
+        await pumpNeutral(
           tester,
           variant.create(
             _Options(
@@ -212,7 +212,7 @@ void main() {
         final WidgetStatesController controller = WidgetStatesController();
         addTearDown(controller.dispose);
         InteractionState? current;
-        await pumpPure(
+        await pumpNeutral(
           tester,
           variant.create(
             _Options(
@@ -255,13 +255,13 @@ void main() {
           decoration: StateProperty<Decoration?>.all(global),
           padding: StateProperty<EdgeInsetsGeometry?>.all(EdgeInsets.all(2)),
         );
-        await pumpPure(
+        await pumpNeutral(
           tester,
           variant.create(_Options(onPressed: () {})),
           theme: variant.globalTheme(globalStyle),
         );
         expect(_container(tester).decoration, global);
-        await pumpPure(
+        await pumpNeutral(
           tester,
           variant.wrapTheme(
             const ButtonStyle(
@@ -274,7 +274,7 @@ void main() {
         expect(_container(tester).decoration, component);
         // A replacing component theme does not inherit the global padding.
         expect(_container(tester).padding, isNull);
-        await pumpPure(
+        await pumpNeutral(
           tester,
           variant.wrapTheme(
             const ButtonStyle(
@@ -310,7 +310,7 @@ void main() {
       testWidgets('constrains finite fixed dimensions to minimum and maximum', (
         WidgetTester tester,
       ) async {
-        await pumpPure(
+        await pumpNeutral(
           tester,
           variant.create(
             _Options(
@@ -325,7 +325,7 @@ void main() {
           ),
         );
         expect(tester.getSize(find.byKey(_buttonKey)), const Size(60, 25));
-        await pumpPure(
+        await pumpNeutral(
           tester,
           variant.create(
             _Options(
@@ -347,14 +347,14 @@ void main() {
       ) async {
         int calls = 0;
         final SemanticsHandle semantics = tester.ensureSemantics();
-        await pumpPure(
+        await pumpNeutral(
           tester,
           variant.create(
             _Options(onPressed: () => calls++, onLongPress: () => calls++),
           ),
         );
         final Size size = tester.getSize(find.byKey(_buttonKey));
-        await pumpPure(
+        await pumpNeutral(
           tester,
           variant.create(
             _Options(
@@ -388,14 +388,14 @@ void main() {
                   state.isDisabled ? const SizedBox(key: styleIndicator) : null,
             ),
           );
-          await pumpPure(
+          await pumpNeutral(
             tester,
             variant.create(
               _Options(onPressed: () {}, style: style, isLoading: true),
             ),
           );
           expect(find.byKey(styleIndicator), findsOneWidget);
-          await pumpPure(
+          await pumpNeutral(
             tester,
             variant.create(
               _Options(
@@ -414,7 +414,7 @@ void main() {
       testWidgets('clipping without a decoration does not assert', (
         WidgetTester tester,
       ) async {
-        await pumpPure(
+        await pumpNeutral(
           tester,
           variant.create(
             _Options(
@@ -434,7 +434,7 @@ void main() {
     (WidgetTester tester) async {
       for (final _Variant variant in _variants) {
         int calls = 0;
-        await pumpPure(
+        await pumpNeutral(
           tester,
           variant.create(_Options(onPressed: () => calls++)),
         );
@@ -462,7 +462,7 @@ void main() {
     );
     for (final _Variant variant in _variants) {
       final Widget child = variant.create(_Options(onPressed: () {}));
-      await pumpPure(
+      await pumpNeutral(
         tester,
         variant.name == 'ElevatedButton'
             ? TextButtonTheme(data: unrelated, child: child)
@@ -480,7 +480,7 @@ void main() {
     addTearDown(node.dispose);
     InteractionState? current;
     int pressed = 0;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       ElevatedButton(
         key: _buttonKey,
@@ -516,7 +516,7 @@ void main() {
   testWidgets('padding and alignment position content inside the styled box', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       ElevatedButton(
         key: _buttonKey,
@@ -547,7 +547,7 @@ void main() {
     const Key trailing = Key('trailing');
     for (final TextDirection direction in TextDirection.values) {
       for (final IconAlignment alignment in IconAlignment.values) {
-        await pumpPure(
+        await pumpNeutral(
           tester,
           ElevatedButton.icon(
             key: _buttonKey,
@@ -606,7 +606,7 @@ void main() {
       ),
     ];
     for (final Widget button in buttons) {
-      await pumpPure(tester, button);
+      await pumpNeutral(tester, button);
       expect(find.text('icon'), findsOneWidget);
       expect(find.text('label'), findsOneWidget);
     }
@@ -616,7 +616,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final SemanticsHandle semantics = tester.ensureSemantics();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       ElevatedButton(
         key: _buttonKey,
@@ -647,7 +647,7 @@ void main() {
     bool loading = false;
     int mounts = 0;
     late StateSetter rebuild;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setter) {
@@ -690,7 +690,7 @@ void main() {
     (WidgetTester tester) async {
       final SemanticsHandle semantics = tester.ensureSemantics();
       InteractionState? current;
-      await pumpPure(
+      await pumpNeutral(
         tester,
         IconButton(
           key: _buttonKey,

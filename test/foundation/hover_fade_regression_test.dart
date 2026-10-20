@@ -1,9 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
-import 'package:pure_ui/src/foundation/animated_surface.dart';
-import 'package:pure_ui/src/menus/menu_panel.dart';
+import 'package:neutral_ui/neutral_ui.dart';
+import 'package:neutral_ui/src/foundation/animated_surface.dart';
+import 'package:neutral_ui/src/menus/menu_panel.dart';
 
 import '../helpers/pump.dart';
 
@@ -71,7 +71,7 @@ void main() {
   testWidgets('DropdownButton rows fade without a dark flash', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownButton<String>(
         items: const <DropdownMenuItem<String>>[
@@ -95,7 +95,7 @@ void main() {
   testWidgets('DropdownMenu entries fade without a dark flash', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownMenu<int>(
         dropdownMenuEntries: const <DropdownMenuEntry<int>>[
@@ -121,7 +121,7 @@ void main() {
   testWidgets('PopupMenuButton items fade without a dark flash', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       PopupMenuButton<int>(
         itemBuilder: (BuildContext context) => const <PopupMenuEntry<int>>[
@@ -147,7 +147,7 @@ void main() {
   testWidgets('TextButton hover fades without a dark flash', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       TextButton(onPressed: () {}, style: _rowStyle(), child: const Text('Go')),
     );
@@ -165,7 +165,7 @@ void main() {
     WidgetTester tester,
   ) async {
     bool value = false;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) => Checkbox(

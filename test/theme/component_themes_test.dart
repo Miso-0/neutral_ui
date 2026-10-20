@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
+import 'package:neutral_ui/neutral_ui.dart';
 
 void main() {
   testWidgets(
@@ -679,13 +679,13 @@ void _componentThemeTests<S, W extends InheritedTheme>({
   required bool Function(W current, W old) shouldNotify,
 }) {
   group(name, () {
-    testWidgets('of falls back to PureTheme and maybeOf stays local', (
+    testWidgets('of falls back to NeutralTheme and maybeOf stays local', (
       WidgetTester tester,
     ) async {
       S? found;
       S? local;
       await tester.pumpWidget(
-        PureTheme(
+        NeutralTheme(
           data: global(data: base),
           child: Builder(
             builder: (BuildContext context) {
@@ -706,7 +706,7 @@ void _componentThemeTests<S, W extends InheritedTheme>({
       S? found;
       S? local;
       await tester.pumpWidget(
-        PureTheme(
+        NeutralTheme(
           data: global(data: base),
           child: create(
             data: base,
@@ -728,10 +728,12 @@ void _componentThemeTests<S, W extends InheritedTheme>({
       expect(found, isNot(combined));
     });
 
-    testWidgets('merge inherits from PureTheme', (WidgetTester tester) async {
+    testWidgets('merge inherits from NeutralTheme', (
+      WidgetTester tester,
+    ) async {
       S? found;
       await tester.pumpWidget(
-        PureTheme(
+        NeutralTheme(
           data: global(data: base),
           child: merge(
             data: partial,
@@ -801,13 +803,13 @@ void _componentThemeTests<S, W extends InheritedTheme>({
       );
     });
 
-    testWidgets('InheritedTheme.capture preserves component and PureTheme', (
+    testWidgets('InheritedTheme.capture preserves component and NeutralTheme', (
       WidgetTester tester,
     ) async {
       late CapturedThemes captured;
       final ThemeData themeData = global(data: partial);
       await tester.pumpWidget(
-        PureTheme(
+        NeutralTheme(
           data: themeData,
           child: create(
             data: base,
@@ -827,7 +829,7 @@ void _componentThemeTests<S, W extends InheritedTheme>({
           Builder(
             builder: (BuildContext context) {
               found = of(context);
-              foundGlobal = PureTheme.maybeOf(context);
+              foundGlobal = NeutralTheme.maybeOf(context);
               return const SizedBox();
             },
           ),

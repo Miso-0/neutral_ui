@@ -12,7 +12,7 @@ import '../foundation/interaction_state.dart';
 import '../foundation/motion.dart';
 import '../foundation/state_property.dart';
 import '../foundation/style_resolution.dart';
-import '../localizations/pure_localizations.dart';
+import '../localizations/neutral_localizations.dart';
 import '../styles/button_style.dart';
 import '../styles/text_field_style.dart';
 import '../theme/button_themes.dart';
@@ -313,7 +313,8 @@ class _TextFieldState extends State<TextField>
   void initState() {
     super.initState();
     _controller = widget.controller ?? TextEditingController();
-    _focusNode = widget.focusNode ?? FocusNode(debugLabel: 'PureUI TextField');
+    _focusNode =
+        widget.focusNode ?? FocusNode(debugLabel: 'NeutralUI TextField');
     _controller.addListener(_textChanged);
     _previousValue = _controller.value;
     _focusNode.addListener(_focusChanged);
@@ -339,7 +340,7 @@ class _TextFieldState extends State<TextField>
       _focusNode.removeListener(_focusChanged);
       if (oldWidget.focusNode == null) _focusNode.dispose();
       _focusNode =
-          widget.focusNode ?? FocusNode(debugLabel: 'PureUI TextField');
+          widget.focusNode ?? FocusNode(debugLabel: 'NeutralUI TextField');
       _focusNode.addListener(_focusChanged);
     }
     if (!widget.enabled && _focusNode.hasFocus) _focusNode.unfocus();
@@ -510,7 +511,7 @@ class _TextFieldState extends State<TextField>
     BuildContext context,
     TextFieldStyle style,
     InteractionState state,
-    PureLocalizations strings,
+    NeutralLocalizations strings,
     Duration duration,
     bool multiline,
     double alignY,
@@ -816,7 +817,7 @@ class _TextFieldState extends State<TextField>
       context,
       style.animationDuration ?? const Duration(milliseconds: 200),
     );
-    final PureLocalizations strings = PureLocalizations.of(context);
+    final NeutralLocalizations strings = NeutralLocalizations.of(context);
     return InteractionDetector(
       enabled: widget.enabled,
       canRequestFocus: false,

@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '../localizations/pure_localizations.dart';
+import '../localizations/neutral_localizations.dart';
 
 /// Interprets, formats and navigates dates in a calendar system.
 abstract class CalendarDelegate<T extends DateTime> {
@@ -35,7 +35,7 @@ abstract class CalendarDelegate<T extends DateTime> {
   T addDaysToDate(T date, int days);
 
   /// The number of empty cells before the first day in the month's first week.
-  int firstDayOffset(int year, int month, PureLocalizations localizations);
+  int firstDayOffset(int year, int month, NeutralLocalizations localizations);
 
   /// The number of days in [month] of [year].
   int getDaysInMonth(int year, int month);
@@ -47,32 +47,32 @@ abstract class CalendarDelegate<T extends DateTime> {
   T getDay(int year, int month, int day);
 
   /// Formats the full month name and year.
-  String formatMonthYear(T date, PureLocalizations localizations);
+  String formatMonthYear(T date, NeutralLocalizations localizations);
 
   /// Formats the unabbreviated year.
-  String formatYear(int year, PureLocalizations localizations) =>
+  String formatYear(int year, NeutralLocalizations localizations) =>
       localizations.formatYear(DateTime(year));
 
   /// Formats an abbreviated weekday, month and day.
-  String formatMediumDate(T date, PureLocalizations localizations);
+  String formatMediumDate(T date, NeutralLocalizations localizations);
 
   /// Formats an abbreviated month and day.
-  String formatShortMonthDay(T date, PureLocalizations localizations);
+  String formatShortMonthDay(T date, NeutralLocalizations localizations);
 
   /// Formats an abbreviated month, day and year.
-  String formatShortDate(T date, PureLocalizations localizations);
+  String formatShortDate(T date, NeutralLocalizations localizations);
 
   /// Formats a full weekday, month, day and year for spoken announcements.
-  String formatFullDate(T date, PureLocalizations localizations);
+  String formatFullDate(T date, NeutralLocalizations localizations);
 
   /// Formats a numeric date for text input.
-  String formatCompactDate(T date, PureLocalizations localizations);
+  String formatCompactDate(T date, NeutralLocalizations localizations);
 
   /// Parses a compact date, returning null for invalid or incomplete input.
-  T? parseCompactDate(String? inputString, PureLocalizations localizations);
+  T? parseCompactDate(String? inputString, NeutralLocalizations localizations);
 
   /// The input hint describing the compact date format.
-  String dateHelpText(PureLocalizations localizations);
+  String dateHelpText(NeutralLocalizations localizations);
 }
 
 /// Uses the Gregorian calendar and the ambient localized date formats.
@@ -99,7 +99,7 @@ class GregorianCalendarDelegate extends CalendarDelegate<DateTime> {
       DateUtils.addDaysToDate(date, days);
 
   @override
-  int firstDayOffset(int year, int month, PureLocalizations localizations) =>
+  int firstDayOffset(int year, int month, NeutralLocalizations localizations) =>
       DateUtils.firstDayOffset(year, month, localizations);
 
   @override
@@ -113,37 +113,39 @@ class GregorianCalendarDelegate extends CalendarDelegate<DateTime> {
   DateTime getDay(int year, int month, int day) => DateTime(year, month, day);
 
   @override
-  String formatMonthYear(DateTime date, PureLocalizations localizations) =>
+  String formatMonthYear(DateTime date, NeutralLocalizations localizations) =>
       localizations.formatMonthYear(date);
 
   @override
-  String formatMediumDate(DateTime date, PureLocalizations localizations) =>
+  String formatMediumDate(DateTime date, NeutralLocalizations localizations) =>
       localizations.formatMediumDate(date);
 
   @override
-  String formatShortMonthDay(DateTime date, PureLocalizations localizations) =>
-      localizations.formatShortMonthDay(date);
+  String formatShortMonthDay(
+    DateTime date,
+    NeutralLocalizations localizations,
+  ) => localizations.formatShortMonthDay(date);
 
   @override
-  String formatShortDate(DateTime date, PureLocalizations localizations) =>
+  String formatShortDate(DateTime date, NeutralLocalizations localizations) =>
       localizations.formatShortDate(date);
 
   @override
-  String formatFullDate(DateTime date, PureLocalizations localizations) =>
+  String formatFullDate(DateTime date, NeutralLocalizations localizations) =>
       localizations.formatFullDate(date);
 
   @override
-  String formatCompactDate(DateTime date, PureLocalizations localizations) =>
+  String formatCompactDate(DateTime date, NeutralLocalizations localizations) =>
       localizations.formatCompactDate(date);
 
   @override
   DateTime? parseCompactDate(
     String? inputString,
-    PureLocalizations localizations,
+    NeutralLocalizations localizations,
   ) => localizations.parseCompactDate(inputString);
 
   @override
-  String dateHelpText(PureLocalizations localizations) =>
+  String dateHelpText(NeutralLocalizations localizations) =>
       localizations.dateHelpText;
 }
 
@@ -184,7 +186,7 @@ abstract final class DateUtils {
   static int firstDayOffset(
     int year,
     int month,
-    PureLocalizations localizations,
+    NeutralLocalizations localizations,
   ) => (DateTime(year, month).weekday - localizations.firstDayOfWeekIndex) % 7;
 
   /// The number of days in a proleptic Gregorian month, including leap years.

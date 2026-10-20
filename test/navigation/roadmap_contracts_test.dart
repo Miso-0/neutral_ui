@@ -3,8 +3,8 @@ import 'dart:ui' show Tristate;
 import 'package:flutter/semantics.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
-import 'package:pure_ui/src/foundation/animated_surface.dart';
+import 'package:neutral_ui/neutral_ui.dart';
+import 'package:neutral_ui/src/foundation/animated_surface.dart';
 
 import '../helpers/pump.dart';
 
@@ -43,7 +43,7 @@ void main() {
     'selected disabled chips retain the check and selection semantics',
     (WidgetTester tester) async {
       final SemanticsHandle handle = tester.ensureSemantics();
-      await pumpPure(
+      await pumpNeutral(
         tester,
         const Column(
           mainAxisSize: MainAxisSize.min,
@@ -69,7 +69,7 @@ void main() {
     'filter check width moves monotonically between selection states',
     (WidgetTester tester) async {
       bool selected = false;
-      await pumpPure(
+      await pumpNeutral(
         tester,
         StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) => FilterChip(
@@ -112,7 +112,7 @@ void main() {
   ) async {
     const BoxDecoration inherited = BoxDecoration(color: Color(0xff112233));
     const BoxDecoration inline = BoxDecoration(color: Color(0xffabcdef));
-    await pumpPure(
+    await pumpNeutral(
       tester,
       const ChipTheme(
         data: ChipStyle(
@@ -134,7 +134,7 @@ void main() {
   testWidgets('segment tooltip displays a visible tooltip', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       SegmentedButton<int>(
         segments: const <ButtonSegment<int>>[
@@ -166,7 +166,7 @@ void main() {
   testWidgets(
     'segmented values must be unique and selected values must exist',
     (WidgetTester tester) async {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         SegmentedButton<int>(
           segments: const <ButtonSegment<int>>[
@@ -177,7 +177,7 @@ void main() {
         ),
       );
       expect(tester.takeException(), isAssertionError);
-      await pumpPure(
+      await pumpNeutral(
         tester,
         SegmentedButton<int>(
           segments: const <ButtonSegment<int>>[
@@ -194,7 +194,7 @@ void main() {
   testWidgets(
     'FAB variants size their visual content and share a 48 pixel target',
     (WidgetTester tester) async {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         Row(
           mainAxisSize: MainAxisSize.min,
@@ -237,7 +237,7 @@ void main() {
     (WidgetTester tester) async {
       final SemanticsHandle handle = tester.ensureSemantics();
       final List<RangeValues> values = <RangeValues>[];
-      await pumpPure(
+      await pumpNeutral(
         tester,
         SizedBox(
           width: 240,
@@ -295,7 +295,7 @@ void main() {
     addTearDown(second.dispose);
     TabController current = first;
     late StateSetter update;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       SizedBox(
         width: 200,
@@ -324,7 +324,7 @@ void main() {
   ) async {
     const NavigationStyle style = NavigationStyle(spacing: 9);
     late NavigationStyle found;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       NavigationTheme(
         data: style,

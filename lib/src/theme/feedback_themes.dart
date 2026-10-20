@@ -4,7 +4,7 @@ import '../styles/tooltip_style.dart';
 import '../styles/dialog_style.dart';
 import '../styles/bottom_sheet_style.dart';
 import '../styles/snack_bar_style.dart';
-import 'pure_theme.dart';
+import 'neutral_theme.dart';
 
 /// Overrides tooltip tokens within a subtree.
 class TooltipTheme extends InheritedTheme {
@@ -16,7 +16,7 @@ class TooltipTheme extends InheritedTheme {
 
   /// Returns the nearest local tokens or the application's component style.
   static TooltipStyle of(BuildContext context) =>
-      maybeOf(context) ?? PureTheme.of(context).tooltipStyle;
+      maybeOf(context) ?? NeutralTheme.of(context).tooltipStyle;
 
   /// Returns local tokens when this component theme is present.
   static TooltipStyle? maybeOf(BuildContext context) =>
@@ -51,7 +51,7 @@ class DialogTheme extends InheritedTheme {
 
   /// Returns the nearest local tokens or the application's component style.
   static DialogStyle of(BuildContext context) =>
-      maybeOf(context) ?? PureTheme.of(context).dialogStyle;
+      maybeOf(context) ?? NeutralTheme.of(context).dialogStyle;
 
   /// Returns local tokens when this component theme is present.
   static DialogStyle? maybeOf(BuildContext context) =>
@@ -86,7 +86,7 @@ class BottomSheetTheme extends InheritedTheme {
 
   /// Returns the nearest local tokens or the application's component style.
   static BottomSheetStyle of(BuildContext context) =>
-      maybeOf(context) ?? PureTheme.of(context).bottomSheetStyle;
+      maybeOf(context) ?? NeutralTheme.of(context).bottomSheetStyle;
 
   /// Returns local tokens when this component theme is present.
   static BottomSheetStyle? maybeOf(BuildContext context) =>
@@ -121,7 +121,7 @@ class SnackBarTheme extends InheritedTheme {
 
   /// Returns the nearest local tokens or the application's component style.
   static SnackBarStyle of(BuildContext context) =>
-      maybeOf(context) ?? PureTheme.of(context).snackBarStyle;
+      maybeOf(context) ?? NeutralTheme.of(context).snackBarStyle;
 
   /// Returns local tokens when this component theme is present.
   static SnackBarStyle? maybeOf(BuildContext context) =>

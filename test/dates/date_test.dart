@@ -1,15 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/src/dates/dates.dart';
-import 'package:pure_ui/src/localizations/pure_localizations.dart';
+import 'package:neutral_ui/src/dates/dates.dart';
+import 'package:neutral_ui/src/localizations/neutral_localizations.dart';
 
-class _MondayLocalizations extends DefaultPureLocalizations {
+class _MondayLocalizations extends DefaultNeutralLocalizations {
   const _MondayLocalizations();
 
   @override
   int get firstDayOfWeekIndex => 1;
 }
 
-class _CustomDateLocalizations extends DefaultPureLocalizations {
+class _CustomDateLocalizations extends DefaultNeutralLocalizations {
   const _CustomDateLocalizations();
 
   @override
@@ -26,7 +26,7 @@ class _CustomDateLocalizations extends DefaultPureLocalizations {
 }
 
 void main() {
-  const DefaultPureLocalizations english = DefaultPureLocalizations();
+  const DefaultNeutralLocalizations english = DefaultNeutralLocalizations();
   const GregorianCalendarDelegate calendar = GregorianCalendarDelegate();
 
   test('date arithmetic crosses months and years and clears time', () {

@@ -5,9 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
-import 'package:pure_ui/src/foundation/animated_surface.dart';
-import 'package:pure_ui/src/menus/menu_item_button.dart';
+import 'package:neutral_ui/neutral_ui.dart';
+import 'package:neutral_ui/src/foundation/animated_surface.dart';
+import 'package:neutral_ui/src/menus/menu_item_button.dart';
 
 import '../helpers/pump.dart';
 
@@ -31,7 +31,7 @@ void main() {
           GlobalKey<PopupMenuButtonState<int>>();
       final List<String> calls = <String>[];
       int builds = 0;
-      await pumpPure(
+      await pumpNeutral(
         tester,
         PopupMenuButton<int>(
           key: key,
@@ -75,7 +75,7 @@ void main() {
     WidgetTester tester,
   ) async {
     int opened = 0;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       PopupMenuButton<int>(
         itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[],
@@ -87,7 +87,7 @@ void main() {
     expect(opened, 0);
     final GlobalKey<PopupMenuButtonState<int>> key =
         GlobalKey<PopupMenuButtonState<int>>();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       PopupMenuButton<int>(
         key: key,
@@ -106,7 +106,7 @@ void main() {
     'null values run only item callback and disabled items do nothing',
     (WidgetTester tester) async {
       final List<String> calls = <String>[];
-      await pumpPure(
+      await pumpNeutral(
         tester,
         PopupMenuButton<int>(
           itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
@@ -138,7 +138,7 @@ void main() {
     'initial value receives selected state and focus, arrows skip disabled and wrap',
     (WidgetTester tester) async {
       useTraditionalFocus();
-      await pumpPure(
+      await pumpNeutral(
         tester,
         PopupMenuButton<int>(
           initialValue: 3,
@@ -172,7 +172,7 @@ void main() {
     'outside taps cancel and requestFocus false leaves focus on trigger',
     (WidgetTester tester) async {
       int canceled = 0;
-      await pumpPure(
+      await pumpNeutral(
         tester,
         PopupMenuButton<int>(
           requestFocus: false,
@@ -199,7 +199,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final SemanticsHandle handle = tester.ensureSemantics();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       PopupMenuTheme(
         data: const PopupMenuStyle(
@@ -237,7 +237,7 @@ void main() {
   testWidgets(
     'icon trigger has 48 square target and child trigger remains content sized',
     (WidgetTester tester) async {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         PopupMenuButton<int>(
           itemBuilder: (BuildContext context) => _items,
@@ -248,7 +248,7 @@ void main() {
         tester.getSize(find.byType(PopupMenuButton<int>)),
         const Size(48, 48),
       );
-      await pumpPure(
+      await pumpNeutral(
         tester,
         PopupMenuButton<int>(
           itemBuilder: (BuildContext context) => _items,
@@ -264,7 +264,7 @@ void main() {
   testWidgets('position and offset use overlay geometry', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       PopupMenuButton<int>(
         position: PopupMenuPosition.under,
@@ -288,7 +288,7 @@ void main() {
   testWidgets('transition keeps overlay visible until reverse completes', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       PopupMenuButton<int>(
         style: MenuStyleTest.popup,
@@ -309,7 +309,7 @@ void main() {
     (WidgetTester tester) async {
       final ScrollController page = ScrollController();
       addTearDown(page.dispose);
-      await pumpPure(
+      await pumpNeutral(
         tester,
         SizedBox(
           height: 350,
@@ -364,7 +364,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final List<String> calls = <String>[];
-    await pumpPure(
+    await pumpNeutral(
       tester,
       Column(
         mainAxisSize: MainAxisSize.min,
@@ -402,7 +402,7 @@ void main() {
     AnimatedSurface container() => tester.widget<AnimatedSurface>(
       find.descendant(of: option(), matching: find.byType(AnimatedSurface)),
     );
-    await pumpPure(
+    await pumpNeutral(
       tester,
       PopupMenuButton<int>(
         itemBuilder: (BuildContext context) => const <PopupMenuEntry<int>>[
@@ -420,7 +420,7 @@ void main() {
     );
     await open(tester);
     expect(container().decoration, global);
-    await pumpPure(
+    await pumpNeutral(
       tester,
       PopupMenuTheme(
         data: const PopupMenuStyle(
@@ -485,7 +485,7 @@ void main() {
       null,
       PopupMenuPosition.under,
     ]) {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         PopupMenuTheme(
           data: const PopupMenuStyle(position: PopupMenuPosition.under),
@@ -517,7 +517,7 @@ void main() {
     bool enabled = true;
     int canceled = 0;
     late StateSetter update;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
@@ -541,7 +541,7 @@ void main() {
   testWidgets('custom entries participate in initial focus and navigation', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       PopupMenuButton<int>(
         initialValue: 7,
@@ -571,7 +571,7 @@ void main() {
   testWidgets('a null checked indicator adds no slot or spacing', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       PopupMenuButton<int>(
         style: const PopupMenuStyle(

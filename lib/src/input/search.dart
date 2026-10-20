@@ -4,7 +4,7 @@ import '../buttons/icon_button.dart';
 import '../foundation/decoration_override.dart';
 import '../foundation/glyphs.dart';
 import '../foundation/motion.dart';
-import '../localizations/pure_localizations.dart';
+import '../localizations/neutral_localizations.dart';
 import '../overlay/overlay_behavior.dart';
 import '../overlay/overlay_host.dart';
 import '../overlay/overlay_placement.dart';
@@ -121,7 +121,7 @@ class SearchBar extends StatelessWidget {
       child: TextField(
         controller: controller,
         focusNode: focusNode,
-        hintText: hintText ?? PureLocalizations.of(context).searchFieldLabel,
+        hintText: hintText ?? NeutralLocalizations.of(context).searchFieldLabel,
         prefixIcon: leading ?? const SearchGlyph(),
         suffix: trailing == null
             ? null
@@ -276,10 +276,10 @@ class _SearchAnchorState extends State<SearchAnchor>
   );
   final OverlayPortalController _portal = OverlayPortalController();
   final FocusScopeNode _scope = FocusScopeNode(
-    debugLabel: 'PureUI search',
+    debugLabel: 'NeutralUI search',
     traversalEdgeBehavior: TraversalEdgeBehavior.closedLoop,
   );
-  final FocusNode _viewFocus = FocusNode(debugLabel: 'PureUI search field');
+  final FocusNode _viewFocus = FocusNode(debugLabel: 'NeutralUI search field');
   final GlobalKey _anchorKey = GlobalKey();
   FocusNode? _previousFocus;
   _SearchViewRoute? _route;
@@ -393,7 +393,7 @@ class _SearchAnchorState extends State<SearchAnchor>
           context,
           style.reverseTransitionDuration ?? const Duration(milliseconds: 200),
         ),
-        dismissLabel: PureLocalizations.of(context).modalBarrierDismissLabel,
+        dismissLabel: NeutralLocalizations.of(context).modalBarrierDismissLabel,
       );
       _route = route;
       Navigator.of(context, rootNavigator: true).push<void>(route);
@@ -470,7 +470,7 @@ class _SearchAnchorState extends State<SearchAnchor>
 
   Widget _view(BuildContext context) {
     final SearchStyle style = _style;
-    final PureLocalizations strings = PureLocalizations.of(context);
+    final NeutralLocalizations strings = NeutralLocalizations.of(context);
     return Shortcuts(
       shortcuts: <ShortcutActivator, Intent>{
         menuKeyActivator(0x10000001b): const DismissIntent(),

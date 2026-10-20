@@ -4,7 +4,7 @@ import 'dart:ui' show SemanticsAction, Tristate;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
+import 'package:neutral_ui/neutral_ui.dart';
 
 import '../helpers/pump.dart';
 
@@ -20,7 +20,7 @@ void main() {
     WidgetTester tester,
   ) async {
     DateTime? selected;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       CalendarDatePicker(
         initialDate: DateTime(2026, 10, 16),
@@ -48,7 +48,7 @@ void main() {
     WidgetTester tester,
   ) async {
     DateTime? selected;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       CalendarDatePicker(
         initialDate: DateTime(2026, 10, 31),
@@ -73,7 +73,7 @@ void main() {
     WidgetTester tester,
   ) async {
     DateTime? selected;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       CalendarDatePicker(
         initialDate: DateTime(2026, 10, 16),
@@ -102,7 +102,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final SemanticsHandle semantics = tester.ensureSemantics();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       CalendarDatePicker(
         initialDate: DateTime(2026, 10, 16),
@@ -130,7 +130,7 @@ void main() {
   testWidgets(
     'year mode scrolls to current selection and returns to day mode',
     (WidgetTester tester) async {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         CalendarDatePicker(
           initialDate: DateTime(2026, 10, 16),
@@ -153,7 +153,7 @@ void main() {
     (WidgetTester tester) async {
       final GlobalKey<FormState> form = GlobalKey<FormState>();
       DateTime? saved;
-      await pumpPure(
+      await pumpNeutral(
         tester,
         SizedBox(
           width: 320,
@@ -188,7 +188,7 @@ void main() {
     WidgetTester tester,
   ) async {
     DateTime? result;
-    await pumpPureApp(
+    await pumpNeutralApp(
       tester,
       Builder(
         builder: (BuildContext context) => TextButton(
@@ -221,7 +221,7 @@ void main() {
     WidgetTester tester,
   ) async {
     int taps = 0;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       Column(
         mainAxisSize: MainAxisSize.min,
@@ -257,7 +257,7 @@ void main() {
     'range calendar selects endpoints and skips disabled days by keyboard',
     (WidgetTester tester) async {
       DateTimeRange<DateTime>? selected;
-      await pumpPure(
+      await pumpNeutral(
         tester,
         SizedBox(
           height: 380,
@@ -295,7 +295,7 @@ void main() {
     WidgetTester tester,
   ) async {
     DateTimeRange<DateTime>? selected;
-    await pumpPureApp(
+    await pumpNeutralApp(
       tester,
       Builder(
         builder: (BuildContext context) => TextButton(
@@ -335,7 +335,7 @@ void main() {
     'time dial tracks drag continuously and taps snap to five minutes',
     (WidgetTester tester) async {
       TimeOfDay? selected;
-      await pumpPure(
+      await pumpNeutral(
         tester,
         TimePicker(
           initialTime: const TimeOfDay(hour: 10, minute: 0),
@@ -347,7 +347,9 @@ void main() {
       );
       await tester.tap(find.text('00').first);
       await tester.pumpAndSettle();
-      final Finder dial = find.byKey(const ValueKey<String>('pure-time-dial'));
+      final Finder dial = find.byKey(
+        const ValueKey<String>('neutral-time-dial'),
+      );
       final Offset center = tester.getCenter(dial);
       final Offset pointer = center + const Offset(70, -50);
       final TestGesture gesture = await tester.startGesture(
@@ -358,7 +360,7 @@ void main() {
       final double turns = math.atan2(70, 50) / (2 * math.pi);
       expect(selected?.minute, (turns * 60).round());
       expect(
-        find.byKey(const ValueKey<String>('pure-time-hand')),
+        find.byKey(const ValueKey<String>('neutral-time-hand')),
         paints..something(
           (Symbol method, List<dynamic> arguments) =>
               method == #drawLine &&
@@ -380,7 +382,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final GlobalKey<TimePickerState> key = GlobalKey<TimePickerState>();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       TimePicker(
         key: key,
@@ -390,7 +392,7 @@ void main() {
       ),
     );
     final Offset center = tester.getCenter(
-      find.byKey(const ValueKey<String>('pure-time-dial')),
+      find.byKey(const ValueKey<String>('neutral-time-dial')),
     );
     await tester.tapAt(center + const Offset(70, 0));
     await tester.pumpAndSettle();
@@ -409,7 +411,7 @@ void main() {
   testWidgets('reduced motion changes calendar months immediately', (
     WidgetTester tester,
   ) async {
-    await pumpPureApp(
+    await pumpNeutralApp(
       tester,
       CalendarDatePicker(
         initialDate: DateTime(2026, 10, 16),
@@ -428,7 +430,7 @@ void main() {
   testWidgets(
     'month retargeting continues from the current page without a jump',
     (WidgetTester tester) async {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         CalendarDatePicker(
           initialDate: DateTime(2026, 10, 16),
@@ -463,7 +465,7 @@ void main() {
     WidgetTester tester,
   ) async {
     int predicateCalls = 0;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       CalendarDatePicker(
         initialDate: DateTime(2026, 10, 16),
@@ -491,7 +493,7 @@ void main() {
   ) async {
     final FocusNode after = FocusNode();
     addTearDown(after.dispose);
-    await pumpPure(
+    await pumpNeutral(
       tester,
       Column(
         mainAxisSize: MainAxisSize.min,
@@ -521,7 +523,7 @@ void main() {
     (WidgetTester tester) async {
       final FocusNode field = FocusNode();
       addTearDown(field.dispose);
-      await pumpPure(
+      await pumpNeutral(
         tester,
         SizedBox(
           width: 320,
@@ -549,7 +551,7 @@ void main() {
   ) async {
     final FocusNode outside = FocusNode();
     addTearDown(outside.dispose);
-    await pumpPure(
+    await pumpNeutral(
       tester,
       Column(
         mainAxisSize: MainAxisSize.min,
@@ -582,7 +584,7 @@ void main() {
     WidgetTester tester,
   ) async {
     int taps = 0;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       Column(
         mainAxisSize: MainAxisSize.min,
@@ -620,7 +622,7 @@ void main() {
     WidgetTester tester,
   ) async {
     TimeOfDay? selected;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       TimePicker(
         initialTime: const TimeOfDay(hour: 3, minute: 17),
@@ -639,7 +641,7 @@ void main() {
   ) async {
     final SemanticsHandle semantics = tester.ensureSemantics();
     TimeOfDay? selected;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       TimePicker(
         initialTime: const TimeOfDay(hour: 3, minute: 17),
@@ -673,7 +675,7 @@ void main() {
     WidgetTester tester,
   ) async {
     TimeOfDay? selected;
-    await pumpPureApp(
+    await pumpNeutralApp(
       tester,
       Builder(
         builder: (BuildContext context) => TextButton(
@@ -709,7 +711,7 @@ void main() {
   testWidgets(
     'date field uses the root overlay inside a smaller nested overlay',
     (WidgetTester tester) async {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         SizedBox(
           width: 200,

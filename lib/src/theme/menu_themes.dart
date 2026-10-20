@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import '../styles/dropdown_style.dart';
 import '../styles/popup_menu_style.dart';
-import 'pure_theme.dart';
+import 'neutral_theme.dart';
 
 /// Overrides dropdownButton tokens for a subtree.
 ///
@@ -19,9 +19,9 @@ class DropdownButtonTheme extends InheritedTheme {
   /// The component tokens inherited by this subtree.
   final DropdownStyle data;
 
-  /// Returns the nearest component theme or its PureTheme style.
+  /// Returns the nearest component theme or its NeutralTheme style.
   static DropdownStyle of(BuildContext context) {
-    return maybeOf(context) ?? PureTheme.of(context).dropdownButtonStyle;
+    return maybeOf(context) ?? NeutralTheme.of(context).dropdownButtonStyle;
   }
 
   /// Returns the nearest local component theme, if present.
@@ -70,9 +70,9 @@ class DropdownMenuTheme extends InheritedTheme {
   /// The component tokens inherited by this subtree.
   final DropdownStyle data;
 
-  /// Returns the nearest component theme or its PureTheme style.
+  /// Returns the nearest component theme or its NeutralTheme style.
   static DropdownStyle of(BuildContext context) {
-    return maybeOf(context) ?? PureTheme.of(context).dropdownMenuStyle;
+    return maybeOf(context) ?? NeutralTheme.of(context).dropdownMenuStyle;
   }
 
   /// Returns the nearest local component theme, if present.
@@ -117,9 +117,9 @@ class PopupMenuTheme extends InheritedTheme {
   /// The component tokens inherited by this subtree.
   final PopupMenuStyle data;
 
-  /// Returns the nearest component theme or its PureTheme style.
+  /// Returns the nearest component theme or its NeutralTheme style.
   static PopupMenuStyle of(BuildContext context) {
-    return maybeOf(context) ?? PureTheme.of(context).popupMenuStyle;
+    return maybeOf(context) ?? NeutralTheme.of(context).popupMenuStyle;
   }
 
   /// Returns the nearest local component theme, if present.

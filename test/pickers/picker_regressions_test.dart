@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
+import 'package:neutral_ui/neutral_ui.dart';
 
 import '../helpers/pump.dart';
 
@@ -10,7 +10,7 @@ void main() {
     WidgetTester tester,
   ) async {
     DateTime? selected;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       CalendarDatePicker(
         initialDate: DateTime(2026, 10, 16, 8),
@@ -30,7 +30,7 @@ void main() {
     'calendar month controls keep subsequent keyboard selection visible',
     (WidgetTester tester) async {
       DateTime? selected;
-      await pumpPure(
+      await pumpNeutral(
         tester,
         CalendarDatePicker(
           initialDate: DateTime(2026, 10, 31),
@@ -65,7 +65,7 @@ void main() {
     DateTime first = DateTime(2026);
     DateTime last = DateTime(2027);
     DateTime? selected;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
@@ -98,7 +98,7 @@ void main() {
   ) async {
     final FocusNode node = FocusNode();
     addTearDown(node.dispose);
-    await pumpPureApp(
+    await pumpNeutralApp(
       tester,
       SizedBox(
         width: 320,
@@ -123,7 +123,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final GlobalKey<TimePickerState> key = GlobalKey<TimePickerState>();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       TimePicker(
         key: key,
@@ -164,7 +164,7 @@ void main() {
       final GlobalKey<TimePickerState> key = GlobalKey<TimePickerState>();
       late StateSetter update;
       bool use24 = false;
-      await pumpPure(
+      await pumpNeutral(
         tester,
         StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
@@ -211,7 +211,7 @@ void main() {
     'date modals return normalized dates and ranges without new selection',
     (WidgetTester tester) async {
       late BuildContext launch;
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         Builder(
           builder: (BuildContext context) {
@@ -258,7 +258,7 @@ void main() {
       final GlobalKey<InputDatePickerFormFieldState> key =
           GlobalKey<InputDatePickerFormFieldState>();
       DateTime? saved;
-      await pumpPure(
+      await pumpNeutral(
         tester,
         SizedBox(
           width: 300,
@@ -285,7 +285,7 @@ void main() {
     (WidgetTester tester) async {
       late StateSetter update;
       DateTime? date = DateTime(2026, 10, 16);
-      await pumpPure(
+      await pumpNeutral(
         tester,
         StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
@@ -326,7 +326,7 @@ void main() {
     final GlobalKey<TimePickerState> key = GlobalKey<TimePickerState>();
     late StateSetter update;
     bool use24 = false;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
@@ -355,7 +355,7 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      PureApp(
+      NeutralApp(
         color: const Color(0xffffffff),
         builder: (BuildContext context, Widget? child) => MediaQuery(
           data: MediaQuery.of(context)
@@ -393,7 +393,7 @@ void main() {
   testWidgets('virtual day focus exposes a live semantic announcement', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       CalendarDatePicker(
         initialDate: DateTime(2026, 10, 16),
@@ -419,7 +419,7 @@ void main() {
   testWidgets('year picker scrolls to selection using inherited year extent', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       SizedBox(
         width: 336,
@@ -444,7 +444,7 @@ void main() {
       final GlobalKey<TimePickerState> key = GlobalKey<TimePickerState>();
       bool input = false;
       late StateSetter update;
-      await pumpPure(
+      await pumpNeutral(
         tester,
         Builder(
           builder: (BuildContext context) => Localizations.override(
@@ -482,7 +482,7 @@ void main() {
           (Widget widget) =>
               widget is IconButton &&
               widget.tooltip ==
-                  const DefaultPureLocalizations().inputTimeModeButtonLabel,
+                  const DefaultNeutralLocalizations().inputTimeModeButtonLabel,
         ),
       );
       await tester.pumpAndSettle();
@@ -518,11 +518,11 @@ class _NoonParser extends GregorianCalendarDelegate {
   @override
   DateTime? parseCompactDate(
     String? inputString,
-    PureLocalizations localizations,
+    NeutralLocalizations localizations,
   ) => inputString == 'Custom date' ? DateTime(2026, 10, 16, 12) : null;
 }
 
-class _DigitsLocalizations extends DefaultPureLocalizations {
+class _DigitsLocalizations extends DefaultNeutralLocalizations {
   const _DigitsLocalizations();
   @override
   String formatDecimal(int number) => number
@@ -535,13 +535,13 @@ class _DigitsLocalizations extends DefaultPureLocalizations {
       formatDecimal(timeOfDay.minute).padLeft(2, '٠');
 }
 
-class _DigitsDelegate extends LocalizationsDelegate<PureLocalizations> {
+class _DigitsDelegate extends LocalizationsDelegate<NeutralLocalizations> {
   const _DigitsDelegate();
   @override
   bool isSupported(Locale locale) => true;
   @override
-  Future<PureLocalizations> load(Locale locale) =>
-      Future<PureLocalizations>.value(const _DigitsLocalizations());
+  Future<NeutralLocalizations> load(Locale locale) =>
+      Future<NeutralLocalizations>.value(const _DigitsLocalizations());
   @override
   bool shouldReload(_DigitsDelegate old) => false;
 }

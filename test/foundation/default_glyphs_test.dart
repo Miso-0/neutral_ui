@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
-import 'package:pure_ui/src/menus/menu_panel.dart';
+import 'package:neutral_ui/neutral_ui.dart';
+import 'package:neutral_ui/src/menus/menu_panel.dart';
 
 import '../helpers/pump.dart';
 
@@ -33,7 +33,7 @@ void main() {
     testWidgets('size and color follow the ambient icon theme like Icon', (
       WidgetTester tester,
     ) async {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         const IconTheme(
           data: IconThemeData(color: _accent, size: 18, opacity: 0.5),
@@ -68,7 +68,7 @@ void main() {
       WidgetTester tester,
     ) async {
       final SemanticsHandle semantics = tester.ensureSemantics();
-      await pumpPure(
+      await pumpNeutral(
         tester,
         const IconTheme(
           data: IconThemeData(color: _accent, size: 18),
@@ -95,7 +95,7 @@ void main() {
     testWidgets(
       'DropdownButton paints a chevron in its icon theme and flips it',
       (WidgetTester tester) async {
-        await pumpPure(
+        await pumpNeutral(
           tester,
           DropdownButton<String>(
             items: const <DropdownMenuItem<String>>[
@@ -140,12 +140,12 @@ void main() {
         const List<DropdownMenuEntry<int>> entries = <DropdownMenuEntry<int>>[
           DropdownMenuEntry<int>(value: 1, label: 'One'),
         ];
-        await pumpPure(
+        await pumpNeutral(
           tester,
           const DropdownMenu<int>(dropdownMenuEntries: entries),
         );
         expect(find.byType(ChevronGlyph), findsOneWidget);
-        await pumpPure(
+        await pumpNeutral(
           tester,
           const DropdownMenu<int>(
             dropdownMenuEntries: entries,
@@ -161,7 +161,7 @@ void main() {
     testWidgets('dropdown rows check the chosen option and keep alignment', (
       WidgetTester tester,
     ) async {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         DropdownButton<String>(
           items: const <DropdownMenuItem<String>>[
@@ -224,7 +224,7 @@ void main() {
     testWidgets('DropdownMenu.multiple checks every selected entry', (
       WidgetTester tester,
     ) async {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         DropdownMenu<int>.multiple(
           dropdownMenuEntries: const <DropdownMenuEntry<int>>[
@@ -247,7 +247,7 @@ void main() {
     testWidgets('checked popup items default to a check', (
       WidgetTester tester,
     ) async {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         PopupMenuButton<int>(
           itemBuilder: (BuildContext context) => const <PopupMenuEntry<int>>[
@@ -278,7 +278,7 @@ void main() {
     testWidgets('a provided token that resolves null opts out of the default', (
       WidgetTester tester,
     ) async {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         DropdownButton<String>(
           items: const <DropdownMenuItem<String>>[
@@ -301,7 +301,7 @@ void main() {
     testWidgets('loading buttons show painted dots over hidden content', (
       WidgetTester tester,
     ) async {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         ElevatedButton(
           onPressed: () {},
@@ -326,7 +326,7 @@ void main() {
     testWidgets('a null loading token keeps the content visible instead', (
       WidgetTester tester,
     ) async {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         ElevatedButton(
           onPressed: () {},

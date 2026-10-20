@@ -3,23 +3,23 @@ import 'package:flutter/widgets.dart';
 import '../dates/date.dart';
 import '../dates/time.dart';
 
-/// The text and date conventions used by PureUI components.
+/// The text and date conventions used by NeutralUI components.
 ///
-/// Extend [DefaultPureLocalizations] to override individual English defaults,
+/// Extend [DefaultNeutralLocalizations] to override individual English defaults,
 /// or implement this interface for another language. Install a
-/// [LocalizationsDelegate] with a type of [PureLocalizations] to provide it.
-abstract class PureLocalizations {
+/// [LocalizationsDelegate] with a type of [NeutralLocalizations] to provide it.
+abstract class NeutralLocalizations {
   /// Creates localized resources.
-  const PureLocalizations();
+  const NeutralLocalizations();
 
-  /// The English delegate installed by PureApp.
-  static const LocalizationsDelegate<PureLocalizations> delegate =
-      PureLocalizationsDelegate();
+  /// The English delegate installed by NeutralApp.
+  static const LocalizationsDelegate<NeutralLocalizations> delegate =
+      NeutralLocalizationsDelegate();
 
   /// Resources from the nearest [Localizations], or English when none exist.
-  static PureLocalizations of(BuildContext context) =>
-      Localizations.of<PureLocalizations>(context, PureLocalizations) ??
-      const DefaultPureLocalizations();
+  static NeutralLocalizations of(BuildContext context) =>
+      Localizations.of<NeutralLocalizations>(context, NeutralLocalizations) ??
+      const DefaultNeutralLocalizations();
 
   /// Full month names, ordered January through December.
   List<String> get months;
@@ -305,17 +305,17 @@ abstract class PureLocalizations {
 }
 
 /// English resources with US numeric date and 12-hour time conventions.
-class DefaultPureLocalizations extends PureLocalizations {
+class DefaultNeutralLocalizations extends NeutralLocalizations {
   /// Creates the default English resources.
-  const DefaultPureLocalizations();
+  const DefaultNeutralLocalizations();
 
   /// The default English localization delegate.
-  static const LocalizationsDelegate<PureLocalizations> delegate =
-      PureLocalizationsDelegate();
+  static const LocalizationsDelegate<NeutralLocalizations> delegate =
+      NeutralLocalizationsDelegate();
 
   /// Loads English resources without an external localization dependency.
-  static Future<PureLocalizations> load(Locale locale) =>
-      Future<PureLocalizations>.value(const DefaultPureLocalizations());
+  static Future<NeutralLocalizations> load(Locale locale) =>
+      Future<NeutralLocalizations>.value(const DefaultNeutralLocalizations());
 
   @override
   List<String> get months => const <String>[
@@ -676,22 +676,22 @@ class DefaultPureLocalizations extends PureLocalizations {
   String get refreshIndicatorSemanticLabel => 'Refresh';
 }
 
-/// Loads [DefaultPureLocalizations] for English locales.
-class PureLocalizationsDelegate
-    extends LocalizationsDelegate<PureLocalizations> {
+/// Loads [DefaultNeutralLocalizations] for English locales.
+class NeutralLocalizationsDelegate
+    extends LocalizationsDelegate<NeutralLocalizations> {
   /// Creates the default delegate.
-  const PureLocalizationsDelegate();
+  const NeutralLocalizationsDelegate();
 
   @override
   bool isSupported(Locale locale) => locale.languageCode == 'en';
 
   @override
-  Future<PureLocalizations> load(Locale locale) =>
-      DefaultPureLocalizations.load(locale);
+  Future<NeutralLocalizations> load(Locale locale) =>
+      DefaultNeutralLocalizations.load(locale);
 
   @override
-  bool shouldReload(PureLocalizationsDelegate old) => false;
+  bool shouldReload(NeutralLocalizationsDelegate old) => false;
 
   @override
-  String toString() => 'PureLocalizationsDelegate(en)';
+  String toString() => 'NeutralLocalizationsDelegate(en)';
 }

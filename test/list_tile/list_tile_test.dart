@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
-import 'package:pure_ui/src/foundation/animated_surface.dart';
+import 'package:neutral_ui/neutral_ui.dart';
+import 'package:neutral_ui/src/foundation/animated_surface.dart';
 
 import '../helpers/pump.dart';
 
@@ -32,13 +32,13 @@ void main() {
         ),
       ),
     );
-    await pumpPure(tester, tile());
+    await pumpNeutral(tester, tile());
     expect(tester.getSize(find.byType(ListTile)).height, 80);
     expect(
       tester.getTopLeft(find.byKey(const ValueKey<String>('leading'))).dx,
       lessThan(tester.getTopLeft(find.text('Title')).dx),
     );
-    await pumpPure(tester, tile(), textDirection: TextDirection.rtl);
+    await pumpNeutral(tester, tile(), textDirection: TextDirection.rtl);
     expect(
       tester.getTopLeft(find.byKey(const ValueKey<String>('leading'))).dx,
       greaterThan(tester.getTopLeft(find.text('Title')).dx),
@@ -52,7 +52,7 @@ void main() {
     const BoxDecoration global = BoxDecoration(color: Color(0xFF000001));
     const BoxDecoration local = BoxDecoration(color: Color(0xFF000002));
     const BoxDecoration pressed = BoxDecoration(color: Color(0xFF000003));
-    await pumpPure(
+    await pumpNeutral(
       tester,
       ListTileTheme(
         data: const ListTileStyle(
@@ -96,7 +96,7 @@ void main() {
     WidgetTester tester,
   ) async {
     for (final ListTileTitleAlignment mode in ListTileTitleAlignment.values) {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         SizedBox(
           width: 300,
@@ -132,7 +132,7 @@ void main() {
     final FocusNode focus = FocusNode();
     addTearDown(focus.dispose);
     int taps = 0;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       ListTile(
         title: const Text('Tile'),
@@ -158,7 +158,7 @@ void main() {
         hasFocusAction: true,
       ),
     );
-    await pumpPure(
+    await pumpNeutral(
       tester,
       ListTile(
         title: const Text('Passive'),
@@ -172,7 +172,7 @@ void main() {
     await tester.tap(find.text('Passive'));
     expect(taps, 1);
     expect(focus.canRequestFocus, isFalse);
-    await pumpPure(
+    await pumpNeutral(
       tester,
       ListTile(title: const Text('Static'), focusNode: focus),
     );

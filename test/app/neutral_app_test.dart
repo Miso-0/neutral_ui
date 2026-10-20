@@ -1,22 +1,23 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
+import 'package:neutral_ui/neutral_ui.dart';
 
-class _CustomStrings extends DefaultPureLocalizations {
+class _CustomStrings extends DefaultNeutralLocalizations {
   const _CustomStrings();
 
   @override
   String get cancelButtonLabel => 'Back';
 }
 
-class _CustomDelegate extends LocalizationsDelegate<PureLocalizations> {
+class _CustomDelegate extends LocalizationsDelegate<NeutralLocalizations> {
   const _CustomDelegate();
 
   @override
   bool isSupported(Locale locale) => true;
 
   @override
-  Future<PureLocalizations> load(Locale locale) async => const _CustomStrings();
+  Future<NeutralLocalizations> load(Locale locale) async =>
+      const _CustomStrings();
 
   @override
   bool shouldReload(_CustomDelegate old) => false;
@@ -29,7 +30,7 @@ void main() {
     final GlobalKey<NavigatorState> navigator = GlobalKey<NavigatorState>();
     const ThemeData theme = ThemeData(textButtonStyle: ButtonStyle(spacing: 7));
     await tester.pumpWidget(
-      PureApp(
+      NeutralApp(
         color: const Color(0xFFFFFFFF),
         theme: theme,
         navigatorKey: navigator,
@@ -39,14 +40,14 @@ void main() {
         },
         home: Builder(
           builder: (BuildContext context) {
-            expect(PureTheme.of(context), theme);
-            return Text(PureLocalizations.of(context).cancelButtonLabel);
+            expect(NeutralTheme.of(context), theme);
+            return Text(NeutralLocalizations.of(context).cancelButtonLabel);
           },
         ),
         routes: <String, WidgetBuilder>{
           '/details': (BuildContext context) {
-            expect(PureTheme.of(context), theme);
-            return Text(PureLocalizations.of(context).okButtonLabel);
+            expect(NeutralTheme.of(context), theme);
+            return Text(NeutralLocalizations.of(context).okButtonLabel);
           },
         },
       ),
@@ -66,19 +67,19 @@ void main() {
   ) async {
     const ThemeData theme = ThemeData(iconButtonStyle: ButtonStyle(spacing: 8));
     await tester.pumpWidget(
-      PureApp(
+      NeutralApp(
         color: const Color(0xFFFFFFFF),
         theme: theme,
         localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
           _CustomDelegate(),
         ],
         builder: (BuildContext context, Widget? child) {
-          expect(PureTheme.of(context), theme);
+          expect(NeutralTheme.of(context), theme);
           return child!;
         },
         home: Builder(
           builder: (BuildContext context) =>
-              Text(PureLocalizations.of(context).cancelButtonLabel),
+              Text(NeutralLocalizations.of(context).cancelButtonLabel),
         ),
       ),
     );
@@ -90,14 +91,14 @@ void main() {
     'navigator-free builder retains content and updates its Overlay',
     (WidgetTester tester) async {
       int count = 0;
-      Widget app(String label) => PureApp.builder(
+      Widget app(String label) => NeutralApp.builder(
         color: const Color(0xFFFFFFFF),
         builder: (BuildContext context) {
           expect(Overlay.of(context), isA<OverlayState>());
           expect(Navigator.maybeOf(context), isNull);
           expect(
-            PureLocalizations.of(context),
-            isA<DefaultPureLocalizations>(),
+            NeutralLocalizations.of(context),
+            isA<DefaultNeutralLocalizations>(),
           );
           return Center(
             child: StatefulBuilder(
@@ -129,7 +130,7 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      PureApp(
+      NeutralApp(
         color: const Color(0xFFFFFFFF),
         onGenerateRoute: (RouteSettings settings) => PageRouteBuilder<void>(
           settings: settings,

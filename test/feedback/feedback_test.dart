@@ -2,17 +2,17 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/src/app/pure_app.dart' as pure;
-import 'package:pure_ui/src/buttons/text_button.dart' as pure;
-import 'package:pure_ui/src/buttons/icon_button.dart' as pure;
-import 'package:pure_ui/src/feedback/bottom_sheet.dart';
-import 'package:pure_ui/src/feedback/dialog.dart';
-import 'package:pure_ui/src/feedback/snack_bar.dart';
-import 'package:pure_ui/src/feedback/tooltip.dart';
-import 'package:pure_ui/src/styles/bottom_sheet_style.dart';
-import 'package:pure_ui/src/styles/dialog_style.dart';
-import 'package:pure_ui/src/styles/snack_bar_style.dart';
-import 'package:pure_ui/src/styles/tooltip_style.dart';
+import 'package:neutral_ui/src/app/neutral_app.dart' as neutral;
+import 'package:neutral_ui/src/buttons/text_button.dart' as neutral;
+import 'package:neutral_ui/src/buttons/icon_button.dart' as neutral;
+import 'package:neutral_ui/src/feedback/bottom_sheet.dart';
+import 'package:neutral_ui/src/feedback/dialog.dart';
+import 'package:neutral_ui/src/feedback/snack_bar.dart';
+import 'package:neutral_ui/src/feedback/tooltip.dart';
+import 'package:neutral_ui/src/styles/bottom_sheet_style.dart';
+import 'package:neutral_ui/src/styles/dialog_style.dart';
+import 'package:neutral_ui/src/styles/snack_bar_style.dart';
+import 'package:neutral_ui/src/styles/tooltip_style.dart';
 
 Future<void> app(
   WidgetTester tester,
@@ -22,7 +22,7 @@ Future<void> app(
   TextDirection direction = TextDirection.ltr,
 }) async {
   await tester.pumpWidget(
-    pure.PureApp(
+    neutral.NeutralApp(
       color: const Color(0xffffffff),
       builder: (BuildContext context, Widget? child) => MediaQuery(
         data: MediaQuery.of(context).copyWith(
@@ -309,7 +309,7 @@ void main() {
           title: const Text('Question'),
           content: const Text('Content'),
           actions: <Widget>[
-            pure.TextButton(
+            neutral.TextButton(
               onPressed: () => Navigator.of(context).pop('yes'),
               child: const Text('Confirm'),
             ),
@@ -448,13 +448,13 @@ void main() {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            pure.TextButton(
+            neutral.TextButton(
               onPressed: () {},
               autofocus: true,
               focusNode: first,
               child: const Text('First focus'),
             ),
-            pure.TextButton(
+            neutral.TextButton(
               onPressed: () {},
               focusNode: second,
               child: const Text('Second focus'),
@@ -800,7 +800,7 @@ void main() {
             ),
           );
       await tester.pumpAndSettle();
-      await tester.tap(find.byType(pure.IconButton));
+      await tester.tap(find.byType(neutral.IconButton));
       await tester.pumpAndSettle();
       expect(await closed.closed, SnackBarClosedReason.dismiss);
     });

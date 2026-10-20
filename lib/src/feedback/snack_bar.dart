@@ -6,7 +6,7 @@ import '../foundation/animated_surface.dart';
 import '../foundation/decoration_override.dart';
 import '../foundation/glyphs.dart';
 import '../foundation/motion.dart';
-import '../localizations/pure_localizations.dart';
+import '../localizations/neutral_localizations.dart';
 import '../styles/button_style.dart';
 import '../styles/snack_bar_style.dart';
 import '../theme/feedback_themes.dart';
@@ -123,7 +123,7 @@ class SnackBar extends StatelessWidget {
                     ?.close(SnackBarClosedReason.dismiss),
             style: resolved.closeButtonStyle,
             icon: Semantics(
-              label: PureLocalizations.of(context).closeButtonTooltip,
+              label: NeutralLocalizations.of(context).closeButtonTooltip,
               child: const CloseGlyph(),
             ),
           )
@@ -133,7 +133,7 @@ class SnackBar extends StatelessWidget {
       child: Semantics(
         liveRegion: true,
         container: true,
-        label: PureLocalizations.of(context).snackBarLabel,
+        label: NeutralLocalizations.of(context).snackBarLabel,
         child: AnimatedSurface(
           duration: reducedMotionDuration(
             context,

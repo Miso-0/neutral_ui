@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
+import 'package:neutral_ui/neutral_ui.dart';
 
 import '../helpers/pump.dart';
 
@@ -17,7 +17,7 @@ void main() {
       addTearDown(first.dispose);
       addTearDown(second.dispose);
       addTearDown(text.dispose);
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         SizedBox(
           width: 300,
@@ -54,7 +54,7 @@ void main() {
     addTearDown(first.dispose);
     addTearDown(disabled.dispose);
     addTearDown(last.dispose);
-    await pumpPureApp(
+    await pumpNeutralApp(
       tester,
       SizedBox(
         width: 300,
@@ -82,7 +82,7 @@ void main() {
       final TextEditingController text = TextEditingController();
       addTearDown(text.dispose);
       String? changed;
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         SizedBox(
           width: 300,
@@ -109,7 +109,7 @@ void main() {
     (WidgetTester tester) async {
       final TextEditingController text = TextEditingController();
       addTearDown(text.dispose);
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         SizedBox(width: 300, child: TextField(controller: text, maxLength: 1)),
       );
@@ -143,7 +143,7 @@ void main() {
       final WidgetStatesController states = WidgetStatesController();
       addTearDown(focus.dispose);
       addTearDown(states.dispose);
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         SizedBox(
           width: 300,
@@ -173,7 +173,7 @@ void main() {
     final FocusNode focus = FocusNode();
     addTearDown(focus.dispose);
     const Key label = ValueKey<String>('floating-label');
-    await pumpPureApp(
+    await pumpNeutralApp(
       tester,
       SizedBox(
         width: 300,
@@ -223,7 +223,7 @@ void main() {
     final ValueNotifier<bool> supplied = ValueNotifier<bool>(false);
     addTearDown(external.dispose);
     addTearDown(supplied.dispose);
-    await pumpPureApp(
+    await pumpNeutralApp(
       tester,
       SizedBox(
         width: 300,
@@ -258,7 +258,7 @@ void main() {
   testWidgets('autocomplete reverses its exit when editing resumes', (
     WidgetTester tester,
   ) async {
-    await pumpPureApp(
+    await pumpNeutralApp(
       tester,
       SizedBox(
         width: 300,
@@ -287,7 +287,7 @@ void main() {
   testWidgets('custom autocomplete options retain highlighted-option context', (
     WidgetTester tester,
   ) async {
-    await pumpPureApp(
+    await pumpNeutralApp(
       tester,
       SizedBox(
         width: 300,
@@ -315,7 +315,7 @@ void main() {
   ) async {
     final Map<String, Completer<Iterable<String>>> pending =
         <String, Completer<Iterable<String>>>{};
-    await pumpPureApp(
+    await pumpNeutralApp(
       tester,
       SizedBox(
         width: 300,
@@ -345,7 +345,7 @@ void main() {
         final FocusNode trigger = FocusNode();
         addTearDown(controller.dispose);
         addTearDown(trigger.dispose);
-        await pumpPureApp(
+        await pumpNeutralApp(
           tester,
           SizedBox(
             width: 300,
@@ -384,7 +384,7 @@ void main() {
         final SearchController controller = SearchController();
         addTearDown(controller.dispose);
         int closed = 0;
-        await pumpPureApp(
+        await pumpNeutralApp(
           tester,
           SizedBox(
             width: 300,
@@ -423,7 +423,7 @@ void main() {
     ) async {
       final SearchController controller = SearchController();
       addTearDown(controller.dispose);
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         SizedBox(
           width: 300,
@@ -454,7 +454,7 @@ void main() {
       final ValueNotifier<bool> visible = ValueNotifier<bool>(true);
       addTearDown(controller.dispose);
       addTearDown(visible.dispose);
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         SizedBox(
           width: 300,
@@ -491,7 +491,7 @@ void main() {
     final SearchController controller = SearchController(text: 'query');
     addTearDown(controller.dispose);
     int builds = 0;
-    await pumpPureApp(
+    await pumpNeutralApp(
       tester,
       SizedBox(
         width: 300,
@@ -515,7 +515,7 @@ void main() {
     'text field labels its editable semantics and announces validation errors',
     (WidgetTester tester) async {
       final SemanticsHandle semantics = tester.ensureSemantics();
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         const SizedBox(
           width: 300,
@@ -541,7 +541,7 @@ void main() {
       final SearchController controller = SearchController();
       addTearDown(controller.dispose);
       int taps = 0;
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         SizedBox(
           width: 300,
@@ -579,7 +579,7 @@ void main() {
       WidgetTester tester,
     ) async {
       int taps = 0;
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         SizedBox(
           width: 300,
@@ -623,7 +623,7 @@ void main() {
       addTearDown(first.dispose);
       addTearDown(second.dispose);
       addTearDown(current.dispose);
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         SizedBox(
           width: 300,
@@ -659,7 +659,7 @@ void main() {
   testWidgets(
     'editable text merges partial style tokens with inherited typography',
     (WidgetTester tester) async {
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         const DefaultTextStyle(
           style: TextStyle(

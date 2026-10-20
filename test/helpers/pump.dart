@@ -1,10 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
+import 'package:neutral_ui/neutral_ui.dart';
 
-/// Pumps a control with application keyboard bindings and PureUI theming.
-Future<void> pumpPure(
+/// Pumps a control with application keyboard bindings and NeutralUI theming.
+Future<void> pumpNeutral(
   WidgetTester tester,
   Widget child, {
   ThemeData? theme,
@@ -15,7 +15,7 @@ Future<void> pumpPure(
       color: const Color(0xFFFFFFFF),
       builder: (BuildContext context, Widget? appChild) => Directionality(
         textDirection: textDirection,
-        child: PureTheme(
+        child: NeutralTheme(
           data: theme ?? const ThemeData(),
           child: Overlay(
             key: UniqueKey(),
@@ -116,8 +116,8 @@ void useTraditionalFocus() {
   });
 }
 
-/// Pumps route-based components with navigation, localization and PureUI themes.
-Future<void> pumpPureApp(
+/// Pumps route-based components with navigation, localization and NeutralUI themes.
+Future<void> pumpNeutralApp(
   WidgetTester tester,
   Widget child, {
   ThemeData theme = const ThemeData(),
@@ -126,7 +126,7 @@ Future<void> pumpPureApp(
   GlobalKey<NavigatorState>? navigatorKey,
 }) async {
   await tester.pumpWidget(
-    PureApp(
+    NeutralApp(
       color: const Color(0xFFFFFFFF),
       theme: theme,
       navigatorKey: navigatorKey,

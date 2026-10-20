@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/src/menus/key_activators.dart';
+import 'package:neutral_ui/src/menus/key_activators.dart';
 
 void main() {
   test(

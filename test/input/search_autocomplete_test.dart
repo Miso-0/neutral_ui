@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
+import 'package:neutral_ui/neutral_ui.dart';
 
 import '../helpers/pump.dart';
 
@@ -12,7 +12,7 @@ void main() {
     'autocomplete supports keyboard selection and completes its exit',
     (WidgetTester tester) async {
       String? selected;
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         SizedBox(
           width: 240,
@@ -46,7 +46,7 @@ void main() {
         final SearchController controller = SearchController();
         addTearDown(controller.dispose);
         int closed = 0;
-        await pumpPureApp(
+        await pumpNeutralApp(
           tester,
           SizedBox(
             width: 300,
@@ -85,7 +85,7 @@ void main() {
     addTearDown(controller.dispose);
     final Map<String, Completer<Iterable<Widget>>> pending =
         <String, Completer<Iterable<Widget>>>{};
-    await pumpPureApp(
+    await pumpNeutralApp(
       tester,
       SizedBox(
         width: 300,

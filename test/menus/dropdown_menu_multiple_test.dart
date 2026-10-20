@@ -1,8 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
-import 'package:pure_ui/src/menus/menu_panel.dart';
+import 'package:neutral_ui/neutral_ui.dart';
+import 'package:neutral_ui/src/menus/menu_panel.dart';
 
 import '../helpers/pump.dart';
 
@@ -21,7 +21,7 @@ void main() {
   ) async {
     Set<int> selected = <int>{1};
     final MenuController menu = MenuController();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
@@ -52,7 +52,7 @@ void main() {
     'does not remove the last value when empty selection is forbidden',
     (WidgetTester tester) async {
       final List<Set<int>> updates = <Set<int>>[];
-      await pumpPure(
+      await pumpNeutral(
         tester,
         DropdownMenu<int>.multiple(
           dropdownMenuEntries: _entries,
@@ -81,7 +81,7 @@ void main() {
     final TextEditingController controller = TextEditingController();
     addTearDown(controller.dispose);
     final List<Set<int>> updates = <Set<int>>[];
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownMenu<int>.multiple(
         dropdownMenuEntries: _entries,
@@ -108,7 +108,7 @@ void main() {
     final TextEditingController controller = TextEditingController();
     addTearDown(controller.dispose);
     final List<Set<int>> updates = <Set<int>>[];
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownMenu<int>.multiple(
         dropdownMenuEntries: _entries,
@@ -132,7 +132,7 @@ void main() {
   testWidgets('selected labels form a summary in entry order', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownMenu<int>.multiple(
         dropdownMenuEntries: _entries,
@@ -152,7 +152,7 @@ void main() {
     WidgetTester tester,
   ) async {
     List<int>? received;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownMenu<int>.multiple(
         dropdownMenuEntries: _entries,
@@ -178,7 +178,7 @@ void main() {
     (WidgetTester tester) async {
       final SemanticsHandle semantics = tester.ensureSemantics();
       final List<Set<int>> updates = <Set<int>>[];
-      await pumpPure(
+      await pumpNeutral(
         tester,
         DropdownMenu<int>.multiple(
           dropdownMenuEntries: _entries,
@@ -218,7 +218,7 @@ void main() {
   ) async {
     final MenuController menu = MenuController();
     final List<Set<int>> updates = <Set<int>>[];
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownMenu<int>.multiple(
         dropdownMenuEntries: _entries,

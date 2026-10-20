@@ -6,7 +6,7 @@ import '../foundation/glyphs.dart';
 import '../foundation/interaction_state.dart';
 import '../foundation/motion.dart';
 import '../list_tile/list_tile.dart';
-import '../localizations/pure_localizations.dart';
+import '../localizations/neutral_localizations.dart';
 import '../styles/expansion_tile_style.dart';
 import '../theme/navigation_themes.dart';
 
@@ -139,7 +139,7 @@ class _ExpansionTileState extends State<ExpansionTile> {
       context,
       style.animationDuration ?? const Duration(milliseconds: 200),
     );
-    final PureLocalizations localizations = PureLocalizations.of(context);
+    final NeutralLocalizations localizations = NeutralLocalizations.of(context);
     final Decoration? decoration =
         widget.decoration ??
         style.decoration?.resolve(

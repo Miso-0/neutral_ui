@@ -7,7 +7,7 @@ import '../feedback/dialog.dart';
 import '../foundation/glyphs.dart';
 import '../foundation/motion.dart';
 import '../input/text_field.dart';
-import '../localizations/pure_localizations.dart';
+import '../localizations/neutral_localizations.dart';
 import '../menus/key_activators.dart';
 import '../overlay/overlay_behavior.dart';
 import '../overlay/overlay_host.dart';
@@ -140,7 +140,7 @@ class _DatePickerFieldState extends State<DatePickerField>
         ? ''
         : widget.calendarDelegate.formatShortDate(
             _date!,
-            PureLocalizations.of(context),
+            NeutralLocalizations.of(context),
           );
   }
 
@@ -255,10 +255,11 @@ class _DatePickerFieldState extends State<DatePickerField>
         autofocus: widget.autofocus,
         style: widget.fieldStyle,
         labelText: widget.labelText,
-        hintText: widget.hintText ?? PureLocalizations.of(context).dateHelpText,
+        hintText:
+            widget.hintText ?? NeutralLocalizations.of(context).dateHelpText,
         suffixIcon: IconButton(
           onPressed: widget.enabled ? _open : null,
-          tooltip: PureLocalizations.of(context).datePickerHelpText,
+          tooltip: NeutralLocalizations.of(context).datePickerHelpText,
           icon: const CalendarGlyph(),
         ),
         onTap: _open,
@@ -358,7 +359,7 @@ class InputDatePickerFormFieldState extends State<InputDatePickerFormField> {
       if (widget.initialDate != null) {
         _controller.text = widget.calendarDelegate.formatCompactDate(
           widget.initialDate!,
-          PureLocalizations.of(context),
+          NeutralLocalizations.of(context),
         );
       }
     }
@@ -375,7 +376,7 @@ class InputDatePickerFormFieldState extends State<InputDatePickerFormField> {
             ? ''
             : widget.calendarDelegate.formatCompactDate(
                 widget.calendarDelegate.dateOnly(widget.initialDate!),
-                PureLocalizations.of(context),
+                NeutralLocalizations.of(context),
               );
       });
     }
@@ -384,13 +385,13 @@ class InputDatePickerFormFieldState extends State<InputDatePickerFormField> {
   DateTime? _parse(String? value) {
     final DateTime? date = widget.calendarDelegate.parseCompactDate(
       value,
-      PureLocalizations.of(context),
+      NeutralLocalizations.of(context),
     );
     return date == null ? null : widget.calendarDelegate.dateOnly(date);
   }
 
   String? _validate(String? value) {
-    final PureLocalizations l = PureLocalizations.of(context);
+    final NeutralLocalizations l = NeutralLocalizations.of(context);
     if (widget.acceptEmptyDate && (value?.trim().isEmpty ?? true)) return null;
     final DateTime? date = _parse(value);
     if (date == null) return widget.errorFormatText ?? l.invalidDateFormatLabel;
@@ -416,7 +417,7 @@ class InputDatePickerFormFieldState extends State<InputDatePickerFormField> {
 
   @override
   Widget build(BuildContext context) {
-    final PureLocalizations l = PureLocalizations.of(context);
+    final NeutralLocalizations l = NeutralLocalizations.of(context);
     return TextFormField(
       key: _field,
       controller: _controller,
@@ -554,7 +555,7 @@ class _DatePickerDialogState extends State<DatePickerDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final PureLocalizations l = PureLocalizations.of(context);
+    final NeutralLocalizations l = NeutralLocalizations.of(context);
     final DatePickerStyle style = (widget.style ?? const DatePickerStyle())
         .merge(DatePickerTheme.of(context));
     final bool canToggle =

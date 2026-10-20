@@ -1,14 +1,14 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/src/feedback/feedback_transition.dart';
-import 'package:pure_ui/src/foundation/motion.dart';
-import 'package:pure_ui/src/overlay/overlay_behavior.dart';
-import 'package:pure_ui/src/overlay/overlay_placement.dart';
-import 'package:pure_ui/src/styles/button_style.dart';
-import 'package:pure_ui/src/styles/tooltip_style.dart';
-import 'package:pure_ui/src/styles/dialog_style.dart';
-import 'package:pure_ui/src/styles/bottom_sheet_style.dart';
-import 'package:pure_ui/src/styles/snack_bar_style.dart';
+import 'package:neutral_ui/src/feedback/feedback_transition.dart';
+import 'package:neutral_ui/src/foundation/motion.dart';
+import 'package:neutral_ui/src/overlay/overlay_behavior.dart';
+import 'package:neutral_ui/src/overlay/overlay_placement.dart';
+import 'package:neutral_ui/src/styles/button_style.dart';
+import 'package:neutral_ui/src/styles/tooltip_style.dart';
+import 'package:neutral_ui/src/styles/dialog_style.dart';
+import 'package:neutral_ui/src/styles/bottom_sheet_style.dart';
+import 'package:neutral_ui/src/styles/snack_bar_style.dart';
 
 void main() {
   Widget transition(

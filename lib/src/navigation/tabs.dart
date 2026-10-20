@@ -4,7 +4,7 @@ import '../buttons/selection_button.dart';
 import '../foundation/interaction_state.dart';
 import '../foundation/motion.dart';
 import '../foundation/style_resolution.dart';
-import '../localizations/pure_localizations.dart';
+import '../localizations/neutral_localizations.dart';
 import '../styles/tab_bar_style.dart';
 import '../theme/navigation_themes.dart';
 
@@ -508,7 +508,7 @@ class _TabBarState extends State<TabBar> {
   }
 
   Widget _button(int index, TabBarStyle style) => Semantics(
-    label: PureLocalizations.of(context)
+    label: NeutralLocalizations.of(context)
         .tabLabel(tabIndex: index + 1, tabCount: widget.tabs.length),
     child: SelectionButton(
       key: _keys[index],

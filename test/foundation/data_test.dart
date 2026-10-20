@@ -1,10 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
-import 'package:pure_ui/src/foundation/animated_icon_theme.dart';
-import 'package:pure_ui/src/foundation/style_resolution.dart';
-import 'package:pure_ui/src/foundation/tap_target.dart';
+import 'package:neutral_ui/neutral_ui.dart';
+import 'package:neutral_ui/src/foundation/animated_icon_theme.dart';
+import 'package:neutral_ui/src/foundation/style_resolution.dart';
+import 'package:neutral_ui/src/foundation/tap_target.dart';
 
 void main() {
   group('InteractionState', () {

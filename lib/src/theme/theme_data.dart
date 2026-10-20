@@ -22,7 +22,7 @@ import '../styles/expansion_tile_style.dart';
 import '../styles/progress_indicator_style.dart';
 import '../styles/badge_style.dart';
 
-/// Component tokens inherited through PureTheme.
+/// Component tokens inherited through NeutralTheme.
 @immutable
 class ThemeData {
   /// Creates the central collection of optional component styles.

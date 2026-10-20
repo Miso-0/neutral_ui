@@ -41,7 +41,7 @@ class _MenuPointerRegion {
   }
 }
 
-/// Shared overlay, transition and focus ownership for PureUI menus.
+/// Shared overlay, transition and focus ownership for NeutralUI menus.
 mixin MenuHost<W extends StatefulWidget> on State<W>, TickerProvider {
   late MenuController _menuController;
   bool _ownsController = true;
@@ -49,7 +49,9 @@ mixin MenuHost<W extends StatefulWidget> on State<W>, TickerProvider {
   bool _ownsFocus = false;
   late final AnimationController _transition;
   late final CurvedAnimation _curvedTransition;
-  final FocusScopeNode _menuScope = FocusScopeNode(debugLabel: 'PureUI menu');
+  final FocusScopeNode _menuScope = FocusScopeNode(
+    debugLabel: 'NeutralUI menu',
+  );
   MenuStyle _panelStyle = const MenuStyle();
   bool _closing = false;
   bool _opening = false;
@@ -169,7 +171,8 @@ mixin MenuHost<W extends StatefulWidget> on State<W>, TickerProvider {
     _menuController = controller ?? MenuController();
     _ownsController = controller == null;
     _ownsFocus = focusNode == null;
-    _anchorFocusNode = focusNode ?? FocusNode(debugLabel: 'PureUI menu anchor');
+    _anchorFocusNode =
+        focusNode ?? FocusNode(debugLabel: 'NeutralUI menu anchor');
     _transition = AnimationController(vsync: this, duration: Duration.zero);
     _curvedTransition = CurvedAnimation(
       parent: _transition,
@@ -190,7 +193,7 @@ mixin MenuHost<W extends StatefulWidget> on State<W>, TickerProvider {
       if (_ownsFocus) _anchorFocusNode.dispose();
       _ownsFocus = focusNode == null;
       _anchorFocusNode =
-          focusNode ?? FocusNode(debugLabel: 'PureUI menu anchor');
+          focusNode ?? FocusNode(debugLabel: 'NeutralUI menu anchor');
     }
   }
 

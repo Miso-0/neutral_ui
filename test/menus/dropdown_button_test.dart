@@ -3,9 +3,9 @@ import 'dart:ui' show Tristate;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
-import 'package:pure_ui/src/foundation/animated_surface.dart';
-import 'package:pure_ui/src/menus/menu_item_button.dart';
+import 'package:neutral_ui/neutral_ui.dart';
+import 'package:neutral_ui/src/foundation/animated_surface.dart';
+import 'package:neutral_ui/src/menus/menu_item_button.dart';
 
 import '../helpers/pump.dart';
 
@@ -95,7 +95,7 @@ void main() {
           null,
           <DropdownMenuItem<String>>[],
         ]) {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         DropdownButton<String>(
           key: _dropdownKey,
@@ -108,7 +108,7 @@ void main() {
       await _open(tester);
       expect(_controller(tester).isOpen, isFalse);
     }
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownButton<String>(
         key: _dropdownKey,
@@ -126,7 +126,7 @@ void main() {
   testWidgets('sizes the trigger to its widest option', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownButton<int>(
         key: _dropdownKey,
@@ -152,7 +152,7 @@ void main() {
     WidgetTester tester,
   ) async {
     for (final bool enabled in <bool>[true, false]) {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         DropdownButton<String>(
           key: _dropdownKey,
@@ -170,7 +170,7 @@ void main() {
   testWidgets(
     'selectedItemBuilder controls trigger content and checks length',
     (WidgetTester tester) async {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         DropdownButton<String>(
           key: _dropdownKey,
@@ -187,7 +187,7 @@ void main() {
       expect(find.text('Third selected'), findsOneWidget);
       await _open(tester);
       expect(find.text('Three'), findsOneWidget);
-      await pumpPure(
+      await pumpNeutral(
         tester,
         DropdownButton<String>(
           items: _items(),
@@ -203,7 +203,7 @@ void main() {
     WidgetTester tester,
   ) async {
     const Key iconKey = Key('icon');
-    await pumpPure(
+    await pumpNeutral(
       tester,
       SizedBox(
         width: 250,
@@ -229,7 +229,7 @@ void main() {
   ) async {
     late MenuController controller;
     final List<bool> openDuringTap = <bool>[];
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownButton<String>(
         key: _dropdownKey,
@@ -253,7 +253,7 @@ void main() {
       LogicalKeyboardKey.space,
     ]) {
       final FocusNode node = FocusNode();
-      await pumpPure(tester, _dropdown(focusNode: node));
+      await pumpNeutral(tester, _dropdown(focusNode: node));
       node.requestFocus();
       await tester.pump();
       await tester.sendKeyEvent(key);
@@ -267,7 +267,7 @@ void main() {
   testWidgets('focuses the selected option and scrolls it into view', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownButton<int>(
         key: _dropdownKey,
@@ -301,7 +301,7 @@ void main() {
   testWidgets('without a selection the first enabled option receives focus', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _dropdown(
         items: <DropdownMenuItem<String>>[_items()[1], _items()[2]],
@@ -318,7 +318,7 @@ void main() {
   testWidgets('arrows and Tab wrap and skip disabled options', (
     WidgetTester tester,
   ) async {
-    await pumpPure(tester, _dropdown());
+    await pumpNeutral(tester, _dropdown());
     await _open(tester);
     expect(
       tester.widget<MenuItemButton>(_options.at(0)).focusNode!.hasFocus,
@@ -354,7 +354,7 @@ void main() {
   ) async {
     final List<String> log = <String>[];
     late MenuController controller;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _dropdown(
         items: _items(log: log),
@@ -375,7 +375,7 @@ void main() {
 
   testWidgets('disabled options ignore selection', (WidgetTester tester) async {
     final List<String?> values = <String?>[];
-    await pumpPure(tester, _dropdown(onChanged: values.add));
+    await pumpNeutral(tester, _dropdown(onChanged: values.add));
     await _open(tester);
     await tester.tap(_options.at(1));
     await tester.pumpAndSettle();
@@ -389,7 +389,10 @@ void main() {
     final FocusNode node = FocusNode();
     addTearDown(node.dispose);
     final List<String?> values = <String?>[];
-    await pumpPure(tester, _dropdown(focusNode: node, onChanged: values.add));
+    await pumpNeutral(
+      tester,
+      _dropdown(focusNode: node, onChanged: values.add),
+    );
     await _open(tester);
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
     await tester.pumpAndSettle();
@@ -408,7 +411,7 @@ void main() {
     final ScrollController scroll = ScrollController();
     addTearDown(scroll.dispose);
     final List<String?> values = <String?>[];
-    await pumpPure(
+    await pumpNeutral(
       tester,
       SizedBox(
         height: 250,
@@ -443,7 +446,7 @@ void main() {
     const Decoration inline = BoxDecoration(color: Color(0xFF334455));
     const Decoration entry = BoxDecoration(color: Color(0xFF445566));
     for (int layer = 0; layer < 4; layer++) {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         DropdownButtonTheme(
           data: layer == 0
@@ -500,7 +503,7 @@ void main() {
       _controller(tester).close();
       await tester.pumpAndSettle();
     }
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _dropdown(),
       theme: const ThemeData(
@@ -519,7 +522,7 @@ void main() {
     WidgetTester tester,
   ) async {
     InteractionState? trigger;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       _dropdown(
         style: DropdownStyle(
@@ -548,7 +551,7 @@ void main() {
     WidgetTester tester,
   ) async {
     const Key iconKey = Key('arrow');
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownButton<String>(
         key: _dropdownKey,
@@ -588,7 +591,7 @@ void main() {
   ) async {
     const Key iconKey = Key('arrow');
     Future<double> openTurns(DropdownStyle? style, DropdownStyle theme) async {
-      await pumpPure(
+      await pumpNeutral(
         tester,
         DropdownButton<String>(
           key: _dropdownKey,
@@ -630,7 +633,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final SemanticsHandle semantics = tester.ensureSemantics();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownButton<String>(
         key: _dropdownKey,
@@ -675,7 +678,7 @@ void main() {
   testWidgets('menu panel overrides retain component tokens', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownButtonTheme(
         data: const DropdownStyle(

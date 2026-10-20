@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
+import 'package:neutral_ui/neutral_ui.dart';
 
 import '../helpers/pump.dart';
 
@@ -12,7 +12,7 @@ void main() {
     final FocusNode node = FocusNode();
     addTearDown(node.dispose);
     InteractionState state = const InteractionState();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       TickerMode(
         enabled: false,
@@ -41,7 +41,7 @@ void main() {
     InteractionState state = const InteractionState();
     int taps = 0;
     int longs = 0;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       InteractionDetector(
         onTap: () {
@@ -89,7 +89,7 @@ void main() {
     addTearDown(node.dispose);
     InteractionState state = const InteractionState();
     int taps = 0;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       InteractionDetector(
         focusNode: node,
@@ -114,7 +114,7 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.space);
     await tester.pump();
     expect(taps, 2);
-    await pumpPure(tester, const SizedBox());
+    await pumpNeutral(tester, const SizedBox());
     await tester.pump(const Duration(milliseconds: 150));
     expect(tester.takeException(), isNull);
   });
@@ -133,7 +133,7 @@ void main() {
     late StateSetter rebuild;
     InteractionState state = const InteractionState();
     final List<bool> hoverEvents = <bool>[];
-    await pumpPure(
+    await pumpNeutral(
       tester,
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setter) {
@@ -178,7 +178,7 @@ void main() {
     bool enabled = true;
     late StateSetter rebuild;
     InteractionState state = const InteractionState();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setter) {
@@ -219,7 +219,7 @@ void main() {
     addTearDown(node.dispose);
     InteractionState state = const InteractionState();
     int taps = 0;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       InteractionDetector(
         focusNode: node,
@@ -252,7 +252,7 @@ void main() {
     bool enabled = true;
     late StateSetter rebuild;
     InteractionState state = const InteractionState();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setter) {
@@ -291,7 +291,7 @@ void main() {
       addTearDown(node.dispose);
       final List<bool> focusEvents = <bool>[];
       InteractionState state = const InteractionState();
-      await pumpPure(
+      await pumpNeutral(
         tester,
         InteractionDetector(
           focusNode: node,
@@ -329,7 +329,7 @@ void main() {
     final FocusNode node = FocusNode();
     addTearDown(node.dispose);
     InteractionState state = const InteractionState();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       MediaQuery(
         data: const MediaQueryData(navigationMode: NavigationMode.directional),
@@ -349,7 +349,7 @@ void main() {
     expect(node.hasFocus, isTrue);
     expect(state.isFocused, isTrue);
     expect(state.isDisabled, isTrue);
-    await pumpPure(
+    await pumpNeutral(
       tester,
       InteractionDetector(
         enabled: false,
@@ -373,7 +373,7 @@ void main() {
       bool enabled = false;
       late StateSetter rebuild;
       final List<bool> hoverEvents = <bool>[];
-      await pumpPure(
+      await pumpNeutral(
         tester,
         StatefulBuilder(
           builder: (BuildContext context, StateSetter setter) {
@@ -422,7 +422,7 @@ void main() {
             ),
           )
           .cursor;
-      await pumpPure(
+      await pumpNeutral(
         tester,
         StatefulBuilder(
           builder: (BuildContext context, StateSetter setter) {
@@ -469,7 +469,7 @@ void main() {
       late StateSetter rebuild;
       int builds = 0;
       InteractionState state = const InteractionState();
-      await pumpPure(
+      await pumpNeutral(
         tester,
         StatefulBuilder(
           builder: (BuildContext context, StateSetter setter) {
@@ -509,7 +509,7 @@ void main() {
       int taps = 0;
       int customActivations = 0;
       int ancestorActivations = 0;
-      await pumpPure(
+      await pumpNeutral(
         tester,
         InteractionDetector(
           onTap: () => taps++,
@@ -530,7 +530,7 @@ void main() {
       Actions.invoke<ActivateIntent>(actionContext, const ActivateIntent());
       expect(customActivations, 1);
       expect(taps, 0);
-      await pumpPure(
+      await pumpNeutral(
         tester,
         Actions(
           actions: <Type, Action<Intent>>{
@@ -564,7 +564,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final SemanticsHandle semantics = tester.ensureSemantics();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       InteractionDetector(
         onTap: () {},
@@ -581,7 +581,7 @@ void main() {
         hasFocusAction: true,
       ),
     );
-    await pumpPure(
+    await pumpNeutral(
       tester,
       InteractionDetector(
         excludeFromSemantics: true,
@@ -604,7 +604,7 @@ void main() {
   ) async {
     InteractionState state = const InteractionState();
     final List<String> events = <String>[];
-    await pumpPure(
+    await pumpNeutral(
       tester,
       InteractionDetector(
         onTap: () {},
@@ -642,7 +642,7 @@ void main() {
     int cancellations = 0;
     int ends = 0;
     InteractionState state = const InteractionState();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       InteractionDetector(
         onHorizontalDragUpdate: (DragUpdateDetails details) {},
@@ -675,7 +675,7 @@ void main() {
     bool enabled = true;
     late StateSetter rebuild;
     InteractionState state = const InteractionState();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setter) {
@@ -714,7 +714,7 @@ void main() {
     bool gesturesEnabled = true;
     late StateSetter rebuild;
     InteractionState state = const InteractionState();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setter) {
@@ -751,7 +751,7 @@ void main() {
   ) async {
     final FocusNode node = FocusNode();
     addTearDown(node.dispose);
-    await pumpPure(
+    await pumpNeutral(
       tester,
       InteractionDetector(
         focusNode: node,
@@ -764,7 +764,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);
     await tester.pump();
-    await pumpPure(tester, const SizedBox());
+    await pumpNeutral(tester, const SizedBox());
     expect(tester.takeException(), isNull);
   });
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
-import 'package:pure_ui/src/foundation/animated_surface.dart';
+import 'package:neutral_ui/neutral_ui.dart';
+import 'package:neutral_ui/src/foundation/animated_surface.dart';
 
 import '../helpers/pump.dart';
 
@@ -196,7 +196,7 @@ void main() {
           enabled: enabled,
           style: const ButtonStyle(spacing: 3),
         );
-        await pumpPure(
+        await pumpNeutral(
           tester,
           variant.create(options()),
           theme: variant.global,
@@ -204,7 +204,7 @@ void main() {
         verify();
         bool enabled = true;
         late StateSetter update;
-        await pumpPure(
+        await pumpNeutral(
           tester,
           variant.wrap(
             StatefulBuilder(
@@ -248,7 +248,7 @@ void main() {
       testWidgets('${variant.name} rejects inline $token conflicts', (
         WidgetTester tester,
       ) async {
-        await pumpPure(
+        await pumpNeutral(
           tester,
           variant.create(
             _Options(

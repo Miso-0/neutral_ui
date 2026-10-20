@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
+import 'package:neutral_ui/neutral_ui.dart';
 
 import '../helpers/pump.dart';
 
@@ -10,7 +10,7 @@ void main() {
     (WidgetTester tester) async {
       final GlobalKey<ScaffoldMessengerState> key =
           GlobalKey<ScaffoldMessengerState>();
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         ScaffoldMessenger(key: key, child: const Text('Host')),
       );
@@ -38,7 +38,7 @@ void main() {
     (WidgetTester tester) async {
       final GlobalKey<ScaffoldMessengerState> key =
           GlobalKey<ScaffoldMessengerState>();
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         ScaffoldMessenger(key: key, child: const Text('Host')),
       );
@@ -64,7 +64,7 @@ void main() {
   ) async {
     final GlobalKey<ScaffoldMessengerState> key =
         GlobalKey<ScaffoldMessengerState>();
-    await pumpPureApp(
+    await pumpNeutralApp(
       tester,
       ScaffoldMessenger(key: key, child: const Text('Host')),
     );
@@ -88,7 +88,7 @@ void main() {
       addTearDown(external.dispose);
       AnimationController? current;
       late StateSetter update;
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         SizedBox(
           width: 300,
@@ -120,7 +120,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final GlobalKey<TooltipState> key = GlobalKey<TooltipState>();
-    await pumpPureApp(
+    await pumpNeutralApp(
       tester,
       Tooltip(key: key, message: 'Hint', child: const Text('Anchor')),
     );
@@ -136,7 +136,7 @@ void main() {
     'scroll controlled sheet lets its child grow and close at minimum extent',
     (WidgetTester tester) async {
       late BuildContext launch;
-      await pumpPureApp(
+      await pumpNeutralApp(
         tester,
         Builder(
           builder: (BuildContext context) {

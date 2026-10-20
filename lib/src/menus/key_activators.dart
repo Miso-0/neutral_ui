@@ -9,6 +9,6 @@ SingleActivator menuKeyActivator(int keyId) {
   }
   throw StateError(
     'WidgetsApp.defaultShortcuts no longer exposes menu key '
-    '0x${keyId.toRadixString(16)}. Update the PureUI key lookup for this SDK.',
+    '0x${keyId.toRadixString(16)}. Update the NeutralUI key lookup for this SDK.',
   );
 }

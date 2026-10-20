@@ -1,9 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/src/dates/dates.dart';
-import 'package:pure_ui/src/localizations/pure_localizations.dart';
+import 'package:neutral_ui/src/dates/dates.dart';
+import 'package:neutral_ui/src/localizations/neutral_localizations.dart';
 
-class _CustomLocalizations extends DefaultPureLocalizations {
+class _CustomLocalizations extends DefaultNeutralLocalizations {
   const _CustomLocalizations();
 
   @override
@@ -19,21 +19,21 @@ class _CustomLocalizations extends DefaultPureLocalizations {
   String get postMeridiemAbbreviation => 'afternoon';
 }
 
-class _CustomDelegate extends LocalizationsDelegate<PureLocalizations> {
+class _CustomDelegate extends LocalizationsDelegate<NeutralLocalizations> {
   const _CustomDelegate();
 
   @override
   bool isSupported(Locale locale) => true;
 
   @override
-  Future<PureLocalizations> load(Locale locale) =>
-      Future<PureLocalizations>.value(const _CustomLocalizations());
+  Future<NeutralLocalizations> load(Locale locale) =>
+      Future<NeutralLocalizations>.value(const _CustomLocalizations());
 
   @override
   bool shouldReload(_CustomDelegate old) => false;
 }
 
-class _ClockLocalizations extends DefaultPureLocalizations {
+class _ClockLocalizations extends DefaultNeutralLocalizations {
   const _ClockLocalizations(this.clockFormat);
 
   final TimeOfDayFormat clockFormat;
@@ -44,7 +44,7 @@ class _ClockLocalizations extends DefaultPureLocalizations {
 }
 
 void main() {
-  const DefaultPureLocalizations english = DefaultPureLocalizations();
+  const DefaultNeutralLocalizations english = DefaultNeutralLocalizations();
 
   test('date formats use English names with Sunday-first weekday lists', () {
     final DateTime date = DateTime(2017, 9, 27);
@@ -173,16 +173,16 @@ void main() {
   testWidgets('of falls back to English outside a Localizations widget', (
     WidgetTester tester,
   ) async {
-    late PureLocalizations resources;
+    late NeutralLocalizations resources;
     await tester.pumpWidget(
       Builder(
         builder: (BuildContext context) {
-          resources = PureLocalizations.of(context);
+          resources = NeutralLocalizations.of(context);
           return const SizedBox.shrink();
         },
       ),
     );
-    expect(resources, isA<DefaultPureLocalizations>());
+    expect(resources, isA<DefaultNeutralLocalizations>());
     expect(resources.cancelButtonLabel, 'Cancel');
     expect(resources.okButtonLabel, 'OK');
   });
@@ -190,7 +190,7 @@ void main() {
   testWidgets(
     'a custom delegate overrides defaults and inherits other labels',
     (WidgetTester tester) async {
-      late PureLocalizations resources;
+      late NeutralLocalizations resources;
       await tester.pumpWidget(
         Localizations(
           locale: const Locale('en'),
@@ -200,7 +200,7 @@ void main() {
           ],
           child: Builder(
             builder: (BuildContext context) {
-              resources = PureLocalizations.of(context);
+              resources = NeutralLocalizations.of(context);
               return const SizedBox.shrink();
             },
           ),
@@ -213,16 +213,20 @@ void main() {
   );
 
   test('the delegate loads English resources for English variants', () async {
-    const PureLocalizationsDelegate delegate = PureLocalizationsDelegate();
+    const NeutralLocalizationsDelegate delegate =
+        NeutralLocalizationsDelegate();
     expect(delegate.isSupported(const Locale('en')), isTrue);
     expect(delegate.isSupported(const Locale('en', 'ZA')), isTrue);
     expect(delegate.isSupported(const Locale('fr')), isFalse);
-    expect(delegate.shouldReload(const PureLocalizationsDelegate()), isFalse);
+    expect(
+      delegate.shouldReload(const NeutralLocalizationsDelegate()),
+      isFalse,
+    );
     expect(
       await delegate.load(const Locale('en')),
-      isA<DefaultPureLocalizations>(),
+      isA<DefaultNeutralLocalizations>(),
     );
-    expect(PureLocalizations.delegate, delegate);
-    expect(DefaultPureLocalizations.delegate, delegate);
+    expect(NeutralLocalizations.delegate, delegate);
+    expect(DefaultNeutralLocalizations.delegate, delegate);
   });
 }

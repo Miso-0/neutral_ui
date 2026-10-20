@@ -4,10 +4,10 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pure_ui/pure_ui.dart';
-import 'package:pure_ui/src/foundation/animated_surface.dart';
-import 'package:pure_ui/src/menus/menu_item_button.dart';
-import 'package:pure_ui/src/menus/menu_panel.dart';
+import 'package:neutral_ui/neutral_ui.dart';
+import 'package:neutral_ui/src/foundation/animated_surface.dart';
+import 'package:neutral_ui/src/menus/menu_item_button.dart';
+import 'package:neutral_ui/src/menus/menu_panel.dart';
 
 import '../helpers/pump.dart';
 
@@ -61,7 +61,7 @@ void main() {
   testWidgets('editable hover fades smoothly and reverses without a flash', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownMenu<int>(
         dropdownMenuEntries: entries,
@@ -106,7 +106,7 @@ void main() {
   testWidgets('editable hover honors a themed duration and curve', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       const DropdownMenu<int>(
         dropdownMenuEntries: entries,
@@ -130,7 +130,7 @@ void main() {
   testWidgets('an explicit zero duration keeps editable hover immediate', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownMenu<int>(
         dropdownMenuEntries: entries,
@@ -149,7 +149,7 @@ void main() {
   testWidgets('uses editable and select-only modes', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       const DropdownMenu<int>(
         dropdownMenuEntries: entries,
@@ -157,7 +157,7 @@ void main() {
       ),
     );
     expect(find.byType(EditableText), findsOneWidget);
-    await pumpPure(
+    await pumpNeutral(
       tester,
       const DropdownMenu<int>(dropdownMenuEntries: entries, selectOnly: true),
     );
@@ -172,7 +172,7 @@ void main() {
   ) async {
     final FocusNode focus = FocusNode(canRequestFocus: false);
     addTearDown(focus.dispose);
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownMenu<int>(
         dropdownMenuEntries: entries,
@@ -185,7 +185,7 @@ void main() {
 
   testWidgets('disabled fields cannot open', (WidgetTester tester) async {
     final MenuController menu = MenuController();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownMenu<int>(
         dropdownMenuEntries: entries,
@@ -202,7 +202,7 @@ void main() {
   testWidgets('default filter uses case-insensitive contains', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       const DropdownMenu<int>(
         dropdownMenuEntries: entries,
@@ -221,7 +221,7 @@ void main() {
     WidgetTester tester,
   ) async {
     String? received;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownMenu<int>(
         dropdownMenuEntries: entries,
@@ -257,7 +257,7 @@ void main() {
     int? selection;
     final FocusNode focus = FocusNode();
     addTearDown(focus.dispose);
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownMenu<int>(
         dropdownMenuEntries: entries,
@@ -279,7 +279,7 @@ void main() {
     WidgetTester tester,
   ) async {
     int? selection;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownMenu<int>(
         dropdownMenuEntries: entries,
@@ -299,7 +299,7 @@ void main() {
   ) async {
     final List<int?> selections = <int?>[];
     final MenuController menu = MenuController();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownMenu<int>(
         dropdownMenuEntries: entries,
@@ -323,7 +323,7 @@ void main() {
     final MenuController menu = MenuController();
     addTearDown(text.dispose);
     addTearDown(focus.dispose);
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownMenu<int>(
         dropdownMenuEntries: entries,
@@ -359,7 +359,7 @@ void main() {
   ) async {
     final TextEditingController text = TextEditingController();
     addTearDown(text.dispose);
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownMenu<int>(
         dropdownMenuEntries: entries,
@@ -385,7 +385,7 @@ void main() {
       final MenuController menu = MenuController();
       bool? openAtCallback;
       int? selected;
-      await pumpPure(
+      await pumpNeutral(
         tester,
         DropdownMenu<int>(
           dropdownMenuEntries: entries,
@@ -412,7 +412,7 @@ void main() {
   ) async {
     final FocusNode focus = FocusNode();
     addTearDown(focus.dispose);
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownMenu<int>(
         dropdownMenuEntries: entries,
@@ -432,7 +432,7 @@ void main() {
   ) async {
     final MenuController menu = MenuController();
     final List<int?> selected = <int?>[];
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownMenu<int>(
         dropdownMenuEntries: entries,
@@ -461,7 +461,7 @@ void main() {
     addTearDown(controller.dispose);
     late StateSetter rebuild;
     int selection = 1;
-    await pumpPure(
+    await pumpNeutral(
       tester,
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
@@ -486,7 +486,7 @@ void main() {
   ) async {
     final MenuController menu = MenuController();
     final List<int?> selected = <int?>[];
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownMenu<int>(
         dropdownMenuEntries: entries,
@@ -509,7 +509,7 @@ void main() {
   testWidgets('explicit width and expanded insets determine field width', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       const DropdownMenu<int>(
         dropdownMenuEntries: entries,
@@ -519,7 +519,7 @@ void main() {
       ),
     );
     expect(tester.getSize(find.byType(EditableText)).width, 210);
-    await pumpPure(
+    await pumpNeutral(
       tester,
       const SizedBox(
         width: 300,
@@ -539,7 +539,7 @@ void main() {
   ) async {
     const Color themeColor = Color(0xFF123456);
     const Color selectedColor = Color(0xFF654321);
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownMenuTheme(
         data: const DropdownStyle(
@@ -592,7 +592,7 @@ void main() {
     final MenuController menu = MenuController();
     final List<int?> selected = <int?>[];
     addTearDown(focus.dispose);
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownMenu<int>(
         dropdownMenuEntries: entries,
@@ -619,7 +619,7 @@ void main() {
   testWidgets('width defaults to the widest label without intrinsics', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       const DropdownMenu<int>(
         dropdownMenuEntries: entries,
@@ -636,7 +636,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final SemanticsHandle semantics = tester.ensureSemantics();
-    await pumpPure(
+    await pumpNeutral(
       tester,
       const DropdownMenu<int>(
         dropdownMenuEntries: entries,
@@ -667,7 +667,7 @@ void main() {
     (WidgetTester tester) async {
       final FocusNode focus = FocusNode();
       addTearDown(focus.dispose);
-      await pumpPure(
+      await pumpNeutral(
         tester,
         DropdownMenu<int>(
           dropdownMenuEntries: entries,
@@ -687,7 +687,7 @@ void main() {
   testWidgets('selected indicators resolve live hover states', (
     WidgetTester tester,
   ) async {
-    await pumpPure(
+    await pumpNeutral(
       tester,
       DropdownMenu<int>(
         dropdownMenuEntries: entries,
@@ -713,7 +713,7 @@ void main() {
       'the single trailing icon flips while open (selectOnly: $selectOnly)',
       (WidgetTester tester) async {
         const Key iconKey = Key('arrow');
-        await pumpPure(
+        await pumpNeutral(
           tester,
           DropdownMenu<int>(
             trailingIcon: const SizedBox(key: iconKey, width: 10, height: 10),
@@ -756,7 +756,7 @@ void main() {
     WidgetTester tester,
   ) async {
     const Key iconKey = Key('arrow');
-    await pumpPure(
+    await pumpNeutral(
       tester,
       const DropdownMenu<int>(
         trailingIcon: SizedBox(key: iconKey, width: 10, height: 10),

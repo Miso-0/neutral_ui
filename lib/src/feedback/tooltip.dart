@@ -35,7 +35,7 @@ class TooltipVisibility extends InheritedWidget {
 
 /// A tooltip triggered by hover, touch, keyboard focus or a state key.
 ///
-/// RawTooltip owns gesture delays, exclusivity and feedback. PureUI owns the
+/// RawTooltip owns gesture delays, exclusivity and feedback. NeutralUI owns the
 /// visible overlay, allowing an individual tooltip to finish its exit before
 /// removal and to update its animation tokens while mounted.
 class Tooltip extends StatefulWidget {
@@ -116,7 +116,7 @@ class Tooltip extends StatefulWidget {
   /// The cursor displayed over the tooltip anchor.
   final MouseCursor? mouseCursor;
 
-  /// Dismisses all currently visible PureUI tooltips.
+  /// Dismisses all currently visible NeutralUI tooltips.
   static bool dismissAllToolTips() {
     final bool hadVisible = TooltipState._visible.isNotEmpty;
     for (final TooltipState state in TooltipState._visible.toList()) {
