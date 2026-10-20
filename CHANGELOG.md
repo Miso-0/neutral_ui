@@ -1,6 +1,12 @@
+## 0.11.0
+
+- Add `searchBuilder` to single and multiple dropdowns for query-driven results independent of text labels.
+- Breaking: make `DropdownMenuEntry.label` nullable. Supply `labelWidget` for widget-only entries, and handle null when reading `label`.
+- Display widget-only selections in dropdown fields, preserve selections across search results, and keep keyboard highlights within visible options.
+- Update the gallery and documentation with custom dropdown search examples.
+
 ## 0.10.0
 
-- Allow widget-only dropdown entries and add `searchBuilder` for query-driven results independent of text labels.
 - Prepare the first pub.dev release under the `neutral_ui` name, with hosted installation instructions, a runnable quick-start and gallery documentation.
 - Add package repository and issue links, discovery topics and the MIT license.
 - Rename the package to `neutral_ui` and its entrypoint to `package:neutral_ui/neutral_ui.dart`.

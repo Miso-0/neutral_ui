@@ -20,7 +20,7 @@ Add the hosted package to your Flutter application's `pubspec.yaml`, then run `f
 dependencies:
   flutter:
     sdk: flutter
-  neutral_ui: ^0.10.0
+  neutral_ui: ^0.11.0
 ```
 
 Replace `lib/main.dart` with this runnable example. `NeutralApp` supplies the theme, localization, navigation, and overlay foundations; the application supplies colors and other visual tokens.

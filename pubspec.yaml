@@ -1,6 +1,6 @@
 name: neutral_ui
 description: A headless Flutter design system with accessible controls, composable state-driven themes, and no third-party runtime dependencies.
-version: 0.10.0
+version: 0.11.0
 homepage: https://github.com/Miso-0/pure_ui
 repository: https://github.com/Miso-0/pure_ui
 issue_tracker: https://github.com/Miso-0/pure_ui/issues
