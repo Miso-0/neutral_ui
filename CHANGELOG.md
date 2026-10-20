@@ -1,10 +1,9 @@
-## Unreleased
-
-- Rename the package to `neutral_ui` and its entrypoint to `package:neutral_ui/neutral_ui.dart`.
-- Rename the application, theme and localization APIs to `NeutralApp`, `NeutralTheme`, `NeutralLocalizations`, `DefaultNeutralLocalizations` and `NeutralLocalizationsDelegate`.
-
 ## 0.10.0
 
+- Prepare the first pub.dev release under the `neutral_ui` name, with hosted installation instructions, a runnable quick-start and gallery documentation.
+- Add package repository and issue links, discovery topics and the MIT license.
+- Rename the package to `neutral_ui` and its entrypoint to `package:neutral_ui/neutral_ui.dart`.
+- Rename the application, theme and localization APIs to `NeutralApp`, `NeutralTheme`, `NeutralLocalizations`, `DefaultNeutralLocalizations` and `NeutralLocalizationsDelegate`.
 - Fit text-field padding, typography, cursors and side controls to explicit dimensions and parent bounds, with matching sizing on TextFormField.
 - Fix text-field focus and tap ordering by using Flutter's selection gesture handling across the decorated surface; suffix actions and canceled drags no longer activate the field callback.
 - Add TabController, DefaultTabController, Tab, TabBar and TabBarView with retargetable motion and an indicator that follows page drags.

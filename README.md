@@ -1,33 +1,87 @@
 # NeutralUI
 
-NeutralUI is a zero-dependency headless Flutter design system. It supplies controlled values, pointer and keyboard interaction, semantics, layout slots, and composable themes. Your application supplies its visual language. The library imports only Flutter's `widgets.dart`, local code, and `dart:math`.
+NeutralUI is a headless Flutter design system with no third-party runtime dependencies. It supplies controlled values, pointer and keyboard interaction, semantics, layout slots, and composable themes. Your application supplies its visual language. The library uses Flutter's widgets layer without importing Material or Cupertino.
 
-Requires Flutter 3.47 or newer and Dart 3.13.4 or newer. Version 0.10.0 is tested with Flutter 3.47.5.
+[Package](https://pub.dev/packages/neutral_ui) | [API reference](https://pub.dev/documentation/neutral_ui/latest/) | [Source](https://github.com/Miso-0/pure_ui) | [Issues](https://github.com/Miso-0/pure_ui/issues) | [Changelog](CHANGELOG.md)
+
+Requires Flutter 3.47 or newer and Dart 3.13.4 or newer, below Dart 4.0.0. The release is validated with Flutter 3.47.5 and Dart 3.13.4.
+
+- Buttons, toggles, chips, list tiles, sliders, and range sliders.
+- Dropdowns, popup menus, text fields, autocomplete, and search.
+- Dialogs, bottom sheets, snack bars, tooltips, badges, and progress indicators.
+- Tabs, navigation controls, expansion tiles, and date, date range, and time pickers.
+- Shared interaction state, component themes, overlay placement, localization hooks, and reduced-motion behavior.
 
 ## Get started
 
+Add the hosted package to your Flutter application's `pubspec.yaml`, then run `flutter pub get`:
+
 ```yaml
 dependencies:
-  neutral_ui:
-    path: ../neutral_ui
+  flutter:
+    sdk: flutter
+  neutral_ui: ^0.10.0
 ```
+
+Replace `lib/main.dart` with this runnable example. `NeutralApp` supplies the theme, localization, navigation, and overlay foundations; the application supplies colors and other visual tokens.
 
 ```dart
 import 'package:flutter/widgets.dart';
 import 'package:neutral_ui/neutral_ui.dart';
 
-NeutralTheme(
-  data: const ThemeData(
-    elevatedButtonStyle: ButtonStyle(
-      padding: StateProperty.all(EdgeInsets.all(16)),
-      decoration: StateProperty.all(
-        BoxDecoration(color: Color(0xFF087F6D)),
+void main() => runApp(const CounterApp());
+
+class CounterApp extends StatefulWidget {
+  const CounterApp({super.key});
+
+  @override
+  State<CounterApp> createState() => _CounterAppState();
+}
+
+class _CounterAppState extends State<CounterApp> {
+  int _count = 0;
+
+  @override
+  Widget build(BuildContext context) => NeutralApp(
+    color: const Color(0xFFF4F7F3),
+    textStyle: const TextStyle(color: Color(0xFF142C2A), fontSize: 16),
+    theme: ThemeData(
+      elevatedButtonStyle: ButtonStyle(
+        padding: const StateProperty<EdgeInsetsGeometry?>.all(
+          EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        ),
+        decoration: StateProperty<Decoration?>.resolveWith((
+          InteractionState state,
+        ) {
+          return BoxDecoration(
+            color: state.isPressed
+                ? const Color(0xFF065F53)
+                : const Color(0xFF087F6D),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: state.isFocused
+                  ? const Color(0xFF142C2A)
+                  : const Color(0x00000000),
+              width: 2,
+            ),
+          );
+        }),
+        textStyle: const StateProperty<TextStyle?>.all(
+          TextStyle(color: Color(0xFFFFFFFF)),
+        ),
       ),
-      textStyle: StateProperty.all(TextStyle(color: Color(0xFFFFFFFF))),
     ),
-  ),
-  child: ElevatedButton(onPressed: save, child: const Text('Save')),
-)
+    home: ColoredBox(
+      color: const Color(0xFFF4F7F3),
+      child: Center(
+        child: ElevatedButton(
+          onPressed: () => setState(() => _count += 1),
+          child: Text('Pressed $_count times'),
+        ),
+      ),
+    ),
+  );
+}
 ```
 
 NeutralUI uses Material's familiar names: `ElevatedButton`, `OutlinedButton`, `TextButton`, `IconButton`, `Checkbox`, `Switch`, `Radio`, `ListTile`, `Slider`, `DropdownButton`, `DropdownMenu`, `PopupMenuButton`, `ButtonStyle`, `ThemeData`, and the component theme names. When importing `material.dart` as well, use a prefix for NeutralUI (`import 'package:neutral_ui/neutral_ui.dart' as neutral;`) or hide conflicting names. `widgets.dart` can be imported unprefixed alongside NeutralUI.
@@ -182,7 +236,7 @@ Each painted slider part has a matching direct decoration parameter; secondary t
 
 ## Menus and selection
 
-Menus need an `Overlay` ancestor: use `WidgetsApp` with `home`/`routes`, or wrap in `Overlay`. All menus use `RawMenuAnchor` and require no Navigator or route. For an app that uses only the `WidgetsApp.builder`, add the overlay inside your theme:
+Menus need an `Overlay` ancestor. `NeutralApp` supplies one, including its navigator-free `.builder` constructor. When setting up the widgets layer yourself, use `WidgetsApp` with `home`/`routes`, or wrap content in `Overlay`. All menus use `RawMenuAnchor` and require no Navigator or route. For an app that uses only the `WidgetsApp.builder`, add the overlay inside your theme:
 
 ```dart
 WidgetsApp(
@@ -214,20 +268,23 @@ All menus support keyboard activation, arrow navigation that skips disabled opti
 
 Option rows resolve each token per state in this order: entry style, inline `style.itemStyle`, nearest component theme, structural defaults. Trigger and panel tokens follow the same order without the entry style. `DropdownStyle` and `PopupMenuStyle` deep-merge their nested button and menu styles. Open triggers resolve `isSelected`; selected dropdown rows and checked popup indicators resolve it for their chosen or checked state. Search highlights resolve visible focus while real focus stays in the editable field.
 
-No panel visuals are supplied, and menu glyphs follow the default glyph rules above. An editable field must have a cursor color: `DropdownStyle.cursorColor` falls back to the ambient text color, then opaque black. This is the package's only explicit color fallback; glyphs otherwise use the icon theme's color. Trigger and option semantics expose button, text field, expanded, selected, checked and enabled states as appropriate. Menu-specific `SemanticsRole` values are omitted because Flutter's widgets layer does not export those types.
+No panel visuals are supplied, and menu glyphs follow the default glyph rules above. An editable field must have a cursor color: `DropdownStyle.cursorColor` falls back to the ambient text color, then opaque black. Text fields have the same final cursor fallback. Glyphs use the icon theme's color. Trigger and option semantics expose button, text field, expanded, selected, checked and enabled states as appropriate. Menu-specific `SemanticsRole` values are omitted because Flutter's widgets layer does not export those types.
 
 ## Run the gallery
 
+The repository includes a runnable [example gallery](https://github.com/Miso-0/pure_ui/tree/main/example) with macOS and web runners. From a checkout of the repository:
+
 ```sh
 cd example
-flutter run -d macos
-# Or:
+flutter pub get
 flutter run -d chrome
+# On macOS with Xcode installed:
+flutter run -d macos
 ```
 
-The WidgetsApp gallery demonstrates a central visual theme, local component themes, inline `copyWith`, direct decorations with an asset image, loading, selection, RadioGroup, RTL, sliders, searchable and multi-select dropdowns, popup menus and a live interaction-state readout. It has macOS and web runners and no Material dependency.
+The NeutralApp gallery demonstrates a central visual theme, local component themes, inline `copyWith`, direct decorations with an asset image, loading, selection, RadioGroup, RTL, reduced motion, sliders, searchable and multi-select dropdowns, popup menus, and a live interaction-state readout. It also includes feedback surfaces, text input and search, date and time pickers, chips, tabs, navigation, and progress controls. Its green palette belongs to the example application; the package does not impose it.
 
-To verify the package, run `flutter analyze` and `flutter test`, followed by `flutter test`, `flutter build macos` and `flutter build web` inside `example`.
+To verify a checkout, run `flutter analyze` and `flutter test` at the repository root. In `example`, run `flutter analyze` and `flutter test`; `flutter build web` and `flutter build macos` validate the bundled runners on supported development hosts. See the [example README](https://github.com/Miso-0/pure_ui/blob/main/example/README.md) for its source layout.
 
 
 ## Application, overlays and calendar foundations
@@ -259,7 +316,7 @@ Menus use the root overlay by default. Set `MenuStyle(overlayLocation: OverlayLo
 
 `MenuStyle.offset.dx` is directional: positive values move toward the reading direction's end. A positive vertical gap stays outside the anchor when the panel flips upward.
 
-`NeutralLocalizations.of(context)` returns English strings even without a localization delegate. Override `DefaultNeutralLocalizations` and install a delegate to customize text, month and weekday names, compact date parsing, date/time formatting and accessibility labels. No `intl` dependency is required. `GregorianCalendarDelegate` implements `CalendarDelegate<DateTime>`; custom calendars can replace its date arithmetic and formatting. `DateUtils`, `DateTimeRange`, `TimeOfDay`, picker modes and `DayPeriod` supply widgets-only value types for future pickers.
+`NeutralLocalizations.of(context)` returns English strings even without a localization delegate. Override `DefaultNeutralLocalizations` and install a delegate to customize text, month and weekday names, compact date parsing, date/time formatting and accessibility labels. No `intl` dependency is required. `GregorianCalendarDelegate` implements `CalendarDelegate<DateTime>`; custom calendars can replace its date arithmetic and formatting. `DateUtils`, `DateTimeRange`, `TimeOfDay`, picker modes and `DayPeriod` supply widgets-only date and time value types.
 
 The painted `CloseGlyph`, `SearchGlyph`, `CalendarGlyph`, `ClockGlyph`, `EditGlyph` and `ArrowGlyph` follow the ambient `IconTheme`. `ChevronGlyph` and `ArrowGlyph` accept `GlyphDirection`; `start` and `end` mirror with text direction, while `left` and `right` stay physical. Glyphs are decorative and excluded from semantics.
 
@@ -345,3 +402,11 @@ final DateTime? date = await showDatePicker(
 `RangeSlider` uses SliderStyle with `RangeValues` and two independently focusable thumbs. Arrow keys adjust the focused thumb, and a stop or push policy keeps the endpoints ordered. Continuous visual drag positions settle to controlled or discrete values with a velocity-aware spring. It accepts direct track, active track, thumb and tick decorations with the same validation rules as Slider.
 
 `Badge` and `Badge.count` support compact marks or localized capped counts such as `99+`. `CircularProgressIndicator` and `LinearProgressIndicator` animate determinate changes; a null value selects indeterminate motion. Their default paint follows IconTheme, and progress exposes accessible labels and values. All respect reduced motion. BadgeStyle and ProgressIndicatorStyle provide themeable tokens.
+
+## Issues and contributions
+
+Report bugs or request components in the [GitHub issue tracker](https://github.com/Miso-0/pure_ui/issues). For a rendering or interaction bug, include a minimal example, your Flutter version, the target platform, and any relevant theme tokens. Contributions should include the relevant analyzer and test checks described above.
+
+## License
+
+NeutralUI is available under the [MIT license](LICENSE).
