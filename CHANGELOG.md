@@ -1,4 +1,4 @@
-## Unreleased
+## 0.12.0
 
 - Add widgets-only `DataTable`, `DataTableColumn`, `DataTableRow` and `DataTableGroup` with NeutralUI controls, inherited styles, keyboard interaction, spanning groups/details and aligned intrinsic columns.
 - Add gallery table examples with sorting, selection that follows projects through sorting, expandable details, footer totals and collapsible groups.
