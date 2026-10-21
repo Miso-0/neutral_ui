@@ -1,15 +1,18 @@
-import 'dart:math' as math;
-
-import 'package:flutter/widgets.dart';
-
 import '../foundation/animated_surface.dart';
 import '../foundation/decoration_override.dart';
 import '../foundation/interaction_detector.dart';
 import '../foundation/interaction_state.dart';
+import '../foundation/motion.dart';
 import '../foundation/state_property.dart';
 import '../foundation/style_resolution.dart';
 import '../styles/slider_style.dart';
 import '../theme/slider_theme.dart';
+
+import 'dart:math' as math;
+
+import 'package:flutter/widgets.dart';
+
+import 'slider_metrics.dart';
 
 /// A controlled value selector whose appearance comes entirely from its style.
 class Slider extends StatefulWidget {
@@ -514,12 +517,14 @@ class _SliderState extends State<Slider> {
                 ) ??
                 EdgeInsets.zero)
             .resolve(Directionality.of(context));
-    final Duration duration =
-        resolvePlain<SliderStyle, Duration>(
-          layers,
-          (SliderStyle style) => style.animationDuration,
-        ) ??
-        const Duration(milliseconds: 200);
+    final Duration duration = reducedMotionDuration(
+      context,
+      resolvePlain<SliderStyle, Duration>(
+            layers,
+            (SliderStyle style) => style.animationDuration,
+          ) ??
+          const Duration(milliseconds: 200),
+    );
     final Curve curve =
         resolvePlain<SliderStyle, Curve>(
           layers,
@@ -573,112 +578,130 @@ class _SliderState extends State<Slider> {
           (SliderStyle style) => style.activeTickMarkDecoration,
         );
     _thumbHitRadius = math.max(thumb.width, target.width) / 2;
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        final double width = constraints.hasBoundedWidth
-            ? constraints.maxWidth
-            : constraints.constrainWidth(preferredWidth);
-        final double height = constraints.constrainHeight(
-          math.max(
-            math.max(target.height, thumb.height),
-            math.max(trackHeight, tick.height),
-          ),
-        );
-        _trackLeft = padding.left + thumb.width / 2;
-        final double trackRight = width - padding.right - thumb.width / 2;
-        _trackWidth = math.max(0, trackRight - _trackLeft);
-        final double fraction = _normalized(widget.value);
-        final double visual = _rtl ? 1 - fraction : fraction;
-        _thumbX = _trackLeft + visual * _trackWidth;
-        final double activeLeft = _rtl ? _thumbX : _trackLeft;
-        final double activeWidth = _trackWidth * fraction;
-        final double? secondary = widget.secondaryTrackValue;
-        final double secondaryFraction = secondary == null
-            ? 0
-            : _normalized(secondary);
-        final double secondaryWidth = _trackWidth * secondaryFraction;
-        final double secondaryLeft = _rtl
-            ? _trackLeft + _trackWidth - secondaryWidth
-            : _trackLeft;
-        Widget track(double left, double width, Decoration? decoration) {
-          return Positioned(
-            left: left,
-            top: (height - trackHeight) / 2,
-            width: width,
-            height: trackHeight,
-            child: AnimatedSurface(
-              duration: duration,
-              curve: curve,
-              decoration: decoration,
-            ),
-          );
-        }
-
-        return SizedBox(
-          width: width,
-          height: height,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: <Widget>[
-              track(_trackLeft, _trackWidth, trackDecoration),
-              if (secondary != null)
-                track(secondaryLeft, secondaryWidth, secondaryDecoration),
-              track(activeLeft, activeWidth, activeDecoration),
-              if (widget.divisions != null)
-                for (int i = 0; i <= widget.divisions!; i += 1)
-                  Positioned(
-                    left:
-                        _trackLeft +
-                        (_rtl
-                                ? 1 - i / widget.divisions!
-                                : i / widget.divisions!) *
-                            _trackWidth,
-                    top: height / 2,
-                    child: FractionalTranslation(
-                      translation: const Offset(-0.5, -0.5),
-                      child: AnimatedSurface(
-                        width: tick.width,
-                        height: tick.height,
-                        duration: duration,
-                        curve: curve,
-                        decoration: i / widget.divisions! <= fraction
-                            ? activeTickDecoration
-                            : tickDecoration,
-                      ),
-                    ),
-                  ),
-              Positioned(
-                left: _thumbX,
-                top: height / 2,
-                child: FractionalTranslation(
-                  translation: const Offset(-0.5, -0.5),
+    // Sizes that depend on hover, focus or press animate together, and every
+    // position below is computed from the animated values, so the track and
+    // ticks stay aligned with a thumb that is still growing.
+    return TweenAnimationBuilder<SliderMetrics>(
+      tween: SliderMetricsTween(
+        end: SliderMetrics(thumb: thumb, trackHeight: trackHeight, tick: tick),
+      ),
+      duration: duration,
+      curve: curve,
+      builder: (BuildContext context, SliderMetrics metrics, Widget? child) =>
+          LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              final Size thumb = metrics.thumb;
+              final double trackHeight = metrics.trackHeight;
+              final Size tick = metrics.tick;
+              final double width = constraints.hasBoundedWidth
+                  ? constraints.maxWidth
+                  : constraints.constrainWidth(preferredWidth);
+              final double height = constraints.constrainHeight(
+                math.max(
+                  math.max(target.height, thumb.height),
+                  math.max(trackHeight, tick.height),
+                ),
+              );
+              _trackLeft = padding.left + thumb.width / 2;
+              final double trackRight = width - padding.right - thumb.width / 2;
+              _trackWidth = math.max(0, trackRight - _trackLeft);
+              final double fraction = _normalized(widget.value);
+              final double visual = _rtl ? 1 - fraction : fraction;
+              _thumbX = _trackLeft + visual * _trackWidth;
+              final double activeLeft = _rtl ? _thumbX : _trackLeft;
+              final double activeWidth = _trackWidth * fraction;
+              final double? secondary = widget.secondaryTrackValue;
+              final double secondaryFraction = secondary == null
+                  ? 0
+                  : _normalized(secondary);
+              final double secondaryWidth = _trackWidth * secondaryFraction;
+              final double secondaryLeft = _rtl
+                  ? _trackLeft + _trackWidth - secondaryWidth
+                  : _trackLeft;
+              Widget track(double left, double width, Decoration? decoration) {
+                return Positioned(
+                  left: left,
+                  top: (height - trackHeight) / 2,
+                  width: width,
+                  height: trackHeight,
                   child: AnimatedSurface(
-                    width: thumb.width,
-                    height: thumb.height,
                     duration: duration,
                     curve: curve,
-                    decoration: thumbDecoration,
+                    decoration: decoration,
                   ),
-                ),
-              ),
-              if (indicator != null)
-                Positioned(
-                  left: _thumbX,
-                  top: height / 2 - thumb.height / 2,
-                  child: FractionalTranslation(
-                    translation: const Offset(-0.5, -1),
-                    child: indicator(
-                      context,
-                      state,
-                      widget.value,
-                      widget.label,
+                );
+              }
+
+              return SizedBox(
+                width: width,
+                height: height,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: <Widget>[
+                    track(_trackLeft, _trackWidth, trackDecoration),
+                    if (secondary != null)
+                      track(secondaryLeft, secondaryWidth, secondaryDecoration),
+                    track(activeLeft, activeWidth, activeDecoration),
+                    if (widget.divisions != null)
+                      for (int i = 0; i <= widget.divisions!; i += 1)
+                        Positioned(
+                          left:
+                              _trackLeft +
+                              (_rtl
+                                      ? 1 - i / widget.divisions!
+                                      : i / widget.divisions!) *
+                                  _trackWidth,
+                          top: height / 2,
+                          child: FractionalTranslation(
+                            translation: const Offset(-0.5, -0.5),
+                            child: SizedBox(
+                              width: tick.width,
+                              height: tick.height,
+                              child: AnimatedSurface(
+                                duration: duration,
+                                curve: curve,
+                                decoration: i / widget.divisions! <= fraction
+                                    ? activeTickDecoration
+                                    : tickDecoration,
+                              ),
+                            ),
+                          ),
+                        ),
+                    Positioned(
+                      left: _thumbX,
+                      top: height / 2,
+                      child: FractionalTranslation(
+                        translation: const Offset(-0.5, -0.5),
+                        child: SizedBox(
+                          width: thumb.width,
+                          height: thumb.height,
+                          child: AnimatedSurface(
+                            duration: duration,
+                            curve: curve,
+                            decoration: thumbDecoration,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    if (indicator != null)
+                      Positioned(
+                        left: _thumbX,
+                        top: height / 2 - thumb.height / 2,
+                        child: FractionalTranslation(
+                          translation: const Offset(-0.5, -1),
+                          child: indicator(
+                            context,
+                            state,
+                            widget.value,
+                            widget.label,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
-            ],
+              );
+            },
           ),
-        );
-      },
     );
   }
 }

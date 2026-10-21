@@ -1,8 +1,7 @@
-import 'package:flutter/widgets.dart';
-
 import '../buttons/selection_button.dart';
 import '../buttons/text_button.dart';
 import '../feedback/tooltip.dart';
+import '../foundation/animated_reveal.dart';
 import '../foundation/decoration_override.dart';
 import '../foundation/glyphs.dart';
 import '../foundation/interaction_state.dart';
@@ -12,6 +11,8 @@ import '../localizations/neutral_localizations.dart';
 import '../styles/button_style.dart';
 import '../styles/chip_style.dart';
 import '../theme/chip_theme.dart';
+
+import 'package:flutter/widgets.dart';
 
 /// A compact label with optional avatar and independent delete action.
 class Chip extends _Chip {
@@ -287,15 +288,11 @@ class _Chip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         spacing: 0,
         children: <Widget>[
-          ClipRect(
-            child: AnimatedSize(
-              duration: duration,
-              curve: effective.animationCurve ?? Curves.easeInOut,
-              alignment: AlignmentDirectional.centerStart,
-              child: selected && check != null
-                  ? check
-                  : const SizedBox(width: 0, height: 0),
-            ),
+          AnimatedReveal(
+            visible: selected && check != null,
+            duration: duration,
+            curve: effective.animationCurve ?? Curves.easeInOut,
+            child: check ?? const SizedBox.shrink(),
           ),
           ?leading,
         ],
@@ -329,6 +326,8 @@ class _Chip extends StatelessWidget {
     return SelectionButton(
       isSelected: selected,
       isSemanticButton: interactive,
+      // A chip without callbacks only displays information.
+      isInteractive: interactive,
       focusNode: focusNode,
       autofocus: autofocus,
       clipBehavior: clipBehavior,

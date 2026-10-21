@@ -104,6 +104,7 @@ class Badge extends StatelessWidget {
               ? null
               : AnimatedDefaultTextStyle(
                   duration: duration,
+                  curve: effective.animationCurve ?? Curves.easeInOut,
                   style: DefaultTextStyle.of(context).style.merge(
                     effective.textStyle?.resolve(const InteractionState()),
                   ),

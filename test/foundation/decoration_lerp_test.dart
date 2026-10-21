@@ -120,6 +120,75 @@ void main() {
   });
 
   group('lerpDecoration', () {
+    test('a null endpoint fades colors and keeps the shape', () {
+      final BoxDecoration box = BoxDecoration(
+        color: _light,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: _accent, width: 2),
+        boxShadow: const <BoxShadow>[
+          BoxShadow(color: _accent, blurRadius: 8, offset: Offset(0, 2)),
+        ],
+      );
+      for (final (Decoration? from, Decoration? to, double alpha)
+          in <(Decoration?, Decoration?, double)>[
+            (null, box, 0.25),
+            (box, null, 0.75),
+          ]) {
+        final BoxDecoration result =
+            lerpDecoration(from, to, 0.25)! as BoxDecoration;
+        expect(result.borderRadius, BorderRadius.circular(12));
+        _expectChannels(result.color!, _light, alpha: alpha);
+        final Border border = result.border! as Border;
+        _expectChannels(border.top.color, _accent, alpha: alpha);
+        expect(border.top.width, closeTo(2 * alpha, 1e-9));
+        final BoxShadow shadow = result.boxShadow!.single;
+        _expectChannels(shadow.color, _accent, alpha: alpha);
+        expect(shadow.blurRadius, 8);
+        expect(shadow.offset, const Offset(0, 2));
+      }
+      expect(lerpDecoration(null, box, 0), isNull);
+      expect(identical(lerpDecoration(null, box, 1), box), isTrue);
+    });
+
+    test('a missing border or shadow list fades in place', () {
+      final BoxDecoration from = BoxDecoration(
+        color: _light,
+        borderRadius: BorderRadius.circular(8),
+      );
+      final BoxDecoration to = BoxDecoration(
+        color: _light,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: _accent, width: 2),
+        boxShadow: const <BoxShadow>[BoxShadow(color: _accent, blurRadius: 6)],
+      );
+      final BoxDecoration result =
+          lerpDecoration(from, to, 0.5)! as BoxDecoration;
+      _expectChannels(
+        (result.border! as Border).left.color,
+        _accent,
+        alpha: 0.5,
+      );
+      expect(result.boxShadow!.single.blurRadius, 6);
+      _expectChannels(result.boxShadow!.single.color, _accent, alpha: 0.5);
+    });
+
+    test('an outlined shape decoration fades against null', () {
+      const ShapeDecoration shape = ShapeDecoration(
+        color: _accent,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: _light, width: 2),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+      );
+      final ShapeDecoration result =
+          lerpDecoration(null, shape, 0.5)! as ShapeDecoration;
+      _expectChannels(result.color!, _accent, alpha: 0.5);
+      final RoundedRectangleBorder border =
+          result.shape as RoundedRectangleBorder;
+      expect(border.borderRadius, const BorderRadius.all(Radius.circular(10)));
+      expect(border.side.color.a, closeTo(0.5, 1e-9));
+    });
+
     test(
       'box fills fade premultiplied while geometry follows BoxDecoration',
       () {
@@ -215,8 +284,6 @@ void main() {
         shape: StadiumBorder(),
       );
       expect(lerpDecoration(box, shape, 0.5), Decoration.lerp(box, shape, 0.5));
-      expect(lerpDecoration(null, box, 0.5), Decoration.lerp(null, box, 0.5));
-      expect(lerpDecoration(box, null, 0.5), Decoration.lerp(box, null, 0.5));
       const BoxDecoration gradient = BoxDecoration(
         gradient: LinearGradient(colors: <Color>[_clear, _light]),
       );

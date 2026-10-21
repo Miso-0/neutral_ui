@@ -33,10 +33,12 @@ void main() {
       BoxDecoration surface() =>
           tester
                   .widget<DecoratedBox>(
-                    find.descendant(
-                      of: fieldSurface,
-                      matching: find.byType(DecoratedBox),
-                    ),
+                    find
+                        .descendant(
+                          of: fieldSurface,
+                          matching: find.byType(DecoratedBox),
+                        )
+                        .first,
                   )
                   .decoration
               as BoxDecoration;

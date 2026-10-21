@@ -1,16 +1,18 @@
-import 'package:flutter/widgets.dart';
-
 import '../buttons/icon_button.dart';
 import '../buttons/text_button.dart';
 import '../dates/date.dart';
 import '../foundation/decoration_override.dart';
+import '../foundation/focus_visibility.dart';
 import '../foundation/glyphs.dart';
 import '../foundation/motion.dart';
 import '../localizations/neutral_localizations.dart';
 import '../menus/key_activators.dart';
-import '../styles/date_picker_style.dart';
 import '../styles/button_style.dart';
+import '../styles/date_picker_style.dart';
 import '../theme/picker_themes.dart';
+
+import 'package:flutter/widgets.dart';
+
 import 'picker_common.dart';
 
 /// A lazily paged calendar with day and year selection.
@@ -124,6 +126,7 @@ class _CalendarDatePickerState extends State<CalendarDatePicker> {
   @override
   void initState() {
     super.initState();
+    FocusVisibility.addListener(_focusVisibilityChanged);
     _selected = widget.initialDate == null
         ? null
         : _calendar.dateOnly(widget.initialDate!);
@@ -246,8 +249,14 @@ class _CalendarDatePickerState extends State<CalendarDatePicker> {
     }
   }
 
+  // The virtual focus is drawn only while keyboard focus is visible.
+  void _focusVisibilityChanged() {
+    if (mounted && _gridFocus.hasFocus) setState(() {});
+  }
+
   @override
   void dispose() {
+    FocusVisibility.removeListener(_focusVisibilityChanged);
     _pages.dispose();
     _gridFocus.dispose();
     super.dispose();
@@ -270,6 +279,7 @@ class _CalendarDatePickerState extends State<CalendarDatePicker> {
       context,
       style.animationDuration ?? const Duration(milliseconds: 200),
     );
+    final Curve curve = style.animationCurve ?? Curves.easeOutCubic;
     final int page = _calendar.monthDelta(_first, _month);
     final int count = _calendar.monthDelta(_first, _last) + 1;
     final double extent = style.dayExtent ?? 40;
@@ -293,6 +303,7 @@ class _CalendarDatePickerState extends State<CalendarDatePicker> {
                   trailing: AnimatedRotation(
                     turns: _mode == DatePickerMode.year ? .5 : 0,
                     duration: duration,
+                    curve: curve,
                     child: const ChevronGlyph(direction: GlyphDirection.down),
                   ),
                   child: Semantics(
@@ -302,6 +313,8 @@ class _CalendarDatePickerState extends State<CalendarDatePicker> {
                         : l.selectYearSemanticsLabel,
                     child: AnimatedSwitcher(
                       duration: duration,
+                      switchInCurve: curve,
+                      switchOutCurve: curve,
                       child: Text(
                         _calendar.formatMonthYear(_month, l),
                         key: ValueKey<DateTime>(_month),

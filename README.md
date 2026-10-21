@@ -10,6 +10,7 @@ Requires Flutter 3.47 or newer and Dart 3.13.4 or newer, below Dart 4.0.0. The r
 - Dropdowns, popup menus, text fields, autocomplete, and search.
 - Dialogs, bottom sheets, snack bars, tooltips, badges, and progress indicators.
 - Tabs, navigation controls, expansion tiles, and date, date range, and time pickers.
+- Tables with sorting, selection, expandable rows, groups and footer rows.
 - Shared interaction state, component themes, overlay placement, localization hooks, and reduced-motion behavior.
 
 ## Get started
@@ -84,11 +85,15 @@ class _CounterAppState extends State<CounterApp> {
 }
 ```
 
-NeutralUI uses Material's familiar names: `ElevatedButton`, `OutlinedButton`, `TextButton`, `IconButton`, `Checkbox`, `Switch`, `Radio`, `ListTile`, `Slider`, `DropdownButton`, `DropdownMenu`, `PopupMenuButton`, `ButtonStyle`, `ThemeData`, and the component theme names. When importing `material.dart` as well, use a prefix for NeutralUI (`import 'package:neutral_ui/neutral_ui.dart' as neutral;`) or hide conflicting names. `widgets.dart` can be imported unprefixed alongside NeutralUI.
+NeutralUI uses Material's familiar names: `ElevatedButton`, `OutlinedButton`, `TextButton`, `IconButton`, `Checkbox`, `Switch`, `Radio`, `ListTile`, `DataTable`, `Slider`, `DropdownButton`, `DropdownMenu`, `PopupMenuButton`, `ButtonStyle`, `ThemeData`, and the component theme names. When importing `material.dart` as well, use a prefix for NeutralUI (`import 'package:neutral_ui/neutral_ui.dart' as neutral;`) or hide conflicting names. `widgets.dart` can be imported unprefixed alongside NeutralUI.
 
 ## State and styling
 
-A `StateProperty<T>` resolves a token from an immutable `InteractionState`. States expose `isPressed`, `isHovered`, `isFocused`, `isSelected`, `isDisabled`, and `isDragged`. `isFocused` represents visible focus; `onFocusChange` reports raw focus. Constant tokens use `const StateProperty.all(value)`.
+A `StateProperty<T>` resolves a token from an immutable `InteractionState`. States expose `isPressed`, `isHovered`, `isFocused`, `isSelected`, `isDisabled`, and `isDragged`. Constant tokens use `const StateProperty.all(value)`.
+
+`isFocused` represents visible keyboard focus, like CSS `:focus-visible`. It is set only on the control that holds primary focus, and only after keyboard input, under directional navigation, or when the application selects `FocusHighlightStrategy.alwaysTraditional`. A pointer press hides it until the next key press, so focus moved in code while someone uses a mouse, such as a menu restoring focus to its anchor, draws no keyboard ring. Text fields show focus whenever they have it. `onFocusChange` reports raw focus, including focus held by a descendant.
+
+Only the innermost interactive control shows hover and press. While the pointer is over a chip's delete button or a tile's trailing switch, the chip or tile reports neither, and a focused descendant never shows focus on its ancestor. `onHover` still reports that the pointer is over the outer control. Surfaces without an action, such as a `ListTile` without `onTap` or a `Chip` without callbacks, show no hover or press.
 
 ```dart
 ButtonStyle(
@@ -104,9 +109,11 @@ Visual tokens are unset by default: your application supplies colors, radii, bor
 
 A few indicator slots paint a default glyph instead of staying empty: the dropdown arrow (`ChevronGlyph`), the chosen dropdown row and checked popup item (`CheckGlyph`), and the button loading indicator (`DotsGlyph`). Glyphs are drawn with `CustomPainter`, never text characters, and take their color, opacity and size from the ambient `IconTheme` exactly like an `Icon`, so each control's `iconTheme` token styles them. A default applies only when no style layer provides the token: provide a token that resolves to null to show nothing, or any widget to replace it. The glyph widgets are public, so you can reuse them elsewhere.
 
-The structural defaults are 200 ms animation with `Curves.easeInOut`, enabled feedback, click/basic cursors, centered button content with start-aligned icons, `threeLine` tile alignment, and slider width 144 when unbounded, keyboard step 0.05 and `tapAndSlide` interaction. Checkbox, Switch, Radio and IconButton have a 48 by 48 minimum hit target; Slider has a 48 minimum height. Buttons and ListTile size to content and style. Compact targets can be overridden with `tapTargetSize`.
+The structural defaults are 200 ms animation with `Curves.easeInOut` for buttons, toggles, tiles, sliders and fields (picker cells use 150 ms and navigation indicators 250 ms, both with `Curves.easeOutCubic`), enabled feedback, click/basic cursors, centered button content with start-aligned icons, `threeLine` tile alignment, and slider width 144 when unbounded, keyboard step 0.05 and `tapAndSlide` interaction. Checkbox, Switch, Radio and IconButton have a 48 by 48 minimum hit target; Slider has a 48 minimum height. Buttons and ListTile size to content and style. Compact targets can be overridden with `tapTargetSize`.
 
-Decoration transitions blend fill, border and shadow colors in premultiplied-alpha space, as CSS transitions do. Fading between `Color(0x00000000)` and a light color therefore never passes through gray, so transparent idle states are safe for hover effects. Gradients and `ShapeDecoration` use Flutter's standard interpolation.
+Decoration transitions blend fill, border and shadow colors in premultiplied-alpha space, as CSS transitions do. Fading between `Color(0x00000000)` and a light color therefore never passes through gray, so transparent idle states are safe for hover effects. A decoration, border or shadow that is null in some states fades in and out while keeping its shape and radius. Other gradients and `ShapeDecoration` pairs use Flutter's standard interpolation. State transitions are immediate under reduced motion.
+
+Borders count toward layout, as in `Container`, so a border whose width changes between states moves the content. Keep border widths constant and change only their color, or draw focus rings with `BorderSide.strokeAlignOutside` or a `foregroundDecoration`, neither of which affects layout. Rings drawn outside a control can be clipped by a clipping ancestor.
 
 ## Decorations
 
@@ -232,7 +239,7 @@ Slider supports arbitrary min/max ranges, divisions, a secondary track, ticks, a
 
 Each painted slider part has a matching direct decoration parameter; secondary tracks and ticks require the corresponding part to be enabled.
 
-`InteractionDetector` is public for custom controls. It combines focus, hover, press and drag state with keyboard activation, feedback and optional external state-controller synchronization. Use its builder to size the full hit target. `InteractionState` can round-trip Flutter `WidgetState` sets.
+`InteractionDetector` is public for custom controls. It combines focus, hover, press and drag state with keyboard activation, feedback and optional external state-controller synchronization, and follows the visible focus and nesting rules above. A custom control that keeps focus on a descendant, such as an editable field, passes `isFocused` explicitly. Use its builder to size the full hit target. `InteractionState` can round-trip Flutter `WidgetState` sets.
 
 ## Menus and selection
 
@@ -285,7 +292,7 @@ All three menu controls accept direct trigger or field `decoration` and panel `m
 
 Both dropdowns paint a `ChevronGlyph` arrow by default. Pass `DropdownButton.icon` or `DropdownMenu.trailingIcon` to replace it with one icon drawn pointing down. While the menu is open the arrow turns by `DropdownStyle.iconTurns`, half a turn by default so it flips to point up, using the trigger's `animationDuration` and `animationCurve`. Set `iconTurns: 0` to keep it still. To hide it, pass `SizedBox.shrink()` as the DropdownButton icon or set `showTrailingIcon: false` on DropdownMenu.
 
-All menus support keyboard activation, arrow navigation that skips disabled options, Escape and outside-tap dismissal. Panels follow their anchor and close when an ancestor scrolls, the window resizes, another route covers their route, or their anchor becomes inactive through `TickerMode`. Start-edge alignment respects RTL, and panels flip and clamp inside `edgePadding`, safe-area padding and keyboard insets. Dropdown panels are at least as wide as their anchor by default, subject to `maximumSize` and available overlay space. Popup panels size to their content by default. `MenuStyle` defaults to a fade and scale entrance over 150 ms and an exit over 100 ms. Set `transitionDuration: Duration.zero` for immediate transitions, or provide a `MenuTransitionBuilder`. `reverseTransitionDuration`, `transitionCurve` and `reverseTransitionCurve` control each direction. Reduced motion makes transitions immediate. Closing completes the reverse transition before removing the panel.
+All menus support keyboard activation, arrow navigation that skips disabled options, Escape and outside-tap dismissal. Moving the pointer over a row makes it the active row, so hover, arrow keys and Enter always agree on one row. A pointer resting where a row appears does not take over until it moves, and after keyboard navigation row hover stays hidden until the pointer moves. Arrow keys scroll only as far as needed to show the active row, and the chosen row keeps its appearance while the panel exits. An open trigger hands its focus indication to the active row. Panels follow their anchor and close when an ancestor scrolls, the window resizes, another route covers their route, or their anchor becomes inactive through `TickerMode`. Start-edge alignment respects RTL, and panels flip and clamp inside `edgePadding`, safe-area padding and keyboard insets. Dropdown panels are at least as wide as their anchor by default, subject to `maximumSize` and available overlay space. Popup panels size to their content by default. `MenuStyle` defaults to a fade and scale entrance over 150 ms and an exit over 100 ms. Set `transitionDuration: Duration.zero` for immediate transitions, or provide a `MenuTransitionBuilder`. `reverseTransitionDuration`, `transitionCurve` and `reverseTransitionCurve` control each direction. Reduced motion makes transitions immediate. Closing completes the reverse transition before removing the panel.
 
 Option rows resolve each token per state in this order: entry style, inline `style.itemStyle`, nearest component theme, structural defaults. Trigger and panel tokens follow the same order without the entry style. `DropdownStyle` and `PopupMenuStyle` deep-merge their nested button and menu styles. Open triggers resolve `isSelected`; selected dropdown rows and checked popup indicators resolve it for their chosen or checked state. Search highlights resolve visible focus while real focus stays in the editable field.
 
@@ -303,7 +310,7 @@ flutter run -d chrome
 flutter run -d macos
 ```
 
-The NeutralApp gallery demonstrates a central visual theme, local component themes, inline `copyWith`, direct decorations with an asset image, loading, selection, RadioGroup, RTL, reduced motion, sliders, searchable and multi-select dropdowns, popup menus, and a live interaction-state readout. It also includes feedback surfaces, text input and search, date and time pickers, chips, tabs, navigation, and progress controls. Its green palette belongs to the example application; the package does not impose it.
+The NeutralApp gallery demonstrates a central visual theme, local component themes, inline `copyWith`, direct decorations with an asset image, loading, selection, RadioGroup, RTL, reduced motion, sliders, searchable and multi-select dropdowns, popup menus, and a live interaction-state readout. It also includes feedback surfaces, text input and search, date and time pickers, chips, tabs, navigation, progress controls, and interactive tables. Its green palette belongs to the example application; the package does not impose it.
 
 To verify a checkout, run `flutter analyze` and `flutter test` at the repository root. In `example`, run `flutter analyze` and `flutter test`; `flutter build web` and `flutter build macos` validate the bundled runners on supported development hosts. See the [example README](https://github.com/Miso-0/pure_ui/blob/main/example/README.md) for its source layout.
 
@@ -344,7 +351,7 @@ The painted `CloseGlyph`, `SearchGlyph`, `CalendarGlyph`, `ClockGlyph`, `EditGly
 
 ## Feedback and modal surfaces
 
-`Tooltip` supports hover, long press, tap and visible keyboard focus. It accepts plain `message` or `richMessage`, the framework trigger/delay/feedback parameters, and a `TooltipStyle`. A `GlobalKey<TooltipState>` exposes `ensureTooltipVisible()` and `dismiss()`. `TooltipVisibility` controls a subtree. Escape dismisses the current tooltip; inline motion tokens can be changed while it is shown.
+`Tooltip` supports hover, long press, tap and visible keyboard focus. It accepts plain `message` or `richMessage`, the framework trigger/delay/feedback parameters, and a `TooltipStyle`. A `GlobalKey<TooltipState>` exposes `ensureTooltipVisible()` and `dismiss()`. `TooltipVisibility` controls a subtree. Escape dismisses the current tooltip, and reaches an enclosing dialog or sheet when none is shown; inline motion tokens can be changed while it is shown. Focus opens a tooltip only while focus is visible, and dismissing one keeps its child mounted.
 
 `Dialog`, `AlertDialog`, `SimpleDialog` and `SimpleDialogOption` use `DialogStyle` and `DialogTheme`. `showDialog<T>` requires a Navigator such as the regular `NeutralApp`, captures inherited themes, closes on Escape or a dismissible barrier, traps Tab focus and returns the value passed to `Navigator.pop`. DialogStyle controls surface decoration, layout, the optional barrier blur, and independent entrance/exit motion.
 
@@ -423,6 +430,32 @@ final DateTime? date = await showDatePicker(
 `RangeSlider` uses SliderStyle with `RangeValues` and two independently focusable thumbs. Arrow keys adjust the focused thumb, and a stop or push policy keeps the endpoints ordered. Continuous visual drag positions settle to controlled or discrete values with a velocity-aware spring. It accepts direct track, active track, thumb and tick decorations with the same validation rules as Slider.
 
 `Badge` and `Badge.count` support compact marks or localized capped counts such as `99+`. `CircularProgressIndicator` and `LinearProgressIndicator` animate determinate changes; a null value selects indeterminate motion. Their default paint follows IconTheme, and progress exposes accessible labels and values. All respect reduced motion. BadgeStyle and ProgressIndicatorStyle provide themeable tokens.
+
+## Tables
+
+`DataTable` uses the widgets layer and NeutralUI controls. The example gallery includes a tables section with sorting, selection, row details and collapsible groups. `DataTableColumn` defines headers, widths, visibility and sorting; `DataTableRow.cells` corresponds to all columns, including hidden columns. `onSort` reports the original column index so the application can reorder its data.
+
+```dart
+DataTable(
+  columns: const [
+    DataTableColumn(header: Text('Name'), sortable: true),
+    DataTableColumn(header: Text('Age'), width: FixedColumnWidth(80)),
+  ],
+  rows: const [
+    DataTableRow(cells: [Text('Alice'), Text('28')]),
+    DataTableRow(cells: [Text('Bob'), Text('34')]),
+  ],
+  style: const DataTableStyle(
+    headerCellPadding: EdgeInsets.all(12),
+    cellPadding: EdgeInsets.all(12),
+    headerTextStyle: TextStyle(fontWeight: FontWeight.w600),
+  ),
+)
+```
+
+Set table tokens through `ThemeData.dataTableStyle`, a local `DataTableTheme`, or inline `style`. As with other component themes, a local theme replaces the central component style; `DataTableTheme.merge` retains enclosing tokens. Colors, borders, padding and typography come from the application. Stateful `decoration` and `textStyle` tokens receive row hover, press, keyboard focus and selection. Inline `DataTableThemeData` is also supported below `style` in precedence.
+
+`showCheckboxes` enables selection of top-level rows. `expandedRowChildBuilder` and group headers span the table; `rowBuilder` wraps each data row. Nested expansion uses paths such as `0.1`. Selection, expansion and collapsed groups update internally and resynchronize when their supplied sets change. Wrap the table in an appropriate scroll view when its content can overflow; flex columns need a bounded width.
 
 ## Issues and contributions
 

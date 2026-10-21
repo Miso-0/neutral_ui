@@ -1,3 +1,17 @@
+## Unreleased
+
+- Add widgets-only `DataTable`, `DataTableColumn`, `DataTableRow` and `DataTableGroup` with NeutralUI controls, inherited styles, keyboard interaction, spanning groups/details and aligned intrinsic columns.
+- Add gallery table examples with sorting, selection that follows projects through sorting, expandable details, footer totals and collapsible groups.
+- Show visible focus like CSS `:focus-visible`: only the control with primary focus shows it, and only after keyboard input, under directional navigation or with `FocusHighlightStrategy.alwaysTraditional`. Focus moved in code during mouse use, such as menus opening and closing, tabs, navigation and calendars, no longer draws keyboard rings.
+- Show hover and press on the innermost interactive control only. A chip's delete button, a tile's trailing control or a field's clear button no longer lights its container, and a nested press never flashes the outer control. `onHover` and `onFocusChange` keep reporting raw pointer and focus state.
+- Fade decorations that are null in some states instead of snapping, keep shapes and radii while borders and shadows appear, and never remount a control's content when its decoration, clip, padding or size tokens change between null and non-null.
+- Make hover move the active row in DropdownButton, PopupMenuButton, DropdownMenu and Autocomplete, so Enter selects the lit row. Hide row hover after keyboard navigation until the pointer moves, scroll only as far as needed, keep panel rows stretched on every rebuild, and keep the chosen row's appearance while a panel exits.
+- Keep toggle hover, focus and press fades running while selection animates or a switch is dragged.
+- Let Escape reach an enclosing dialog or sheet when no tooltip is shown, keep a tooltip's child mounted on dismissal, and close focus-opened tooltips on pointer input.
+- Respect reduced motion in buttons, tiles, toggles, sliders, dropdown arrows and the editable dropdown field.
+- Animate slider geometry with its thumb and track sizes, size range thumbs from their own state, fade text-field labels, hints and helper text, cross-fade navigation icons, reveal chip and segment checkmarks with a fade, and show keyboard focus on picker year cells and time segments.
+- Stop non-interactive chips and tiles without actions from taking focus or showing hover and press.
+
 ## 0.11.0
 
 - Add `searchBuilder` to single and multiple dropdowns for query-driven results independent of text labels.

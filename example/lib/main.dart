@@ -2,12 +2,18 @@ import 'package:flutter/widgets.dart';
 import 'package:neutral_ui/neutral_ui.dart';
 
 import 'sections/roadmap_sections.dart';
+import 'sections/table_section.dart';
 
 const Color _ink = Color(0xFF142C2A);
 const Color _muted = Color(0xFF657B77);
 const Color _accent = Color(0xFF087F6D);
 const Color _canvas = Color(0xFFF4F7F3);
 const Color _line = Color(0xFFCFDDD4);
+
+/// A focus ring drawn outside the control, so showing it never moves content.
+const List<BoxShadow> _focusRing = <BoxShadow>[
+  BoxShadow(color: Color(0x66087F6D), spreadRadius: 3),
+];
 
 /// Starts the sample gallery.
 void main() => runApp(const GalleryApp());
@@ -28,14 +34,15 @@ Decoration _surface(InteractionState state, {bool solid = false}) =>
                 ? const Color(0xFFE9F2EB)
                 : const Color(0xFFFFFFFF)),
       borderRadius: BorderRadius.circular(12),
+      // A constant border width keeps content still; focus adds a ring.
       border: Border.all(
         color: state.isFocused
             ? _accent
             : solid
             ? const Color(0x00000000)
             : _line,
-        width: state.isFocused ? 2 : 1,
       ),
+      boxShadow: state.isFocused ? _focusRing : null,
     );
 
 ButtonStyle _button({bool solid = false}) => ButtonStyle(
@@ -80,15 +87,9 @@ ToggleStyle _toggle({bool radio = false, bool isSwitch = false}) => ToggleStyle(
           : state.isSelected
           ? _accent
           : const Color(0xFFFFFFFF),
-      border: Border.all(
-        color: state.isFocused
-            ? _ink
-            : state.isSelected
-            ? _accent
-            : _line,
-        width: state.isFocused ? 2 : 1,
-      ),
+      border: Border.all(color: state.isSelected ? _accent : _line),
       borderRadius: BorderRadius.circular(radio || isSwitch ? 30 : 6),
+      boxShadow: state.isFocused ? _focusRing : null,
     ),
   ),
   thumbSize: StateProperty<Size?>.all(
@@ -212,6 +213,7 @@ ThemeData _theme() => ThemeData(
             ? const Color(0xFFE9F2EB)
             : const Color(0x00000000),
         borderRadius: BorderRadius.circular(12),
+        boxShadow: state.isFocused ? _focusRing : null,
       ),
     ),
   ),
@@ -239,6 +241,7 @@ ThemeData _theme() => ThemeData(
             ? const Color(0xFFF0F5F0)
             : const Color(0xFFFFFFFF),
         borderRadius: BorderRadius.circular(12),
+        boxShadow: state.isFocused ? _focusRing : null,
       ),
     ),
     titleTextStyle: const StateProperty<TextStyle?>.all(
@@ -595,6 +598,7 @@ class _GalleryState extends State<_Gallery> {
               enableFilter: true,
               dropdownMenuEntries: _teams,
               selected: _disciplines,
+
               onSelectionChanged: (Set<String> values) => setState(() {
                 _disciplines = values;
                 _activity = 'Teams: ${values.join(', ')}';
@@ -1289,6 +1293,8 @@ class _GalleryState extends State<_Gallery> {
                   RoadmapSections(
                     onReducedMotionChanged: widget.onReducedMotionChanged,
                   ),
+                  const SizedBox(height: 18),
+                  const TableSection(),
                   const SizedBox(height: 24),
                   const Text(
                     'NeutralUI 0.10 / Flutter widgets, your visual language.',

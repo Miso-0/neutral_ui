@@ -207,6 +207,7 @@ class _SwitchState extends State<Switch>
                 return AnimatedSurface(
                   duration: interactionDuration,
                   curve: interactionCurve,
+                  transitionKey: interactionKey(state),
                   width: size.width,
                   height: size.height,
                   decoration: decorationToken(
@@ -225,6 +226,7 @@ class _SwitchState extends State<Switch>
                     child: AnimatedSurface(
                       duration: interactionDuration,
                       curve: interactionCurve,
+                      transitionKey: interactionKey(state),
                       width: thumb.width,
                       height: thumb.height,
                       decoration: decorationToken(

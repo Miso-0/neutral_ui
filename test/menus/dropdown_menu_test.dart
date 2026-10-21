@@ -169,10 +169,12 @@ void main() {
   Color paintedFieldColor(WidgetTester tester) =>
       (tester
                   .widget<DecoratedBox>(
-                    find.descendant(
-                      of: find.byType(AnimatedSurface),
-                      matching: find.byType(DecoratedBox),
-                    ),
+                    find
+                        .descendant(
+                          of: find.byType(AnimatedSurface),
+                          matching: find.byType(DecoratedBox),
+                        )
+                        .first,
                   )
                   .decoration
               as BoxDecoration)

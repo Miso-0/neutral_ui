@@ -153,7 +153,7 @@ class _ExpansionTileState extends State<ExpansionTile> {
       curve: style.animationCurve ?? Curves.easeInOut,
       padding: style.padding,
       decoration: decoration,
-      clipBehavior: decoration == null ? Clip.none : widget.clipBehavior,
+      clipBehavior: widget.clipBehavior,
       child: Expansible(
         controller: _controller,
         animationStyle: AnimationStyle(

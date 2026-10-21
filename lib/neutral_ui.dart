@@ -2,7 +2,7 @@
 library;
 
 export 'src/foundation/glyphs.dart';
-export 'src/foundation/interaction_detector.dart';
+export 'src/foundation/interaction_detector.dart' hide InteractionBoundary;
 export 'src/foundation/interaction_state.dart';
 export 'src/foundation/state_property.dart';
 export 'src/styles/button_style.dart';
@@ -77,3 +77,7 @@ export 'src/theme/input_themes.dart';
 export 'src/theme/picker_themes.dart';
 export 'src/theme/chip_theme.dart';
 export 'src/theme/navigation_themes.dart';
+
+export 'src/tables/tables.dart';
+export 'src/styles/data_table_style.dart';
+export 'src/theme/data_table_theme.dart';

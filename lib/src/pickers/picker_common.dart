@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import '../dates/date.dart';
 import '../foundation/animated_surface.dart';
+import '../foundation/focus_visibility.dart';
 import '../foundation/interaction_detector.dart';
 import '../foundation/interaction_state.dart';
 import '../foundation/motion.dart';
@@ -39,6 +40,9 @@ class PickerCell extends StatelessWidget {
   final bool selected;
 
   /// Whether the calendar's virtual focus is here.
+  ///
+  /// Semantics always report it; it is drawn only while keyboard focus is
+  /// visible, like real focus.
   final bool focused;
 
   /// Full accessibility label.
@@ -51,50 +55,61 @@ class PickerCell extends StatelessWidget {
   final bool canRequestFocus;
 
   @override
-  Widget build(BuildContext context) => Semantics(
-    label: label,
-    selected: selected,
-    focused: focused ? true : null,
-    liveRegion: focused,
-    button: true,
-    enabled: onPressed != null,
-    excludeSemantics: label != null,
-    onTap: onPressed,
-    child: InteractionDetector(
+  Widget build(BuildContext context) {
+    final bool showFocus =
+        focused &&
+        (MediaQuery.maybeNavigationModeOf(context) ==
+                NavigationMode.directional ||
+            FocusVisibility.isVisible);
+    return Semantics(
+      label: label,
+      selected: selected,
+      focused: focused ? true : null,
+      liveRegion: focused,
+      button: true,
       enabled: onPressed != null,
-      isSelected: selected,
-      isFocused: focused ? true : null,
-      canRequestFocus: canRequestFocus,
+      excludeSemantics: label != null,
       onTap: onPressed,
-      excludeFromSemantics: true,
-      builder: (BuildContext context, InteractionState state) {
-        final Duration duration = reducedMotionDuration(
-          context,
-          resolvePlain(styles, (ButtonStyle s) => s.animationDuration) ??
-              const Duration(milliseconds: 150),
-        );
-        final TextStyle textStyle = DefaultTextStyle.of(context).style.merge(
-          resolveStateful(state, styles, (ButtonStyle s) => s.textStyle),
-        );
-        Widget content = AnimatedDefaultTextStyle(
-          style: textStyle,
-          duration: duration,
-          child: Center(child: child),
-        );
-        final Decoration? decoration = resolveStateful(
-          state,
-          styles,
-          (ButtonStyle s) => s.decoration,
-        );
-        if (decoration == null &&
-            !styles.any((ButtonStyle? s) => s?.decoration != null)) {
-          content = Stack(
-            fit: StackFit.expand,
+      child: InteractionDetector(
+        enabled: onPressed != null,
+        isSelected: selected,
+        isFocused: showFocus ? true : null,
+        canRequestFocus: canRequestFocus,
+        onTap: onPressed,
+        excludeFromSemantics: true,
+        builder: (BuildContext context, InteractionState state) {
+          final Duration duration = reducedMotionDuration(
+            context,
+            resolvePlain(styles, (ButtonStyle s) => s.animationDuration) ??
+                const Duration(milliseconds: 150),
+          );
+          final Curve curve =
+              resolvePlain(styles, (ButtonStyle s) => s.animationCurve) ??
+              Curves.easeOutCubic;
+          final TextStyle textStyle = DefaultTextStyle.of(context).style.merge(
+            resolveStateful(state, styles, (ButtonStyle s) => s.textStyle),
+          );
+          final Decoration? decoration = resolveStateful(
+            state,
+            styles,
+            (ButtonStyle s) => s.decoration,
+          );
+          // The default indicator stands in when no style paints the cell. It is
+          // always built, faded by opacity, because the style list changes with
+          // selection and today; swapping trees would remount the content.
+          final bool indicator =
+              decoration == null &&
+              !styles.any((ButtonStyle? s) => s?.decoration != null);
+          final bool indicatorFocused = showFocus || state.isFocused;
+          final Widget content = Stack(
             children: <Widget>[
               Positioned.fill(
                 child: AnimatedOpacity(
-                  opacity: selected || today || focused ? 1 : 0,
+                  opacity: indicator && (selected || today || indicatorFocused)
+                      ? 1
+                      : 0,
                   duration: duration,
+                  curve: curve,
                   child: CustomPaint(
                     painter: _CellIndicator(
                       color:
@@ -102,49 +117,52 @@ class PickerCell extends StatelessWidget {
                           textStyle.color ??
                           const Color(0xFF000000),
                       today: today,
-                      focused: focused,
+                      focused: indicatorFocused,
                       selected: selected,
                     ),
                   ),
                 ),
               ),
-              content,
+              AnimatedDefaultTextStyle(
+                style: textStyle,
+                duration: duration,
+                curve: curve,
+                child: Center(child: child),
+              ),
             ],
           );
-        }
-        final Size? fixed = resolveStateful(
-          state,
-          styles,
-          (ButtonStyle s) => s.fixedSize,
-        );
-        return TapTarget(
-          minSize:
-              resolvePlain(styles, (ButtonStyle s) => s.tapTargetSize) ??
-              Size.zero,
-          child: AnimatedSurface(
-            duration: duration,
-            curve:
-                resolvePlain(styles, (ButtonStyle s) => s.animationCurve) ??
-                Curves.easeOutCubic,
-            decoration: decoration,
-            foregroundDecoration: resolveStateful(
-              state,
-              styles,
-              (ButtonStyle s) => s.foregroundDecoration,
+          final Size? fixed = resolveStateful(
+            state,
+            styles,
+            (ButtonStyle s) => s.fixedSize,
+          );
+          return TapTarget(
+            minSize:
+                resolvePlain(styles, (ButtonStyle s) => s.tapTargetSize) ??
+                Size.zero,
+            child: AnimatedSurface(
+              duration: duration,
+              curve: curve,
+              decoration: decoration,
+              foregroundDecoration: resolveStateful(
+                state,
+                styles,
+                (ButtonStyle s) => s.foregroundDecoration,
+              ),
+              padding: resolveStateful(
+                state,
+                styles,
+                (ButtonStyle s) => s.padding,
+              ),
+              width: fixed?.width,
+              height: fixed?.height,
+              child: content,
             ),
-            padding: resolveStateful(
-              state,
-              styles,
-              (ButtonStyle s) => s.padding,
-            ),
-            width: fixed?.width,
-            height: fixed?.height,
-            child: content,
-          ),
-        );
-      },
-    ),
-  );
+          );
+        },
+      ),
+    );
+  }
 }
 
 class _CellIndicator extends CustomPainter {

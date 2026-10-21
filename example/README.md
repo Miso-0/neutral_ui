@@ -30,8 +30,9 @@ The example intentionally depends on `neutral_ui` through `path: ../` so edits t
 - Dialogs, bottom sheets, snack bars, tooltips, text input, autocomplete, and search.
 - Date, date range, and time pickers; chips and button variants; tabs and navigation.
 - Badges, progress indicators, a live interaction-state readout, RTL, and reduced-motion controls.
+- Data tables with sorting, persistent selection, expandable project details, totals, and collapsible workstream groups.
 
-`lib/main.dart` contains the application, base theme, and core control demos. `lib/sections/roadmap_sections.dart` extends the theme and builds the additional component sections. `test/widget_test.dart` exercises gallery interactions, menu selection, image loading, RTL, and reduced motion.
+`lib/main.dart` contains the application, base theme, and core control demos. `lib/sections/roadmap_sections.dart` extends the theme and builds the additional component sections. `lib/sections/table_section.dart` adds the interactive tables section with responsive horizontal scrolling. `test/widget_test.dart` exercises gallery interactions, menu selection, image loading, RTL, and reduced motion; `test/tables_test.dart` covers the table examples.
 
 ## Check changes
 

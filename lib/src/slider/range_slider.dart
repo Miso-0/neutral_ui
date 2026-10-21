@@ -10,6 +10,7 @@ import '../foundation/motion.dart';
 import '../foundation/state_property.dart';
 import '../foundation/style_resolution.dart';
 import '../styles/slider_style.dart';
+import 'slider_metrics.dart';
 import '../theme/slider_theme.dart';
 
 /// The ordered lower and upper values of a range slider.
@@ -166,6 +167,12 @@ class _RangeSliderState extends State<RangeSlider>
   late final List<AnimationController> _positions;
   final FocusNode _start = FocusNode();
   final FocusNode _end = FocusNode();
+  // Each thumb's resolved state, so the track can show a focused thumb.
+  final List<WidgetStatesController> _thumbStates = <WidgetStatesController>[
+    WidgetStatesController(),
+    WidgetStatesController(),
+  ];
+  bool _thumbStateUpdateScheduled = false;
   int? _active;
   bool _dragging = false;
   double? _pointerX;
@@ -194,6 +201,23 @@ class _RangeSliderState extends State<RangeSlider>
     for (final AnimationController controller in _positions) {
       controller.addListener(_positionChanged);
     }
+    for (final WidgetStatesController states in _thumbStates) {
+      states.addListener(_thumbStatesChanged);
+    }
+  }
+
+  bool _thumbFocused(int thumb) =>
+      _thumbStates[thumb].value.contains(WidgetState.focused);
+
+  // Thumb detectors can synchronize their state during a build, so the track
+  // rebuilds after that build completes.
+  void _thumbStatesChanged() {
+    if (_thumbStateUpdateScheduled) return;
+    _thumbStateUpdateScheduled = true;
+    Future<void>.microtask(() {
+      _thumbStateUpdateScheduled = false;
+      if (mounted) setState(() {});
+    });
   }
 
   void _positionChanged() {
@@ -374,6 +398,9 @@ class _RangeSliderState extends State<RangeSlider>
     }
     _start.dispose();
     _end.dispose();
+    for (final WidgetStatesController states in _thumbStates) {
+      states.dispose();
+    }
     super.dispose();
   }
 
@@ -459,6 +486,8 @@ class _RangeSliderState extends State<RangeSlider>
         ),
       ),
       canRequestFocus: false,
+      // The track shows focus while either thumb shows it.
+      isFocused: _thumbFocused(0) || _thumbFocused(1),
       excludeFromSemantics: true,
       onTapDown: tap
           ? (TapDownDetails details) =>
@@ -521,117 +550,160 @@ class _RangeSliderState extends State<RangeSlider>
         return Listener(
           onPointerDown: (PointerDownEvent event) =>
               _pointerX = event.localPosition.dx,
-          child: LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints constraints) {
-              final double width = constraints.hasBoundedWidth
-                  ? constraints.maxWidth
-                  : constraints.constrainWidth(effective.preferredWidth ?? 144);
-              final double height = constraints.constrainHeight(
-                math.max(target.height, math.max(thumb.height, trackHeight)),
-              );
-              _left = padding.left + thumb.width / 2;
-              _width = math.max(0, width - padding.horizontal - thumb.width);
-              final double end = _positions[1].value.clamp(0.0, 1.0),
-                  start = _positions[0].value.clamp(0.0, end);
-              double x(double fraction) =>
-                  _left + (_rtl ? 1 - fraction : fraction) * _width;
-              _startX = x(start);
-              _endX = x(end);
-              Widget track(double left, double width, Decoration? decoration) =>
-                  Positioned(
-                    left: left,
-                    top: (height - trackHeight) / 2,
-                    width: width,
-                    height: trackHeight,
-                    child: AnimatedSurface(
-                      duration: duration,
-                      curve: curve,
-                      decoration: decoration,
-                    ),
-                  );
-              return SizedBox(
-                width: width,
-                height: height,
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: <Widget>[
-                    track(
-                      _left,
-                      _width,
-                      resolveStateful<SliderStyle, Decoration>(
-                        state,
-                        layers,
-                        (SliderStyle s) => s.trackDecoration,
+          // Interaction-dependent sizes animate together and drive every
+          // position, as in Slider.
+          child: TweenAnimationBuilder<SliderMetrics>(
+            tween: SliderMetricsTween(
+              end: SliderMetrics(
+                thumb: thumb,
+                trackHeight: trackHeight,
+                tick: tick,
+              ),
+            ),
+            duration: duration,
+            curve: curve,
+            builder: (BuildContext context, SliderMetrics metrics, Widget? _) =>
+                LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                    final Size thumb = metrics.thumb;
+                    final double trackHeight = metrics.trackHeight;
+                    final Size tick = metrics.tick;
+                    final double width = constraints.hasBoundedWidth
+                        ? constraints.maxWidth
+                        : constraints.constrainWidth(
+                            effective.preferredWidth ?? 144,
+                          );
+                    final double height = constraints.constrainHeight(
+                      math.max(
+                        target.height,
+                        math.max(thumb.height, trackHeight),
                       ),
-                    ),
-                    track(
-                      math.min(_startX, _endX),
-                      (end - start) * _width,
-                      resolveStateful<SliderStyle, Decoration>(
-                        state,
-                        layers,
-                        (SliderStyle s) => s.activeTrackDecoration,
+                    );
+                    _left = padding.left + thumb.width / 2;
+                    _width = math.max(
+                      0,
+                      width - padding.horizontal - thumb.width,
+                    );
+                    final double end = _positions[1].value.clamp(0.0, 1.0),
+                        start = _positions[0].value.clamp(0.0, end);
+                    double x(double fraction) =>
+                        _left + (_rtl ? 1 - fraction : fraction) * _width;
+                    _startX = x(start);
+                    _endX = x(end);
+                    Widget track(
+                      double left,
+                      double width,
+                      Decoration? decoration,
+                    ) => Positioned(
+                      left: left,
+                      top: (height - trackHeight) / 2,
+                      width: width,
+                      height: trackHeight,
+                      child: AnimatedSurface(
+                        duration: duration,
+                        curve: curve,
+                        decoration: decoration,
                       ),
-                    ),
-                    if (widget.divisions != null)
-                      for (int i = 0; i <= widget.divisions!; i++)
-                        Positioned(
-                          left: x(i / widget.divisions!),
-                          top: height / 2,
-                          child: FractionalTranslation(
-                            translation: const Offset(-0.5, -0.5),
-                            child: AnimatedSurface(
-                              width: tick.width,
-                              height: tick.height,
-                              duration: duration,
-                              curve: curve,
-                              decoration:
-                                  resolveStateful<SliderStyle, Decoration>(
-                                    state,
-                                    layers,
-                                    (SliderStyle s) =>
-                                        i / widget.divisions! >= start &&
-                                            i / widget.divisions! <= end
-                                        ? s.activeTickMarkDecoration
-                                        : s.tickMarkDecoration,
+                    );
+                    return SizedBox(
+                      width: width,
+                      height: height,
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: <Widget>[
+                          track(
+                            _left,
+                            _width,
+                            resolveStateful<SliderStyle, Decoration>(
+                              state,
+                              layers,
+                              (SliderStyle s) => s.trackDecoration,
+                            ),
+                          ),
+                          track(
+                            math.min(_startX, _endX),
+                            (end - start) * _width,
+                            resolveStateful<SliderStyle, Decoration>(
+                              state,
+                              layers,
+                              (SliderStyle s) => s.activeTrackDecoration,
+                            ),
+                          ),
+                          if (widget.divisions != null)
+                            for (int i = 0; i <= widget.divisions!; i++)
+                              Positioned(
+                                left: x(i / widget.divisions!),
+                                top: height / 2,
+                                child: FractionalTranslation(
+                                  translation: const Offset(-0.5, -0.5),
+                                  child: SizedBox(
+                                    width: tick.width,
+                                    height: tick.height,
+                                    child: AnimatedSurface(
+                                      duration: duration,
+                                      curve: curve,
+                                      decoration:
+                                          resolveStateful<
+                                            SliderStyle,
+                                            Decoration
+                                          >(
+                                            state,
+                                            layers,
+                                            (SliderStyle s) =>
+                                                i / widget.divisions! >=
+                                                        start &&
+                                                    i / widget.divisions! <= end
+                                                ? s.activeTickMarkDecoration
+                                                : s.tickMarkDecoration,
+                                          ),
+                                    ),
                                   ),
-                            ),
-                          ),
-                        ),
-                    for (int index = 0; index < 2; index++)
-                      Positioned(
-                        left: (index == 0 ? _startX : _endX) - _targetWidth / 2,
-                        top: 0,
-                        width: _targetWidth,
-                        height: height,
-                        child: _thumb(index, layers, thumb, duration, curve),
-                      ),
-                    if (effective.valueIndicatorBuilder != null)
-                      for (int index = 0; index < 2; index++)
-                        Positioned(
-                          left: index == 0 ? _startX : _endX,
-                          top: height / 2 - thumb.height / 2,
-                          child: FractionalTranslation(
-                            translation: const Offset(-0.5, -1),
-                            child: effective.valueIndicatorBuilder!(
-                              context,
-                              state.copyWith(
-                                isPressed: _active == index,
-                                isDragged: _active == index && _dragging,
+                                ),
                               ),
-                              index == 0
-                                  ? widget.values.start
-                                  : widget.values.end,
-                              index == 0
-                                  ? widget.labels?.start
-                                  : widget.labels?.end,
+                          for (int index = 0; index < 2; index++)
+                            Positioned(
+                              left:
+                                  (index == 0 ? _startX : _endX) -
+                                  _targetWidth / 2,
+                              top: 0,
+                              width: _targetWidth,
+                              height: height,
+                              child: _thumb(
+                                index,
+                                layers,
+                                thumb,
+                                duration,
+                                curve,
+                              ),
                             ),
-                          ),
-                        ),
-                  ],
+                          if (effective.valueIndicatorBuilder != null)
+                            for (int index = 0; index < 2; index++)
+                              Positioned(
+                                left: index == 0 ? _startX : _endX,
+                                top: height / 2 - thumb.height / 2,
+                                child: FractionalTranslation(
+                                  translation: const Offset(-0.5, -1),
+                                  child: effective.valueIndicatorBuilder!(
+                                    context,
+                                    state.copyWith(
+                                      isPressed: _active == index,
+                                      isDragged: _active == index && _dragging,
+                                      isFocused: _thumbFocused(index),
+                                    ),
+                                    index == 0
+                                        ? widget.values.start
+                                        : widget.values.end,
+                                    index == 0
+                                        ? widget.labels?.start
+                                        : widget.labels?.end,
+                                  ),
+                                ),
+                              ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
           ),
         );
       },
@@ -667,48 +739,67 @@ class _RangeSliderState extends State<RangeSlider>
       ),
       onIncrease: _enabled ? () => _adjust(thumb, true) : null,
       onDecrease: _enabled ? () => _adjust(thumb, false) : null,
-      child: InteractionDetector(
-        enabled: _enabled,
-        mouseCursor: StateProperty<MouseCursor?>.resolveWith(
-          (InteractionState state) => resolveStateful<SliderStyle, MouseCursor>(
-            state,
-            layers,
-            (SliderStyle style) => style.mouseCursor,
+      // Thumbs are parts of this control rather than nested controls, so
+      // hovering one keeps the whole slider hovered.
+      child: InteractionBoundary(
+        child: InteractionDetector(
+          enabled: _enabled,
+          // Without their own gestures, thumbs defer to the track's cursor.
+          mouseCursor: StateProperty<MouseCursor?>.resolveWith(
+            (InteractionState state) =>
+                resolveStateful<SliderStyle, MouseCursor>(
+                  state,
+                  layers,
+                  (SliderStyle style) => style.mouseCursor,
+                ) ??
+                MouseCursor.defer,
           ),
-        ),
-        focusNode: _focus(thumb),
-        autofocus: thumb == 0 && widget.autofocus,
-        excludeFromSemantics: true,
-        actions: <Type, Action<Intent>>{
-          DirectionalFocusIntent: CallbackAction<DirectionalFocusIntent>(
-            onInvoke: (DirectionalFocusIntent intent) =>
-                _direction(thumb, intent.direction),
-          ),
-          ScrollIntent: CallbackAction<ScrollIntent>(
-            onInvoke: (ScrollIntent intent) =>
-                _direction(thumb, switch (intent.direction) {
-                  AxisDirection.left => TraversalDirection.left,
-                  AxisDirection.right => TraversalDirection.right,
-                  AxisDirection.up => TraversalDirection.up,
-                  AxisDirection.down => TraversalDirection.down,
-                }),
-          ),
-        },
-        builder: (BuildContext context, InteractionState state) => Center(
-          child: AnimatedSurface(
-            duration: duration,
-            curve: curve,
-            width: size.width,
-            height: size.height,
-            decoration: resolveStateful<SliderStyle, Decoration>(
-              state.copyWith(
-                isPressed: _active == thumb,
-                isDragged: _active == thumb && _dragging,
-              ),
-              layers,
-              (SliderStyle s) => s.thumbDecoration,
+          focusNode: _focus(thumb),
+          statesController: _thumbStates[thumb],
+          autofocus: thumb == 0 && widget.autofocus,
+          excludeFromSemantics: true,
+          actions: <Type, Action<Intent>>{
+            DirectionalFocusIntent: CallbackAction<DirectionalFocusIntent>(
+              onInvoke: (DirectionalFocusIntent intent) =>
+                  _direction(thumb, intent.direction),
             ),
-          ),
+            ScrollIntent: CallbackAction<ScrollIntent>(
+              onInvoke: (ScrollIntent intent) =>
+                  _direction(thumb, switch (intent.direction) {
+                    AxisDirection.left => TraversalDirection.left,
+                    AxisDirection.right => TraversalDirection.right,
+                    AxisDirection.up => TraversalDirection.up,
+                    AxisDirection.down => TraversalDirection.down,
+                  }),
+            ),
+          },
+          builder: (BuildContext context, InteractionState state) {
+            final InteractionState thumbState = state.copyWith(
+              isPressed: _active == thumb,
+              isDragged: _active == thumb && _dragging,
+            );
+            // Only the focused thumb takes a focused size.
+            final Size thumbSize =
+                resolveStateful<SliderStyle, Size>(
+                  thumbState,
+                  layers,
+                  (SliderStyle s) => s.thumbSize,
+                ) ??
+                size;
+            return Center(
+              child: AnimatedSurface(
+                duration: duration,
+                curve: curve,
+                width: thumbSize.width,
+                height: thumbSize.height,
+                decoration: resolveStateful<SliderStyle, Decoration>(
+                  thumbState,
+                  layers,
+                  (SliderStyle s) => s.thumbDecoration,
+                ),
+              ),
+            );
+          },
         ),
       ),
     );

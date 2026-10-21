@@ -1,9 +1,8 @@
-import 'package:flutter/widgets.dart';
-
 import '../buttons/icon_button.dart';
 import '../buttons/text_button.dart';
 import '../dates/date.dart';
 import '../feedback/dialog.dart';
+import '../foundation/focus_visibility.dart';
 import '../foundation/glyphs.dart';
 import '../foundation/motion.dart';
 import '../localizations/neutral_localizations.dart';
@@ -11,6 +10,9 @@ import '../menus/key_activators.dart';
 import '../styles/date_picker_style.dart';
 import '../theme/picker_themes.dart';
 import 'date_picker.dart';
+
+import 'package:flutter/widgets.dart';
+
 import 'picker_common.dart';
 
 /// A lazy scrolling month list for choosing an inclusive date range.
@@ -97,6 +99,7 @@ class _CalendarDateRangePickerState extends State<CalendarDateRangePicker> {
   @override
   void initState() {
     super.initState();
+    FocusVisibility.addListener(_focusVisibilityChanged);
     assert(!_last.isBefore(_first));
     _start = widget.initialStartDate == null
         ? null
@@ -182,6 +185,11 @@ class _CalendarDateRangePickerState extends State<CalendarDateRangePicker> {
     }
   }
 
+  // The virtual focus is drawn only while keyboard focus is visible.
+  void _focusVisibilityChanged() {
+    if (mounted && _focus.hasFocus) setState(() {});
+  }
+
   void _move(_RangeMoveIntent intent) {
     final bool rtl = Directionality.of(context) == TextDirection.rtl;
     final int delta = intent.directional && rtl ? -intent.delta : intent.delta;
@@ -191,11 +199,29 @@ class _CalendarDateRangePickerState extends State<CalendarDateRangePicker> {
         setState(() {
           _focused = candidate;
         });
-        final double target =
-            (_calendar.monthDelta(_first, candidate) * _monthHeight).clamp(
-              0,
-              _scroll!.position.maxScrollExtent,
-            );
+        // Scroll only as far as the focused row needs, showing the month
+        // header with a month's first row.
+        final double extent = _style.dayExtent ?? 40;
+        final int row =
+            (_calendar.firstDayOffset(
+                  candidate.year,
+                  candidate.month,
+                  NeutralLocalizations.of(context),
+                ) +
+                candidate.day -
+                1) ~/
+            7;
+        final double monthTop =
+            _calendar.monthDelta(_first, candidate) * _monthHeight;
+        final double rowTop = monthTop + 40 + extent * (row + 1);
+        final ScrollPosition position = _scroll!.position;
+        final double? scrollTo = rowTop < position.pixels
+            ? (row == 0 ? monthTop : rowTop)
+            : rowTop + extent > position.pixels + position.viewportDimension
+            ? rowTop + extent - position.viewportDimension
+            : null;
+        if (scrollTo == null) return;
+        final double target = scrollTo.clamp(0, position.maxScrollExtent);
         final Duration duration = reducedMotionDuration(
           context,
           _style.animationDuration ?? const Duration(milliseconds: 200),
@@ -218,6 +244,7 @@ class _CalendarDateRangePickerState extends State<CalendarDateRangePicker> {
   @override
   void dispose() {
     _scroll?.dispose();
+    FocusVisibility.removeListener(_focusVisibilityChanged);
     _focus.dispose();
     super.dispose();
   }

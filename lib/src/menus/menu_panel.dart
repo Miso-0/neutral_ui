@@ -1,18 +1,70 @@
 import 'package:flutter/widgets.dart';
 
+import '../foundation/interaction_detector.dart';
 import '../overlay/overlay_behavior.dart';
 import '../styles/menu_style.dart';
 
 /// Scrolls an option within its menu without moving an enclosing page.
-void ensureMenuItemVisible(GlobalKey key) {
+///
+/// With [minimal], an option that is already visible stays put and one outside
+/// the viewport scrolls only far enough to show it, as keyboard navigation
+/// expects. Otherwise the option is aligned to the top of the viewport.
+void ensureMenuItemVisible(GlobalKey key, {bool minimal = false}) {
   WidgetsBinding.instance.addPostFrameCallback((Duration timeStamp) {
     final BuildContext? context = key.currentContext;
     if (context == null || !context.mounted) return;
     final RenderObject? renderObject = context.findRenderObject();
     if (renderObject == null || !renderObject.attached) return;
-    Scrollable.maybeOf(context)?.position.ensureVisible(renderObject);
+    final ScrollPosition? position = Scrollable.maybeOf(context)?.position;
+    if (position == null) return;
+    if (!minimal) {
+      position.ensureVisible(renderObject);
+      return;
+    }
+    scrollMenuItemIntoView(position, renderObject);
   });
   WidgetsBinding.instance.scheduleFrame();
+}
+
+/// Scrolls [position] only as far as needed to show [item].
+void scrollMenuItemIntoView(ScrollPosition position, RenderObject item) {
+  position.ensureVisible(
+    item,
+    alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtStart,
+  );
+  position.ensureVisible(
+    item,
+    alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
+  );
+}
+
+/// Reports pointer movement over a menu row.
+///
+/// A pointer resting where a row appears, after the menu opens, scrolls or is
+/// navigated by keyboard, is not reported, so only real movement moves the
+/// active row.
+class MenuRowHover extends StatelessWidget {
+  /// Creates a movement listener around [child].
+  const MenuRowHover({
+    super.key,
+    required this.onPointerMove,
+    required this.child,
+  });
+
+  /// Called for each pointer movement over [child].
+  final VoidCallback? onPointerMove;
+
+  /// The row.
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => MouseRegion(
+    opaque: false,
+    onHover: onPointerMove == null
+        ? null
+        : (PointerEvent event) => onPointerMove!(),
+    child: child,
+  );
 }
 
 /// A panel with menu-local navigation and scrolling.
@@ -29,6 +81,7 @@ class MenuPanel extends StatelessWidget {
     this.textField = false,
     this.onNavigate,
     this.closing = false,
+    this.pointerIdle,
   });
 
   /// The anchor's overlay geometry and tap region.
@@ -58,9 +111,31 @@ class MenuPanel extends StatelessWidget {
   /// Whether interaction is suspended while the panel finishes its exit.
   final bool closing;
 
+  /// Whether the pointer has not moved since the panel opened or was last
+  /// navigated by keyboard, which hides row hover so only one row looks active.
+  final ValueNotifier<bool>? pointerIdle;
+
   Object? _move(int direction) {
-    if (!closing) onNavigate?.call(direction);
+    if (!closing) {
+      pointerIdle?.value = true;
+      onNavigate?.call(direction);
+    }
     return null;
+  }
+
+  Widget _hoverScope(Widget content) {
+    final ValueNotifier<bool>? idle = pointerIdle;
+    if (idle == null) return content;
+    return MouseRegion(
+      opaque: false,
+      onHover: (PointerEvent event) => idle.value = false,
+      child: ValueListenableBuilder<bool>(
+        valueListenable: idle,
+        builder: (BuildContext context, bool masked, Widget? child) =>
+            InteractionBoundary(hoverMasked: masked, child: child!),
+        child: content,
+      ),
+    );
   }
 
   @override
@@ -101,7 +176,9 @@ class MenuPanel extends StatelessWidget {
             clipBehavior: style.decoration == null
                 ? Clip.none
                 : style.clipBehavior ?? Clip.none,
-            child: _MeasuredMenuContent(closing: closing, children: children),
+            child: _hoverScope(
+              _MeasuredMenuContent(closing: closing, children: children),
+            ),
           ),
         ),
       ),
@@ -131,10 +208,14 @@ class _MeasuredMenuContent extends StatefulWidget {
 
 class _MeasuredMenuContentState extends State<_MeasuredMenuContent> {
   final GlobalKey _contentKey = GlobalKey();
+  // Keeps the scroll view and rows mounted when the width wrapper changes.
+  final GlobalKey _scrollKey = GlobalKey();
   double? _width;
   BoxConstraints? _constraints;
   bool _measurementPending = false;
   bool _supportsIntrinsicWidth = true;
+  // Whether rows lay out at their intrinsic width until the next measurement.
+  bool _layoutIntrinsic = false;
 
   @override
   void didChangeDependencies() {
@@ -148,9 +229,25 @@ class _MeasuredMenuContentState extends State<_MeasuredMenuContent> {
     if (widget.children != oldWidget.children &&
         !widget.closing &&
         !oldWidget.closing) {
+      // Hover rebuilds the same rows with new state on every change. When
+      // their intrinsic width has proven reliable, lay them out at it in this
+      // frame so they never show unstretched before the next measurement.
+      // New rows, as from filtering, are measured from scratch.
+      _layoutIntrinsic =
+          _supportsIntrinsicWidth &&
+          _width != null &&
+          _sameRows(oldWidget.children, widget.children);
       _width = null;
       _supportsIntrinsicWidth = true;
     }
+  }
+
+  static bool _sameRows(List<Widget> a, List<Widget> b) {
+    if (a.length != b.length) return false;
+    for (int index = 0; index < a.length; index++) {
+      if (!Widget.canUpdate(a[index], b[index])) return false;
+    }
+    return true;
   }
 
   bool _hasLayoutDependentContent(Element root, RenderBox contentBox) {
@@ -200,6 +297,12 @@ class _MeasuredMenuContentState extends State<_MeasuredMenuContent> {
             content is Element &&
             _hasLayoutDependentContent(content, object)) {
           _supportsIntrinsicWidth = false;
+          // An intrinsic layout of such content is not a useful measurement;
+          // lay it out unstretched and measure again.
+          if (_layoutIntrinsic) {
+            setState(() => _layoutIntrinsic = false);
+            return;
+          }
         }
         double measuredWidth = object.size.width;
         try {
@@ -220,7 +323,12 @@ class _MeasuredMenuContentState extends State<_MeasuredMenuContent> {
         final double width = measuredWidth.isFinite
             ? measuredWidth
             : object.size.width;
-        if (width != _width) setState(() => _width = width);
+        if (width != _width || _layoutIntrinsic) {
+          setState(() {
+            _width = width;
+            _layoutIntrinsic = false;
+          });
+        }
       }
     });
   }
@@ -233,19 +341,22 @@ class _MeasuredMenuContentState extends State<_MeasuredMenuContent> {
         if (!_supportsIntrinsicWidth) _width = null;
       }
       if (_width == null) _measure();
+      final Widget content = SingleChildScrollView(
+        key: _scrollKey,
+        primary: false,
+        child: Column(
+          key: _contentKey,
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: _width == null && !_layoutIntrinsic
+              ? CrossAxisAlignment.start
+              : CrossAxisAlignment.stretch,
+          children: widget.children,
+        ),
+      );
+      if (_layoutIntrinsic) return IntrinsicWidth(child: content);
       return SizedBox(
         width: _width == null ? null : constraints.constrainWidth(_width!),
-        child: SingleChildScrollView(
-          primary: false,
-          child: Column(
-            key: _contentKey,
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: _width == null
-                ? CrossAxisAlignment.start
-                : CrossAxisAlignment.stretch,
-            children: widget.children,
-          ),
-        ),
+        child: content,
       );
     },
   );

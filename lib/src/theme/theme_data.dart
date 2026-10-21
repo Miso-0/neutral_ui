@@ -21,6 +21,7 @@ import '../styles/navigation_style.dart';
 import '../styles/expansion_tile_style.dart';
 import '../styles/progress_indicator_style.dart';
 import '../styles/badge_style.dart';
+import '../styles/data_table_style.dart';
 
 /// Component tokens inherited through NeutralTheme.
 @immutable
@@ -58,6 +59,7 @@ class ThemeData {
     this.expansionTileStyle = const ExpansionTileStyle(),
     this.progressIndicatorStyle = const ProgressIndicatorStyle(),
     this.badgeStyle = const BadgeStyle(),
+    this.dataTableStyle = const DataTableStyle(),
   });
 
   /// The tokens for elevatedButton components.
@@ -153,6 +155,9 @@ class ThemeData {
   /// The tokens for badge components.
   final BadgeStyle badgeStyle;
 
+  /// The tokens for data table components.
+  final DataTableStyle dataTableStyle;
+
   /// Replaces the supplied component styles.
   ThemeData copyWith({
     ButtonStyle? elevatedButtonStyle,
@@ -186,6 +191,7 @@ class ThemeData {
     ExpansionTileStyle? expansionTileStyle,
     ProgressIndicatorStyle? progressIndicatorStyle,
     BadgeStyle? badgeStyle,
+    DataTableStyle? dataTableStyle,
   }) => ThemeData(
     elevatedButtonStyle: elevatedButtonStyle ?? this.elevatedButtonStyle,
     outlinedButtonStyle: outlinedButtonStyle ?? this.outlinedButtonStyle,
@@ -220,6 +226,7 @@ class ThemeData {
     progressIndicatorStyle:
         progressIndicatorStyle ?? this.progressIndicatorStyle,
     badgeStyle: badgeStyle ?? this.badgeStyle,
+    dataTableStyle: dataTableStyle ?? this.dataTableStyle,
   );
 
   /// Inherits unset component tokens from the supplied theme.
@@ -263,6 +270,7 @@ class ThemeData {
         other.progressIndicatorStyle,
       ),
       badgeStyle: badgeStyle.merge(other.badgeStyle),
+      dataTableStyle: dataTableStyle.merge(other.dataTableStyle),
     );
   }
 
@@ -300,7 +308,8 @@ class ThemeData {
           navigationStyle == other.navigationStyle &&
           expansionTileStyle == other.expansionTileStyle &&
           progressIndicatorStyle == other.progressIndicatorStyle &&
-          badgeStyle == other.badgeStyle;
+          badgeStyle == other.badgeStyle &&
+          dataTableStyle == other.dataTableStyle;
 
   @override
   int get hashCode => Object.hashAll(<Object?>[
@@ -335,9 +344,10 @@ class ThemeData {
     expansionTileStyle,
     progressIndicatorStyle,
     badgeStyle,
+    dataTableStyle,
   ]);
 
   @override
   String toString() =>
-      'ThemeData(elevatedButtonStyle: $elevatedButtonStyle, outlinedButtonStyle: $outlinedButtonStyle, textButtonStyle: $textButtonStyle, iconButtonStyle: $iconButtonStyle, checkboxStyle: $checkboxStyle, switchStyle: $switchStyle, radioStyle: $radioStyle, listTileStyle: $listTileStyle, sliderStyle: $sliderStyle, dropdownButtonStyle: $dropdownButtonStyle, dropdownMenuStyle: $dropdownMenuStyle, popupMenuStyle: $popupMenuStyle, tooltipStyle: $tooltipStyle, dialogStyle: $dialogStyle, bottomSheetStyle: $bottomSheetStyle, snackBarStyle: $snackBarStyle, textFieldStyle: $textFieldStyle, autocompleteStyle: $autocompleteStyle, searchStyle: $searchStyle, datePickerStyle: $datePickerStyle, timePickerStyle: $timePickerStyle, filledButtonStyle: $filledButtonStyle, floatingActionButtonStyle: $floatingActionButtonStyle, segmentedButtonStyle: $segmentedButtonStyle, toggleButtonsStyle: $toggleButtonsStyle, chipStyle: $chipStyle, tabBarStyle: $tabBarStyle, navigationStyle: $navigationStyle, expansionTileStyle: $expansionTileStyle, progressIndicatorStyle: $progressIndicatorStyle, badgeStyle: $badgeStyle)';
+      'ThemeData(elevatedButtonStyle: $elevatedButtonStyle, outlinedButtonStyle: $outlinedButtonStyle, textButtonStyle: $textButtonStyle, iconButtonStyle: $iconButtonStyle, checkboxStyle: $checkboxStyle, switchStyle: $switchStyle, radioStyle: $radioStyle, listTileStyle: $listTileStyle, sliderStyle: $sliderStyle, dropdownButtonStyle: $dropdownButtonStyle, dropdownMenuStyle: $dropdownMenuStyle, popupMenuStyle: $popupMenuStyle, tooltipStyle: $tooltipStyle, dialogStyle: $dialogStyle, bottomSheetStyle: $bottomSheetStyle, snackBarStyle: $snackBarStyle, textFieldStyle: $textFieldStyle, autocompleteStyle: $autocompleteStyle, searchStyle: $searchStyle, datePickerStyle: $datePickerStyle, timePickerStyle: $timePickerStyle, filledButtonStyle: $filledButtonStyle, floatingActionButtonStyle: $floatingActionButtonStyle, segmentedButtonStyle: $segmentedButtonStyle, toggleButtonsStyle: $toggleButtonsStyle, chipStyle: $chipStyle, tabBarStyle: $tabBarStyle, navigationStyle: $navigationStyle, expansionTileStyle: $expansionTileStyle, progressIndicatorStyle: $progressIndicatorStyle, badgeStyle: $badgeStyle, dataTableStyle: $dataTableStyle)';
 }

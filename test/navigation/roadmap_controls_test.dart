@@ -162,20 +162,17 @@ void main() {
         ),
       );
       final Finder checks = find.byType(CheckGlyph);
-      expect(checks, findsNothing);
+      Finder reveal() =>
+          find.ancestor(of: checks, matching: find.byType(AnimatedAlign)).first;
+      // The check stays mounted so it can fade, occupying no space while hidden.
+      expect(tester.getSize(reveal()).width, 0);
       await tester.tap(find.text('Chip'));
       await tester.pump();
       expect(selected, isTrue);
       expect(checks, findsOneWidget);
       await tester.pump(const Duration(milliseconds: 100));
       expect(
-        tester
-            .widget<AnimatedSize>(
-              find
-                  .ancestor(of: checks, matching: find.byType(AnimatedSize))
-                  .first,
-            )
-            .duration,
+        tester.widget<AnimatedAlign>(reveal()).duration,
         const Duration(milliseconds: 200),
       );
       await tester.pumpAndSettle();

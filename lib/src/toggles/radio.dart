@@ -235,6 +235,7 @@ class _RadioState<T> extends State<Radio<T>>
                 return AnimatedSurface(
                   duration: interactionDuration,
                   curve: interactionCurve,
+                  transitionKey: interactionKey(state),
                   width: size?.width,
                   height: size?.height,
                   decoration: decorationToken(
@@ -255,6 +256,7 @@ class _RadioState<T> extends State<Radio<T>>
                         AnimatedSurface(
                           duration: interactionDuration,
                           curve: interactionCurve,
+                          transitionKey: interactionKey(state),
                           width: thumb?.width ?? 0.0,
                           height: thumb?.height ?? 0.0,
                           decoration: decorationToken(

@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import 'focus_visibility.dart';
 import 'interaction_state.dart';
 import 'state_property.dart';
 
@@ -10,6 +11,12 @@ typedef InteractionWidgetBuilder = Widget Function(
 );
 
 /// Supplies pointer, keyboard, focus and controller state to a headless control.
+///
+/// Only the innermost interactive surface shows interaction: while a nested
+/// detector is hovered or pressed, this detector's state reports neither, and
+/// focus is visible only on the detector that holds primary focus. Visible
+/// focus follows keyboard use, so a pointer press hides it until the next key
+/// press. [onHover] and [onFocusChange] still report the raw pointer and focus.
 class InteractionDetector extends StatefulWidget {
   /// Creates an interaction surface without painting any visual treatment.
   const InteractionDetector({
@@ -80,10 +87,12 @@ class InteractionDetector extends StatefulWidget {
   /// Called when a horizontal drag is canceled.
   final GestureDragCancelCallback? onHorizontalDragCancel;
 
-  /// Reports changes to enabled hover state.
+  /// Reports whether an enabled pointer is over the detector, including over
+  /// nested interactive controls.
   final ValueChanged<bool>? onHover;
 
-  /// Reports raw focus, independently of whether focus is visible.
+  /// Reports raw focus, including focus held by a descendant, independently
+  /// of whether focus is visible.
   final ValueChanged<bool>? onFocusChange;
 
   /// An externally owned focus node.
@@ -142,7 +151,30 @@ class _InteractionDetectorState extends State<InteractionDetector> {
   bool _hovering = false;
   bool _hasFocus = false;
   bool _writingController = false;
+  bool _reportedHover = false;
   NavigationMode _navigationMode = NavigationMode.traditional;
+  FocusNode? _ownedFocusNode;
+  bool _listeningToVisibility = false;
+
+  // Nesting: the enclosing detector, and nested detectors that are active.
+  _InteractionDetectorState? _parent;
+  final Set<_InteractionDetectorState> _hoveredChildren =
+      <_InteractionDetectorState>{};
+  final Set<_InteractionDetectorState> _pressedChildren =
+      <_InteractionDetectorState>{};
+  bool _pressSuppressed = false;
+  bool _childUpdateScheduled = false;
+
+  // A frozen scope keeps the hover and press look captured when it froze; a
+  // masked scope hides hover, as after keyboard navigation in a menu.
+  bool _frozen = false;
+  bool _hoverMasked = false;
+  bool _frozenHovered = false;
+  bool _frozenPressed = false;
+
+  FocusNode get _focusNode =>
+      widget.focusNode ??
+      (_ownedFocusNode ??= FocusNode(debugLabel: 'InteractionDetector'));
 
   bool get _acceptsTap =>
       widget.enabled &&
@@ -159,17 +191,36 @@ class _InteractionDetectorState extends State<InteractionDetector> {
           widget.onHorizontalDragEnd != null ||
           widget.onHorizontalDragCancel != null);
 
+  bool get _rawHovered => widget.enabled && _hovering;
+
+  bool get _rawPressed => widget.enabled && _pressed;
+
+  // Surfaces that only display state, such as a tile without an action, do
+  // not take hover from the control around them.
+  bool get _interactive =>
+      _acceptsTap ||
+      _acceptsDrag ||
+      (widget.enabled && (widget.canRequestFocus || widget.isFocused != null));
+
+  // What this detector reports to its parent: itself or any nested control.
+  bool get _activeHover =>
+      (_interactive && _rawHovered) || _hoveredChildren.isNotEmpty;
+
+  bool get _activePress => _rawPressed || _pressedChildren.isNotEmpty;
+
   InteractionState get _state => InteractionState(
-    isPressed: widget.enabled && _pressed,
+    isPressed: _frozen
+        ? _frozenPressed
+        : _rawPressed && !_pressSuppressed && _pressedChildren.isEmpty,
     isDragged: widget.enabled && _dragged,
-    isHovered: widget.enabled && _hovering,
+    isHovered: _frozen
+        ? _frozenHovered
+        : !_hoverMasked && _rawHovered && _hoveredChildren.isEmpty,
     isFocused:
         widget.isFocused ??
         (_hasFocus &&
             (_navigationMode == NavigationMode.directional ||
-                (widget.enabled &&
-                    FocusManager.instance.highlightMode ==
-                        FocusHighlightMode.traditional))),
+                (widget.enabled && FocusVisibility.isVisible))),
     isSelected:
         widget.isSelected ??
         widget.statesController?.value.contains(WidgetState.selected) ??
@@ -182,7 +233,7 @@ class _InteractionDetectorState extends State<InteractionDetector> {
     super.initState();
     _activateAction = _ActivationAction<ActivateIntent>(this);
     _buttonAction = _ActivationAction<ButtonActivateIntent>(this);
-    FocusManager.instance.addHighlightModeListener(_highlightChanged);
+    FocusVisibility.ensureInitialized();
     widget.statesController?.addListener(_controllerChanged);
     _syncController();
   }
@@ -192,6 +243,17 @@ class _InteractionDetectorState extends State<InteractionDetector> {
     super.didChangeDependencies();
     _navigationMode =
         MediaQuery.maybeNavigationModeOf(context) ?? NavigationMode.traditional;
+    final _InteractionScope? scope = context
+        .dependOnInheritedWidgetOfExactType<_InteractionScope>();
+    _setParent(scope?.owner);
+    final bool frozen = scope?.frozen ?? false;
+    if (frozen && !_frozen) {
+      final InteractionState current = _state;
+      _frozenHovered = current.isHovered;
+      _frozenPressed = current.isPressed;
+    }
+    _frozen = frozen;
+    _hoverMasked = scope?.hoverMasked ?? false;
     _syncController();
   }
 
@@ -203,9 +265,15 @@ class _InteractionDetectorState extends State<InteractionDetector> {
       oldWidget.statesController?.removeListener(_controllerChanged);
       widget.statesController?.addListener(_controllerChanged);
     }
+    if (oldWidget.focusNode != widget.focusNode) {
+      _hasFocus = _focusNode.hasPrimaryFocus;
+      _syncVisibilityListener();
+    }
+    if (oldWidget.isFocused != widget.isFocused) _syncVisibilityListener();
     if (!_acceptsTap) {
       _stopKeyboardPress();
       _pressed = false;
+      _pressSuppressed = false;
     }
     if (!_acceptsDrag) {
       _dragged = false;
@@ -213,13 +281,69 @@ class _InteractionDetectorState extends State<InteractionDetector> {
       _pointers.clear();
     }
     _syncController();
-    if (previousHover != _state.isHovered) {
-      final bool hovered = _state.isHovered;
+    _reportToParent();
+    if (previousHover != _rawHovered) {
+      final bool hovered = _rawHovered;
+      _reportedHover = hovered;
       WidgetsBinding.instance.addPostFrameCallback((Duration timeStamp) {
-        if (mounted && _state.isHovered == hovered) {
+        if (mounted && _rawHovered == hovered) {
           widget.onHover?.call(hovered);
         }
       });
+    }
+  }
+
+  @override
+  void deactivate() {
+    _setParent(null);
+    super.deactivate();
+  }
+
+  void _setParent(_InteractionDetectorState? parent) {
+    if (identical(parent, _parent)) return;
+    _parent?._updateChild(this, hovered: false, pressed: false);
+    _parent = parent;
+    _reportToParent();
+  }
+
+  void _reportToParent() {
+    _parent?._updateChild(this, hovered: _activeHover, pressed: _activePress);
+  }
+
+  // Called by nested detectors, possibly while the tree is building, so the
+  // sets update at once and the rebuild waits for the current frame's work.
+  void _updateChild(
+    _InteractionDetectorState child, {
+    required bool hovered,
+    required bool pressed,
+  }) {
+    final bool hoverChanged = hovered
+        ? _hoveredChildren.add(child)
+        : _hoveredChildren.remove(child);
+    final bool pressChanged = pressed
+        ? _pressedChildren.add(child)
+        : _pressedChildren.remove(child);
+    // A nested press can begin after this detector's own tap down. Keep the
+    // press hidden until this gesture ends, so the inner release that runs
+    // before the outer cancel does not flash it.
+    if (pressed && _pressed) _pressSuppressed = true;
+    if (!hoverChanged && !pressChanged) return;
+    if (_childUpdateScheduled) return;
+    _childUpdateScheduled = true;
+    Future<void>.microtask(() {
+      _childUpdateScheduled = false;
+      _change(() {});
+    });
+  }
+
+  void _syncVisibilityListener() {
+    final bool listen = _hasFocus && widget.isFocused == null;
+    if (listen == _listeningToVisibility) return;
+    _listeningToVisibility = listen;
+    if (listen) {
+      FocusVisibility.addListener(_visibilityChanged);
+    } else {
+      FocusVisibility.removeListener(_visibilityChanged);
     }
   }
 
@@ -256,16 +380,28 @@ class _InteractionDetectorState extends State<InteractionDetector> {
     _change(() {});
   }
 
-  void _highlightChanged(FocusHighlightMode mode) {
+  void _visibilityChanged() {
     if (mounted) _change(() {});
   }
 
   void _change(VoidCallback change) {
     if (!mounted) return;
-    final bool wasHovered = _state.isHovered;
     setState(change);
+    if (!_rawPressed) _pressSuppressed = false;
     _syncController();
-    if (wasHovered != _state.isHovered) widget.onHover?.call(_state.isHovered);
+    _reportToParent();
+    if (_reportedHover != _rawHovered) {
+      _reportedHover = _rawHovered;
+      widget.onHover?.call(_reportedHover);
+    }
+  }
+
+  void _pressStarted() {
+    _stopKeyboardPress();
+    _change(() {
+      _pressed = true;
+      _pressSuppressed = _pressedChildren.isNotEmpty;
+    });
   }
 
   void _activate() {
@@ -314,8 +450,11 @@ class _InteractionDetectorState extends State<InteractionDetector> {
   @override
   void dispose() {
     widget.statesController?.removeListener(_controllerChanged);
-    FocusManager.instance.removeHighlightModeListener(_highlightChanged);
+    if (_listeningToVisibility) {
+      FocusVisibility.removeListener(_visibilityChanged);
+    }
     _stopKeyboardPress();
+    _ownedFocusNode?.dispose();
     super.dispose();
   }
 
@@ -331,15 +470,17 @@ class _InteractionDetectorState extends State<InteractionDetector> {
         ...?widget.actions,
       },
       child: Focus(
-        focusNode: widget.focusNode,
+        focusNode: _focusNode,
         autofocus: widget.autofocus,
         canRequestFocus:
             widget.canRequestFocus &&
             (widget.enabled || _navigationMode == NavigationMode.directional),
         onFocusChange: (bool focused) {
+          // Called again when primary focus moves to or from a descendant.
           _change(() {
-            _hasFocus = focused;
+            _hasFocus = _focusNode.hasPrimaryFocus;
           });
+          _syncVisibilityListener();
           widget.onFocusChange?.call(focused);
         },
         child: MouseRegion(
@@ -400,10 +541,7 @@ class _InteractionDetectorState extends State<InteractionDetector> {
                 onTap: tap && widget.onTap != null ? _tap : null,
                 onTapDown: tap
                     ? (TapDownDetails details) {
-                        _stopKeyboardPress();
-                        _change(() {
-                          _pressed = true;
-                        });
+                        _pressStarted();
                         widget.onTapDown?.call(details);
                       }
                     : null,
@@ -428,11 +566,7 @@ class _InteractionDetectorState extends State<InteractionDetector> {
                     ? _longPress
                     : null,
                 onLongPressStart: widget.enabled && widget.onLongPress != null
-                    ? (LongPressStartDetails details) {
-                        _change(() {
-                          _pressed = true;
-                        });
-                      }
+                    ? (LongPressStartDetails details) => _pressStarted()
                     : null,
                 onLongPressEnd: widget.enabled && widget.onLongPress != null
                     ? (LongPressEndDetails details) {
@@ -486,9 +620,14 @@ class _InteractionDetectorState extends State<InteractionDetector> {
                         widget.onHorizontalDragCancel?.call();
                       }
                     : null,
-                child: Builder(
-                  builder: (BuildContext context) =>
-                      widget.builder(context, state),
+                child: _InteractionScope(
+                  owner: this,
+                  frozen: _frozen,
+                  hoverMasked: _hoverMasked,
+                  child: Builder(
+                    builder: (BuildContext context) =>
+                        widget.builder(context, state),
+                  ),
                 ),
               ),
             ),
@@ -497,4 +636,70 @@ class _InteractionDetectorState extends State<InteractionDetector> {
       ),
     );
   }
+}
+
+/// Starts a new nesting context for [InteractionDetector]s below it.
+///
+/// Detectors below a boundary do not mask detectors above it. Overlay content
+/// inherits from the widget that shows it, so overlays place a boundary that
+/// does not [inherit] at their root.
+///
+/// A [frozen] boundary keeps the hover and press appearance that detectors
+/// below it had when it froze, for content that is leaving. A [hoverMasked]
+/// boundary hides hover below it, for a menu navigated by keyboard under a
+/// resting pointer. Both combine with an enclosing boundary when [inherit] is
+/// true.
+class InteractionBoundary extends StatelessWidget {
+  /// Creates a nesting boundary.
+  const InteractionBoundary({
+    super.key,
+    this.frozen = false,
+    this.hoverMasked = false,
+    this.inherit = true,
+    required this.child,
+  });
+
+  /// Whether detectors below keep their current hover and press appearance.
+  final bool frozen;
+
+  /// Whether detectors below show no hover.
+  final bool hoverMasked;
+
+  /// Whether an enclosing boundary's [frozen] and [hoverMasked] still apply.
+  final bool inherit;
+
+  /// The subtree in the new context.
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final _InteractionScope? outer = inherit
+        ? context.dependOnInheritedWidgetOfExactType<_InteractionScope>()
+        : null;
+    return _InteractionScope(
+      owner: null,
+      frozen: frozen || (outer?.frozen ?? false),
+      hoverMasked: hoverMasked || (outer?.hoverMasked ?? false),
+      child: child,
+    );
+  }
+}
+
+class _InteractionScope extends InheritedWidget {
+  const _InteractionScope({
+    required this.owner,
+    required this.frozen,
+    required this.hoverMasked,
+    required super.child,
+  });
+
+  final _InteractionDetectorState? owner;
+  final bool frozen;
+  final bool hoverMasked;
+
+  @override
+  bool updateShouldNotify(_InteractionScope oldWidget) =>
+      owner != oldWidget.owner ||
+      frozen != oldWidget.frozen ||
+      hoverMasked != oldWidget.hoverMasked;
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/widgets.dart';
 
+import '../foundation/interaction_detector.dart';
 import '../foundation/motion.dart';
 import '../menus/menu_item_button.dart';
+import '../menus/menu_panel.dart';
 import '../overlay/overlay_behavior.dart';
 import '../overlay/overlay_host.dart';
 import '../overlay/overlay_placement.dart';
@@ -287,17 +289,23 @@ class _AutocompleteState<T extends Object> extends State<Autocomplete<T>>
         );
         return IgnorePointer(
           ignoring: _closing,
-          child: AnimatedBuilder(
-            animation: _curve,
-            child: RepaintBoundary(child: TextFieldTapRegion(child: panel)),
-            builder: (BuildContext context, Widget? child) =>
-                menu.transitionBuilder?.call(context, _curve, child!) ??
-                overlayTransition(
-                  context,
-                  _curve,
-                  child!,
-                  alignment: up ? Alignment.bottomCenter : Alignment.topCenter,
-                ),
+          // Rows keep their look while the panel exits.
+          child: InteractionBoundary(
+            frozen: _closing,
+            child: AnimatedBuilder(
+              animation: _curve,
+              child: RepaintBoundary(child: TextFieldTapRegion(child: panel)),
+              builder: (BuildContext context, Widget? child) =>
+                  menu.transitionBuilder?.call(context, _curve, child!) ??
+                  overlayTransition(
+                    context,
+                    _curve,
+                    child!,
+                    alignment: up
+                        ? Alignment.bottomCenter
+                        : Alignment.topCenter,
+                  ),
+            ),
           ),
         );
       },
@@ -409,17 +417,50 @@ class _AutocompletePanelState<T extends Object>
     extends State<_AutocompletePanel<T>> {
   final ScrollController _scroll = ScrollController();
   final Map<int, GlobalKey> _keys = <int, GlobalKey>{};
+  // The option a pointer movement highlighted, until the highlight arrives.
+  // Hover-driven highlights never scroll.
+  int? _hoverTarget;
+  // Whether the pointer has rested since the panel opened or the highlight
+  // moved by keyboard. Resting pointers show no hover, so one row looks active.
+  bool _pointerIdle = true;
+
   @override
   void didUpdateWidget(_AutocompletePanel<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.highlighted != widget.highlighted) {
-      WidgetsBinding.instance.addPostFrameCallback((Duration timestamp) {
-        final BuildContext? item = _keys[widget.highlighted]?.currentContext;
-        final RenderObject? object = item?.findRenderObject();
-        if (mounted && object != null && _scroll.hasClients) {
-          _scroll.position.ensureVisible(object);
-        }
-      });
+    if (oldWidget.options != widget.options) _hoverTarget = null;
+    if (oldWidget.highlighted == widget.highlighted) return;
+    if (widget.highlighted == _hoverTarget) {
+      _hoverTarget = null;
+      return;
+    }
+    _hoverTarget = null;
+    _pointerIdle = true;
+    WidgetsBinding.instance.addPostFrameCallback((Duration timestamp) {
+      final BuildContext? item = _keys[widget.highlighted]?.currentContext;
+      final RenderObject? object = item?.findRenderObject();
+      if (mounted && object != null && _scroll.hasClients) {
+        scrollMenuItemIntoView(_scroll.position, object);
+      }
+    });
+  }
+
+  void _pointerMoved() {
+    if (_pointerIdle) setState(() => _pointerIdle = false);
+  }
+
+  // RawAutocomplete owns the highlighted index and only exposes next and
+  // previous intents, invoked here from the focused field.
+  void _hover(int index) {
+    _pointerMoved();
+    final int from = _hoverTarget ?? widget.highlighted;
+    final BuildContext? field = FocusManager.instance.primaryFocus?.context;
+    if (index == from || field == null) return;
+    _hoverTarget = index;
+    final Intent intent = index > from
+        ? const AutocompleteNextOptionIntent()
+        : const AutocompletePreviousOptionIntent();
+    for (int step = (index - from).abs(); step > 0; step--) {
+      Actions.maybeInvoke<Intent>(field, intent);
     }
   }
 
@@ -427,21 +468,34 @@ class _AutocompletePanelState<T extends Object>
   Widget build(BuildContext context) => Container(
     decoration: widget.menu.decoration,
     padding: widget.menu.padding,
-    child: SingleChildScrollView(
-      controller: _scroll,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          for (int i = 0; i < widget.options.length; i++)
-            MenuItemButton(
-              key: _keys.putIfAbsent(i, GlobalKey.new),
-              onPressed: () => widget.select(widget.options[i]),
-              isFocused: widget.highlighted == i,
-              style: widget.tokens.itemStyle,
-              child: Text(widget.display(widget.options[i])),
-            ),
-        ],
+    child: MouseRegion(
+      opaque: false,
+      onHover: (PointerEvent event) => _pointerMoved(),
+      child: InteractionBoundary(
+        hoverMasked: _pointerIdle,
+        child: SingleChildScrollView(
+          controller: _scroll,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              for (int i = 0; i < widget.options.length; i++)
+                MenuRowHover(
+                  key: _keys.putIfAbsent(i, GlobalKey.new),
+                  onPointerMove: () => _hover(i),
+                  // Real focus stays in the field; rows are virtual focus.
+                  child: ExcludeFocus(
+                    child: MenuItemButton(
+                      onPressed: () => widget.select(widget.options[i]),
+                      isFocused: widget.highlighted == i,
+                      style: widget.tokens.itemStyle,
+                      child: Text(widget.display(widget.options[i])),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     ),
   );

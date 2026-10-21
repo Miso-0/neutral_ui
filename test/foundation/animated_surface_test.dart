@@ -142,8 +142,147 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
     expect(
-      tester.widget<Container>(find.byType(Container)).clipBehavior,
+      tester
+          .widget<ClipPath>(
+            find.descendant(
+              of: _surfaceFinder,
+              matching: find.byType(ClipPath),
+            ),
+          )
+          .clipBehavior,
       Clip.antiAlias,
     );
   });
+
+  testWidgets('a decoration appearing from null fades in', (
+    WidgetTester tester,
+  ) async {
+    Widget build(Decoration? decoration) => _frame(
+      AnimatedSurface(
+        duration: _duration,
+        decoration: decoration,
+        child: const SizedBox(width: 40, height: 20),
+      ),
+    );
+    await tester.pumpWidget(build(null));
+    await tester.pumpWidget(build(const BoxDecoration(color: _light)));
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(paintedColor(tester, _surfaceFinder)!.a, closeTo(0.5, 0.01));
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(paintedColor(tester, _surfaceFinder), _light);
+
+    await tester.pumpWidget(build(null));
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(paintedColor(tester, _surfaceFinder)!.a, closeTo(0.5, 0.01));
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(paintedColor(tester, _surfaceFinder), isNull);
+  });
+
+  testWidgets('null and non-null values never remount the child', (
+    WidgetTester tester,
+  ) async {
+    final GlobalKey<_ProbeState> probe = GlobalKey<_ProbeState>();
+    final FocusNode node = FocusNode();
+    addTearDown(node.dispose);
+    Widget build(bool decorated) => _frame(
+      AnimatedSurface(
+        duration: _duration,
+        padding: decorated ? const EdgeInsets.all(2) : null,
+        decoration: decorated
+            ? BoxDecoration(
+                color: _light,
+                borderRadius: BorderRadius.circular(4),
+              )
+            : null,
+        foregroundDecoration: decorated
+            ? BoxDecoration(border: Border.all(color: _dark))
+            : null,
+        constraints: decorated ? const BoxConstraints(minWidth: 60) : null,
+        clipBehavior: Clip.antiAlias,
+        child: _Probe(key: probe, focusNode: node),
+      ),
+    );
+    await tester.pumpWidget(build(false));
+    node.requestFocus();
+    await tester.pump();
+    final _ProbeState state = probe.currentState!;
+    for (final bool decorated in <bool>[true, false, true]) {
+      await tester.pumpWidget(build(decorated));
+      await tester.pump(const Duration(milliseconds: 50));
+      await tester.pumpAndSettle();
+      expect(identical(probe.currentState, state), isTrue);
+      expect(node.hasPrimaryFocus, isTrue);
+    }
+  });
+
+  testWidgets('an undecorated surface lets taps through to what is behind', (
+    WidgetTester tester,
+  ) async {
+    int taps = 0;
+    await tester.pumpWidget(
+      _frame(
+        SizedBox(
+          width: 100,
+          height: 100,
+          child: Stack(
+            children: <Widget>[
+              Positioned.fill(child: GestureDetector(onTap: () => taps++)),
+              Positioned.fill(
+                child: AnimatedSurface(
+                  duration: _duration,
+                  clipBehavior: Clip.antiAlias,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.tapAt(const Offset(50, 50));
+    expect(taps, 1);
+  });
+
+  testWidgets('an unchanged transition key follows values without fading', (
+    WidgetTester tester,
+  ) async {
+    Widget build(Color color, Object key) => _frame(
+      AnimatedSurface(
+        duration: _duration,
+        transitionKey: key,
+        decoration: BoxDecoration(color: color),
+        child: const SizedBox(width: 40, height: 20),
+      ),
+    );
+    await tester.pumpWidget(build(_light, 'idle'));
+    await tester.pumpWidget(build(_dark, 'idle'));
+    expect(paintedColor(tester, _surfaceFinder), _dark);
+
+    // A key change fades from the painted value, and later values under that
+    // key retarget the same transition instead of restarting it.
+    await tester.pumpWidget(build(_clear, 'hovered'));
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pumpWidget(build(_light, 'hovered'));
+    final Color blended = paintedColor(tester, _surfaceFinder)!;
+    expect(blended.a, closeTo(1, 1e-6));
+    expect(blended.r, closeTo((_dark.r + _light.r) / 2, 0.01));
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(paintedColor(tester, _surfaceFinder), _light);
+  });
+}
+
+class _Probe extends StatefulWidget {
+  const _Probe({super.key, required this.focusNode});
+
+  final FocusNode focusNode;
+
+  @override
+  State<_Probe> createState() => _ProbeState();
+}
+
+class _ProbeState extends State<_Probe> {
+  @override
+  Widget build(BuildContext context) => Focus(
+    focusNode: widget.focusNode,
+    child: const SizedBox(width: 20, height: 20),
+  );
 }

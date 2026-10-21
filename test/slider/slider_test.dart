@@ -363,16 +363,12 @@ void main() {
         ),
       ),
     );
-    AnimatedSurface thumb = tester
-        .widgetList<AnimatedSurface>(find.byType(AnimatedSurface))
-        .last;
-    expect(thumb.constraints!.maxWidth, 20);
+    // The thumb is the last surface; its size animates with the geometry.
+    expect(tester.getSize(find.byType(AnimatedSurface).last).width, 20);
     final TestGesture gesture = await tester.startGesture(_at(tester, 0.5));
     await tester.pump(const Duration(milliseconds: 150));
-    thumb = tester
-        .widgetList<AnimatedSurface>(find.byType(AnimatedSurface))
-        .last;
-    expect(thumb.constraints!.maxWidth, 30);
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(tester.getSize(find.byType(AnimatedSurface).last).width, 30);
     await gesture.up();
   });
 

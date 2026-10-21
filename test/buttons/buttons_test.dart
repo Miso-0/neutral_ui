@@ -423,7 +423,17 @@ void main() {
             ),
           ),
         );
-        expect(_container(tester).clipBehavior, Clip.none);
+        expect(
+          tester
+              .widget<ClipPath>(
+                find.descendant(
+                  of: find.byType(AnimatedSurface),
+                  matching: find.byType(ClipPath),
+                ),
+              )
+              .clipBehavior,
+          Clip.none,
+        );
         expect(tester.takeException(), isNull);
       });
     });

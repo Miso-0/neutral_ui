@@ -271,4 +271,35 @@ void main() {
     await tester.pumpAndSettle();
     expect(found!.size, 30);
   });
+
+  testWidgets(
+    'AnimatedIconTheme fades an omitted color from the inherited one',
+    (WidgetTester tester) async {
+      IconThemeData? found;
+      final Widget probe = Builder(
+        builder: (BuildContext context) {
+          found = IconTheme.of(context);
+          return const SizedBox();
+        },
+      );
+      const Color inherited = Color(0xFFFFFFFF);
+      Widget tree(Color? color) => IconTheme(
+        data: const IconThemeData(color: inherited, size: 18),
+        child: AnimatedIconTheme(
+          data: IconThemeData(color: color),
+          duration: const Duration(milliseconds: 200),
+          child: probe,
+        ),
+      );
+      await tester.pumpWidget(tree(const Color(0xFF000000)));
+      await tester.pumpWidget(tree(null));
+      await tester.pump(const Duration(milliseconds: 100));
+      // Midway between black and the inherited white, fully opaque, full size.
+      expect(found!.color!.a, closeTo(1, 1e-6));
+      expect(found!.color!.r, closeTo(0.5, 0.01));
+      expect(found!.size, 18);
+      await tester.pumpAndSettle();
+      expect(found!.color, inherited);
+    },
+  );
 }

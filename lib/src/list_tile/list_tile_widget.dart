@@ -1,16 +1,17 @@
-import 'dart:math' as math;
-
-import 'package:flutter/widgets.dart';
-
 import '../foundation/animated_icon_theme.dart';
 import '../foundation/animated_surface.dart';
 import '../foundation/decoration_override.dart';
 import '../foundation/interaction_detector.dart';
 import '../foundation/interaction_state.dart';
-import '../foundation/style_resolution.dart';
+import '../foundation/motion.dart';
 import '../foundation/state_property.dart';
+import '../foundation/style_resolution.dart';
 import '../styles/list_tile_style.dart';
 import '../theme/list_tile_theme.dart';
+
+import 'dart:math' as math;
+
+import 'package:flutter/widgets.dart';
 
 /// A headless row with optional leading, title, subtitle and trailing slots.
 class ListTile extends StatelessWidget {
@@ -150,14 +151,20 @@ class ListTile extends StatelessWidget {
               (ListTileStyle s) => s.enableFeedback,
             ) ??
             true,
-        builder: (BuildContext context, InteractionState state) {
+        builder: (BuildContext context, InteractionState detected) {
+          // A tile without an action shows no hover or press.
+          final InteractionState state = hasAction
+              ? detected
+              : detected.copyWith(isHovered: false, isPressed: false);
           T? plain<T>(T? Function(ListTileStyle) select) =>
               resolvePlain<ListTileStyle, T>(layers, select);
           T? token<T>(StateProperty<T?>? Function(ListTileStyle) select) =>
               resolveStateful<ListTileStyle, T>(state, layers, select);
-          final Duration duration =
-              plain<Duration>((ListTileStyle s) => s.animationDuration) ??
-              const Duration(milliseconds: 200);
+          final Duration duration = reducedMotionDuration(
+            context,
+            plain<Duration>((ListTileStyle s) => s.animationDuration) ??
+                const Duration(milliseconds: 200),
+          );
           final Curve curve =
               plain<Curve>((ListTileStyle s) => s.animationCurve) ??
               Curves.easeInOut;

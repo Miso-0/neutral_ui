@@ -81,6 +81,8 @@ List<Decoration> _painted(WidgetTester tester) => tester
       ),
     )
     .map((DecoratedBox widget) => widget.decoration)
+    // Surfaces keep inert placeholders where no decoration is painted.
+    .whereType<BoxDecoration>()
     .toList();
 
 void main() {

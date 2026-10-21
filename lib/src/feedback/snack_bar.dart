@@ -1,15 +1,16 @@
-import 'package:flutter/widgets.dart';
-
 import '../buttons/icon_button.dart';
 import '../buttons/text_button.dart';
 import '../foundation/animated_surface.dart';
 import '../foundation/decoration_override.dart';
 import '../foundation/glyphs.dart';
+import '../foundation/interaction_detector.dart';
 import '../foundation/motion.dart';
 import '../localizations/neutral_localizations.dart';
 import '../styles/button_style.dart';
 import '../styles/snack_bar_style.dart';
 import '../theme/feedback_themes.dart';
+
+import 'package:flutter/widgets.dart';
 
 /// Why a snack bar left its host.
 enum SnackBarClosedReason {
@@ -525,7 +526,7 @@ class ScaffoldMessengerState extends State<ScaffoldMessenger>
       overlayChildBuilder: (
         BuildContext context,
         OverlayChildLayoutInfo info,
-      ) => _buildOverlay(context),
+      ) => InteractionBoundary(inherit: false, child: _buildOverlay(context)),
       child: widget.child,
     ),
   );

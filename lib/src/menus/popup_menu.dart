@@ -202,7 +202,6 @@ class _PopupMenuDividerState extends State<PopupMenuDivider> {
 
 class _PopupEntryScope extends InheritedWidget {
   const _PopupEntryScope({
-    super.key,
     required this.style,
     required this.focusNode,
     required this.selected,
@@ -367,7 +366,7 @@ class PopupMenuButtonState<T> extends State<PopupMenuButton<T>>
     if (index >= 0) _focus(index);
   }
 
-  void _focus(int index) {
+  void _focus(int index, {bool minimalScroll = false}) {
     void focus() {
       if (mounted && menuOpen && index < _nodes.length) {
         _nodes[index].requestFocus();
@@ -381,7 +380,7 @@ class PopupMenuButtonState<T> extends State<PopupMenuButton<T>>
         (Duration timeStamp) => focus(),
       );
     }
-    ensureMenuItemVisible(_keys[index]);
+    ensureMenuItemVisible(_keys[index], minimal: minimalScroll);
   }
 
   void _navigate(int direction) {
@@ -391,7 +390,7 @@ class PopupMenuButtonState<T> extends State<PopupMenuButton<T>>
     for (int step = 1; step <= _entries.length; step++) {
       final int index = (current + direction * step) % _entries.length;
       if (_enabled(index)) {
-        _focus(index);
+        _focus(index, minimalScroll: true);
         return;
       }
     }
@@ -463,6 +462,8 @@ class PopupMenuButtonState<T> extends State<PopupMenuButton<T>>
         themeStyle: theme.buttonStyle,
         focusNode: anchorFocusNode,
         isExpanded: menuOpen,
+        // While open, the active row carries the focus indication instead.
+        isFocused: menuOpen ? false : null,
         tooltip: widget.tooltip,
         defaultTapTarget: widget.icon == null ? null : const Size(48, 48),
         onPressed: widget.enabled
@@ -472,19 +473,28 @@ class PopupMenuButtonState<T> extends State<PopupMenuButton<T>>
       ),
       children: <Widget>[
         for (int index = 0; index < _entries.length; index++)
-          _PopupEntryScope(
+          MenuRowHover(
             key: _keys[index],
-            style: widget.style,
-            focusNode: _nodes[index],
-            selected:
-                widget.initialValue != null &&
-                _entries[index].represents(widget.initialValue),
-            choose: _choose,
-            child:
-                _entries[index] is PopupMenuItem<T> ||
-                    _entries[index] is PopupMenuDivider
-                ? _entries[index]
-                : Focus(focusNode: _nodes[index], child: _entries[index]),
+            // The row under a moving pointer becomes the focused row, without
+            // scrolling, so hover and arrow keys share one active row.
+            onPointerMove: _enabled(index) && !menuClosing
+                ? () {
+                    if (!_nodes[index].hasFocus) _nodes[index].requestFocus();
+                  }
+                : null,
+            child: _PopupEntryScope(
+              style: widget.style,
+              focusNode: _nodes[index],
+              selected:
+                  widget.initialValue != null &&
+                  _entries[index].represents(widget.initialValue),
+              choose: _choose,
+              child:
+                  _entries[index] is PopupMenuItem<T> ||
+                      _entries[index] is PopupMenuDivider
+                  ? _entries[index]
+                  : Focus(focusNode: _nodes[index], child: _entries[index]),
+            ),
           ),
       ],
     );

@@ -1,8 +1,9 @@
-import 'package:flutter/widgets.dart';
-
+import '../foundation/interaction_detector.dart';
 import 'overlay_behavior.dart';
 import 'overlay_insets.dart';
 import 'overlay_placement.dart';
+
+import 'package:flutter/widgets.dart';
 
 /// A lightweight anchored overlay that leaves focus and shortcuts to its caller.
 ///
@@ -89,7 +90,12 @@ class OverlayHost extends StatelessWidget {
               onTapOutside: onTapOutside,
               consumeOutsideTaps:
                   outsideTapBehavior == OutsideTapBehavior.consume,
-              child: RepaintBoundary(child: overlayBuilder(context)),
+              child: RepaintBoundary(
+                child: InteractionBoundary(
+                  inherit: false,
+                  child: overlayBuilder(context),
+                ),
+              ),
             ),
           ),
         );

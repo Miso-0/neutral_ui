@@ -516,20 +516,33 @@ class _NavigationGroupState extends State<_NavigationGroup> {
       NavigationDestinationLabelBehavior.alwaysHide => false,
       NavigationDestinationLabelBehavior.onlyShowSelected => selected,
     };
+    final Curve curve = widget.style.animationCurve ?? Curves.easeOutCubic;
+    // Destinations default to the indicator's motion so colors and the
+    // indicator move together.
     final ButtonStyle
     style = (widget.style.destinationStyle ?? const ButtonStyle()).copyWith(
       textStyle:
           widget.style.labelStyle ?? widget.style.destinationStyle?.textStyle,
       iconTheme:
           widget.style.iconTheme ?? widget.style.destinationStyle?.iconTheme,
+      animationDuration:
+          widget.style.destinationStyle?.animationDuration ?? duration,
+      animationCurve: widget.style.destinationStyle?.animationCurve ?? curve,
     );
-    final Widget icon = selected
-        ? destination.selectedIcon ?? destination.icon
-        : destination.icon;
+    final bool swapsIcon = selected && destination.selectedIcon != null;
+    final Widget icon = AnimatedSwitcher(
+      duration: duration,
+      switchInCurve: curve,
+      switchOutCurve: curve,
+      child: KeyedSubtree(
+        key: ValueKey<bool>(swapsIcon),
+        child: swapsIcon ? destination.selectedIcon! : destination.icon,
+      ),
+    );
     final Widget label = ClipRect(
       child: AnimatedSize(
         duration: duration,
-        curve: widget.style.animationCurve ?? Curves.easeOutCubic,
+        curve: curve,
         child: showLabel ? destination.label : const SizedBox.shrink(),
       ),
     );

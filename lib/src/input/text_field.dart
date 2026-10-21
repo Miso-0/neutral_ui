@@ -278,6 +278,7 @@ class _TextFieldState extends State<TextField>
     implements TextSelectionGestureDetectorBuilderDelegate {
   final GlobalKey<EditableTextState> _editableKey =
       GlobalKey<EditableTextState>();
+  final GlobalKey _fieldKey = GlobalKey();
   late final TextSelectionGestureDetectorBuilder _selectionGestures =
       _TextFieldSelectionGestureDetectorBuilder(this);
 
@@ -716,12 +717,16 @@ class _TextFieldState extends State<TextField>
                 children: <Widget>[
                   if (_controller.text.isEmpty && widget.hintText != null)
                     IgnorePointer(
-                      child: Text(
-                        widget.hintText!,
+                      child: AnimatedDefaultTextStyle(
                         style: hintStyle,
-                        textScaler: fittedTextScaler,
-                        maxLines: multiline ? widget.maxLines : 1,
-                        overflow: TextOverflow.ellipsis,
+                        duration: duration,
+                        curve: style.animationCurve ?? Curves.easeInOut,
+                        child: Text(
+                          widget.hintText!,
+                          textScaler: fittedTextScaler,
+                          maxLines: multiline ? widget.maxLines : 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
                   editable,
@@ -848,10 +853,7 @@ class _TextFieldState extends State<TextField>
           foregroundDecoration:
               widget.foregroundDecoration ??
               style.foregroundDecoration?.resolve(state),
-          clipBehavior:
-              (widget.decoration ?? style.decoration?.resolve(state)) == null
-              ? Clip.none
-              : style.clipBehavior ?? Clip.none,
+          clipBehavior: style.clipBehavior ?? Clip.none,
           child: _inputContent(
             context,
             style,
@@ -862,15 +864,15 @@ class _TextFieldState extends State<TextField>
             alignY,
           ),
         );
-        if (size.minHeight > 0 || size.hasBoundedHeight) {
-          field = ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: size.minHeight,
-              maxHeight: size.maxHeight,
-            ),
-            child: field,
-          );
-        }
+        // Always present, unbounded when no height applies, so size tokens
+        // that change with state never remount the field.
+        field = ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: size.minHeight,
+            maxHeight: size.maxHeight,
+          ),
+          child: field,
+        );
         field = _selectionGestures.buildGestureDetector(
           behavior: HitTestBehavior.translucent,
           child: field,
@@ -882,13 +884,24 @@ class _TextFieldState extends State<TextField>
             child: IgnorePointer(ignoring: !widget.enabled, child: field),
           ),
         );
+        // Wrappers below appear with labels, validation messages and sizes;
+        // the key keeps the field's state and animations when they change.
+        field = KeyedSubtree(key: _fieldKey, child: field);
+        final Curve curve = style.animationCurve ?? Curves.easeInOut;
+        Widget fade(TextStyle? textStyle, Widget text) =>
+            AnimatedDefaultTextStyle(
+              style: DefaultTextStyle.of(context).style.merge(textStyle),
+              duration: duration,
+              curve: curve,
+              child: text,
+            );
         final Widget? label =
             widget.label ??
             (widget.labelText == null
                 ? null
-                : Text(
-                    widget.labelText!,
-                    style: style.labelStyle?.resolve(state),
+                : fade(
+                    style.labelStyle?.resolve(state),
+                    Text(widget.labelText!),
                   ));
         final TextFieldLabelBehavior behavior =
             style.labelBehavior ?? TextFieldLabelBehavior.above;
@@ -960,16 +973,16 @@ class _TextFieldState extends State<TextField>
                         : Semantics(
                             container: true,
                             liveRegion: widget.errorText != null,
-                            child: Text(
-                              supporting,
-                              style: widget.errorText != null
+                            child: fade(
+                              widget.errorText != null
                                   ? style.errorStyle?.resolve(state)
                                   : style.helperStyle?.resolve(state),
+                              Text(supporting),
                             ),
                           ),
                   ),
                   if (counter != null)
-                    Text(counter, style: style.counterStyle?.resolve(state)),
+                    fade(style.counterStyle?.resolve(state), Text(counter)),
                 ],
               ),
             ],
@@ -993,14 +1006,13 @@ class _TextFieldState extends State<TextField>
         final IconThemeData? icons = token<IconThemeData>(
           (TextFieldStyle style) => style.iconTheme?.resolve(state),
         );
-        if (icons != null) {
-          field = AnimatedIconTheme(
-            data: icons,
-            duration: duration,
-            curve: style.animationCurve ?? Curves.easeInOut,
-            child: field,
-          );
-        }
+        // Always present, so an icon token appearing never remounts the field.
+        field = AnimatedIconTheme(
+          data: icons ?? const IconThemeData(),
+          duration: duration,
+          curve: style.animationCurve ?? Curves.easeInOut,
+          child: field,
+        );
         return Semantics(
           enabled: widget.enabled,
           label: widget.labelText,

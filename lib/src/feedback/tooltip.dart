@@ -1,7 +1,7 @@
-import 'package:flutter/widgets.dart';
-
 import '../foundation/animated_surface.dart';
 import '../foundation/decoration_override.dart';
+import '../foundation/focus_visibility.dart';
+import '../foundation/interaction_detector.dart';
 import '../foundation/motion.dart';
 import '../menus/key_activators.dart';
 import '../overlay/overlay_behavior.dart';
@@ -9,6 +9,8 @@ import '../overlay/overlay_insets.dart';
 import '../overlay/overlay_placement.dart';
 import '../styles/tooltip_style.dart';
 import '../theme/feedback_themes.dart';
+
+import 'package:flutter/widgets.dart';
 
 /// Controls tooltip visibility for a subtree.
 class TooltipVisibility extends InheritedWidget {
@@ -140,8 +142,17 @@ class TooltipState extends State<Tooltip> with SingleTickerProviderStateMixin {
   TooltipStyle _style = const TooltipStyle();
   bool _allowed = true;
   bool _shown = false;
+  // Whether keyboard focus opened this tooltip, and whether focus is inside.
   bool _focused = false;
-  bool _suppressSignal = false;
+  bool _hasFocus = false;
+  bool _listeningToVisibility = false;
+  // A dismissal with the pointer still on the child holds until it leaves.
+  bool _pointerInside = false;
+  bool _suppressUntilExit = false;
+  // Keeps the child mounted when the trigger is replaced.
+  final GlobalKey _childKey = GlobalKey();
+  late final Action<_DismissTooltipIntent> _dismissAction =
+      _DismissTooltipAction(this);
   AxisDirection _side = AxisDirection.down;
 
   void _status(AnimationStatus status) {
@@ -190,7 +201,7 @@ class TooltipState extends State<Tooltip> with SingleTickerProviderStateMixin {
     if (!mounted ||
         !_allowed ||
         _shown ||
-        (_suppressSignal && !explicit) ||
+        (_suppressUntilExit && !explicit) ||
         (widget.message ?? widget.richMessage!.toPlainText()).isEmpty) {
       return;
     }
@@ -201,7 +212,7 @@ class TooltipState extends State<Tooltip> with SingleTickerProviderStateMixin {
   }
 
   void _hide() {
-    if (!mounted || _suppressSignal || _focused || !_shown) return;
+    if (!mounted || _focused || !_shown) return;
     _shown = false;
     if (_controller.isDismissed) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -241,20 +252,53 @@ class TooltipState extends State<Tooltip> with SingleTickerProviderStateMixin {
     _shown = false;
     _controller.reverse();
     // RawTooltip exposes no per-instance hide. Replacing only this trigger
-    // clears its timer and hover registration while our overlay exits.
-    _suppressSignal = true;
+    // clears its timer and hover registration while our overlay exits. The
+    // child moves with its global key, keeping its state and focus, and a
+    // pointer still resting on it does not reopen the tooltip until it leaves.
+    _suppressUntilExit = _pointerInside;
     setState(() {
       _rawKey = GlobalKey<RawTooltipState>();
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _suppressSignal = false;
-    });
+  }
+
+  // Signals from a trigger that dismiss() replaced are stale.
+  void _signalShown(GlobalKey<RawTooltipState> trigger) {
+    if (trigger == _rawKey) _show();
+  }
+
+  void _signalHidden(GlobalKey<RawTooltipState> trigger) {
+    if (trigger == _rawKey) _hide();
   }
 
   void _focusChanged(bool focused) {
-    _focused =
-        focused &&
-        FocusManager.instance.highlightMode == FocusHighlightMode.traditional;
+    _hasFocus = focused;
+    if (focused != _listeningToVisibility) {
+      _listeningToVisibility = focused;
+      focused
+          ? FocusVisibility.addListener(_focusVisibilityChanged)
+          : FocusVisibility.removeListener(_focusVisibilityChanged);
+    }
+    _focusVisibilityChanged();
+  }
+
+  // Focus opens the tooltip only while it is visibly keyboard focus, so focus
+  // moved by a pointer or in code does not, and a pointer press closes it.
+  // The decision waits for the event that caused it, so a key that reveals
+  // focus, such as Escape, runs its own shortcut first.
+  void _focusVisibilityChanged() {
+    Future<void>.microtask(_applyFocusVisibility);
+  }
+
+  void _applyFocusVisibility() {
+    if (!mounted) return;
+    final bool visible =
+        _hasFocus &&
+        (ModalRoute.isCurrentOf(context) ?? true) &&
+        (MediaQuery.maybeNavigationModeOf(context) ==
+                NavigationMode.directional ||
+            FocusVisibility.isVisible);
+    if (visible == _focused) return;
+    _focused = visible;
     if (_focused) {
       ensureTooltipVisible();
     } else {
@@ -264,6 +308,9 @@ class TooltipState extends State<Tooltip> with SingleTickerProviderStateMixin {
 
   @override
   void dispose() {
+    if (_listeningToVisibility) {
+      FocusVisibility.removeListener(_focusVisibilityChanged);
+    }
     _visible.remove(this);
     _curve?.dispose();
     _controller.dispose();
@@ -329,6 +376,7 @@ class TooltipState extends State<Tooltip> with SingleTickerProviderStateMixin {
       ),
     );
     final String text = widget.message ?? widget.richMessage!.toPlainText();
+    final GlobalKey<RawTooltipState> trigger = _rawKey;
     final TextDirection direction = Directionality.of(context);
     final OverlayPlacement placement =
         _style.placement ??
@@ -369,31 +417,36 @@ class TooltipState extends State<Tooltip> with SingleTickerProviderStateMixin {
                     _side = side;
                   },
                 ),
-                child: _panel(overlayContext),
+                child: InteractionBoundary(
+                  inherit: false,
+                  child: _panel(overlayContext),
+                ),
               ),
             );
           },
+      // A private intent, enabled only while shown, lets Escape reach an
+      // enclosing dialog or sheet whenever no tooltip is open.
       child: Shortcuts(
         shortcuts: <ShortcutActivator, Intent>{
-          menuKeyActivator(0x10000001b): const DismissIntent(),
+          menuKeyActivator(0x10000001b): const _DismissTooltipIntent(),
         },
         child: Actions(
           actions: <Type, Action<Intent>>{
-            DismissIntent: CallbackAction<DismissIntent>(
-              onInvoke: (DismissIntent intent) {
-                dismiss();
-                return null;
-              },
-            ),
+            _DismissTooltipIntent: _dismissAction,
           },
           child: Focus(
             canRequestFocus: false,
             onFocusChange: _focusChanged,
             child: MouseRegion(
               cursor: widget.mouseCursor ?? MouseCursor.defer,
+              onEnter: (PointerEvent event) => _pointerInside = true,
+              onExit: (PointerEvent event) {
+                _pointerInside = false;
+                _suppressUntilExit = false;
+              },
               child: _allowed && text.isNotEmpty
                   ? RawTooltip(
-                      key: _rawKey,
+                      key: trigger,
                       semanticsTooltip: widget.excludeFromSemantics == true
                           ? null
                           : text,
@@ -411,18 +464,39 @@ class TooltipState extends State<Tooltip> with SingleTickerProviderStateMixin {
                       onTriggered: widget.onTriggered,
                       animationStyle: AnimationStyle.noAnimation,
                       ignorePointer: true,
-                      tooltipBuilder: (
-                        BuildContext context,
-                        Animation<double> animation,
-                      ) => _TooltipSignal(onShow: _show, onHide: _hide),
-                      child: widget.child,
+                      tooltipBuilder:
+                          (BuildContext context, Animation<double> animation) =>
+                              _TooltipSignal(
+                                onShow: () => _signalShown(trigger),
+                                onHide: () => _signalHidden(trigger),
+                              ),
+                      child: KeyedSubtree(key: _childKey, child: widget.child),
                     )
-                  : widget.child,
+                  : KeyedSubtree(key: _childKey, child: widget.child),
             ),
           ),
         ),
       ),
     );
+  }
+}
+
+class _DismissTooltipIntent extends Intent {
+  const _DismissTooltipIntent();
+}
+
+class _DismissTooltipAction extends Action<_DismissTooltipIntent> {
+  _DismissTooltipAction(this.owner);
+
+  final TooltipState owner;
+
+  @override
+  bool isEnabled(_DismissTooltipIntent intent) => owner._shown;
+
+  @override
+  Object? invoke(_DismissTooltipIntent intent) {
+    owner.dismiss();
+    return null;
   }
 }
 

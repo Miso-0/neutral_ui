@@ -247,12 +247,12 @@ class _DropdownButtonState<T> extends State<DropdownButton<T>>
     if (index >= 0) _focusItem(index);
   }
 
-  void _focusItem(int index) {
+  void _focusItem(int index, {bool minimalScroll = false}) {
     _focusedIndex = index;
     void focus() {
       if (!mounted || !menuOpen || index >= _itemFocusNodes.length) return;
       _itemFocusNodes[index].requestFocus();
-      ensureMenuItemVisible(_itemKeys[index]);
+      ensureMenuItemVisible(_itemKeys[index], minimal: minimalScroll);
     }
 
     if (_itemKeys[index].currentContext != null) {
@@ -276,7 +276,7 @@ class _DropdownButtonState<T> extends State<DropdownButton<T>>
     for (int count = 0; count < _items.length; count++) {
       index = (index + direction) % _items.length;
       if (_items[index].enabled) {
-        _focusItem(index);
+        _focusItem(index, minimalScroll: true);
         return;
       }
     }
@@ -370,38 +370,49 @@ class _DropdownButtonState<T> extends State<DropdownButton<T>>
           (ButtonStyle style) => style.spacing,
         ) ??
         0;
-    return MenuItemButton(
+    return MenuRowHover(
       key: _itemKeys[index],
-      onPressed: item.enabled ? () => _select(index) : null,
-      focusNode: _itemFocusNodes[index],
-      statesController: _itemStates[index],
-      isSelected: index == _selectedIndex,
-      style: layeredButtonStyle(itemLayers),
-      child: ValueListenableBuilder<Set<WidgetState>>(
-        valueListenable: _itemStates[index],
-        builder:
-            (BuildContext context, Set<WidgetState> states, Widget? child) {
-              final InteractionState state = InteractionState.fromWidgetStates(
-                states,
-              );
-              final Widget? indicator =
-                  resolveStatefulOrDefault<DropdownStyle, Widget>(
-                    state,
-                    layers,
-                    (DropdownStyle style) => style.selectedIndicator,
-                    () => defaultSelectionIndicator(selected: state.isSelected),
-                  );
-              return Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  if (indicator != null) ...<Widget>[
-                    indicator,
-                    if (spacing != 0) SizedBox(width: spacing),
+      // The row under a moving pointer becomes the focused row, without
+      // scrolling, so hover and arrow keys share one active row.
+      onPointerMove: item.enabled && !menuClosing
+          ? () {
+              if (_itemFocusNodes[index].hasFocus) return;
+              _focusedIndex = index;
+              _itemFocusNodes[index].requestFocus();
+            }
+          : null,
+      child: MenuItemButton(
+        onPressed: item.enabled ? () => _select(index) : null,
+        focusNode: _itemFocusNodes[index],
+        statesController: _itemStates[index],
+        isSelected: index == _selectedIndex,
+        style: layeredButtonStyle(itemLayers),
+        child: ValueListenableBuilder<Set<WidgetState>>(
+          valueListenable: _itemStates[index],
+          builder:
+              (BuildContext context, Set<WidgetState> states, Widget? child) {
+                final InteractionState state =
+                    InteractionState.fromWidgetStates(states);
+                final Widget? indicator =
+                    resolveStatefulOrDefault<DropdownStyle, Widget>(
+                      state,
+                      layers,
+                      (DropdownStyle style) => style.selectedIndicator,
+                      () =>
+                          defaultSelectionIndicator(selected: state.isSelected),
+                    );
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    if (indicator != null) ...<Widget>[
+                      indicator,
+                      if (spacing != 0) SizedBox(width: spacing),
+                    ],
+                    Flexible(child: item),
                   ],
-                  Flexible(child: item),
-                ],
-              );
-            },
+                );
+              },
+        ),
       ),
     );
   }
@@ -478,6 +489,10 @@ class _DropdownTrigger extends ButtonStyleButton {
 
   @override
   bool get expanded => isExpanded;
+
+  // While open, the active row carries the focus indication instead.
+  @override
+  bool? get virtualFocused => isExpanded ? false : null;
 
   @override
   ButtonStyle? themeStyleOf(BuildContext context) => themeStyle;

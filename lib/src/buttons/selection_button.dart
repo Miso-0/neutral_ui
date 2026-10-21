@@ -25,6 +25,7 @@ class SelectionButton extends ButtonStyleButton {
     super.onHover,
     super.onFocusChange,
     super.clipBehavior,
+    this.isInteractive = true,
   });
 
   /// The is selected for this component.
@@ -32,8 +33,13 @@ class SelectionButton extends ButtonStyleButton {
 
   /// The theme style for this component.
   final ButtonStyle? themeStyle;
+
+  /// Whether the button reacts to input; see [ButtonStyleButton.interactive].
+  final bool isInteractive;
   @override
   bool get selected => isSelected;
+  @override
+  bool get interactive => isInteractive;
   @override
   ButtonStyle? themeStyleOf(BuildContext context) => themeStyle;
 }

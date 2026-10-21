@@ -81,7 +81,7 @@ void main() {
       );
       final Finder check = find.descendant(
         of: find.byType(FilterChip),
-        matching: find.byType(AnimatedSize),
+        matching: find.byType(AnimatedAlign),
       );
       final double initial = tester.getSize(check).width;
       await tester.tap(find.text('Filter'));

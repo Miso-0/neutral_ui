@@ -1,10 +1,12 @@
-import 'package:flutter/widgets.dart';
-
 import '../feedback/tooltip.dart';
+import '../foundation/animated_reveal.dart';
 import '../foundation/glyphs.dart';
 import '../foundation/motion.dart';
 import '../styles/button_style.dart';
 import '../theme/button_themes.dart';
+
+import 'package:flutter/widgets.dart';
+
 import 'selection_button.dart';
 
 /// A value and its label in a [SegmentedButton].
@@ -195,15 +197,11 @@ class _SegmentedButtonState<T> extends State<SegmentedButton<T>> {
             ? () => _select(segment)
             : null,
         leading: widget.showSelectedIcon
-            ? ClipRect(
-                child: AnimatedSize(
-                  duration: duration,
-                  curve: curve,
-                  alignment: AlignmentDirectional.centerStart,
-                  child: selected
-                      ? (widget.selectedIcon ?? const CheckGlyph())
-                      : const SizedBox(width: 0, height: 0),
-                ),
+            ? AnimatedReveal(
+                visible: selected,
+                duration: duration,
+                curve: curve,
+                child: widget.selectedIcon ?? const CheckGlyph(),
               )
             : null,
         icon: segment.icon,

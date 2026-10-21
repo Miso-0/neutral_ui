@@ -1,10 +1,11 @@
-import 'package:flutter/widgets.dart';
-
 import '../foundation/decoration_lerp.dart';
 import '../foundation/interaction_state.dart';
+import '../foundation/motion.dart';
 import '../foundation/state_property.dart';
 import '../foundation/style_resolution.dart';
 import '../styles/toggle_style.dart';
+
+import 'package:flutter/widgets.dart';
 
 /// Shared selection animation and token resolution for headless toggles.
 mixin ToggleEngine<W extends StatefulWidget>
@@ -36,11 +37,18 @@ mixin ToggleEngine<W extends StatefulWidget>
       : _curve.transform(position.value);
 
   /// The duration for interaction transitions that do not change selection.
-  Duration get interactionDuration =>
-      position.isAnimating || dragging ? Duration.zero : _duration;
+  Duration get interactionDuration => _duration;
 
   /// The curve used by interaction transitions.
   Curve get interactionCurve => _curve;
+
+  /// Identifies [state] apart from selection, for surfaces whose selection
+  /// appearance already follows [position].
+  ///
+  /// Hover, focus and press changes fade, while selection and drag frames are
+  /// followed directly, so a press released as selection starts still fades.
+  Object interactionKey(InteractionState state) =>
+      state.copyWith(isSelected: false);
 
   @override
   void initState() {
@@ -76,9 +84,11 @@ mixin ToggleEngine<W extends StatefulWidget>
 
   /// Refreshes the structural animation tokens for the current build.
   void configureToggle() {
-    _duration =
-        plainToken<Duration>((ToggleStyle style) => style.animationDuration) ??
-        const Duration(milliseconds: 200);
+    _duration = reducedMotionDuration(
+      context,
+      plainToken<Duration>((ToggleStyle style) => style.animationDuration) ??
+          const Duration(milliseconds: 200),
+    );
     _curve =
         plainToken<Curve>((ToggleStyle style) => style.animationCurve) ??
         Curves.easeInOut;

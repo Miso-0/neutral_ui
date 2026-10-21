@@ -40,23 +40,90 @@ Color? lerpColorPremultiplied(Color? a, Color? b, double t) {
 ///
 /// Pairs of [BoxDecoration]s use [BoxDecoration.lerp] for geometry and
 /// [lerpColorPremultiplied] for the fill, matching border sides and matching
-/// shadows. Every other pair, including gradients, uses [Decoration.lerp].
+/// shadows. A null decoration, border or shadow list fades through a
+/// transparent copy of the other endpoint, so shapes and radii stay put while
+/// colors fade. A [ShapeDecoration] with an [OutlinedBorder] fades the same way
+/// against null. Every other pair, including gradients, uses [Decoration.lerp].
 Decoration? lerpDecoration(Decoration? a, Decoration? b, double t) {
-  if (a is! BoxDecoration || b is! BoxDecoration) {
+  if (t == 0) return a;
+  if (t == 1 || a == b) return b;
+  final Decoration? from = a ?? _transparent(b);
+  final Decoration? to = b ?? _transparent(a);
+  if (from is ShapeDecoration &&
+      to is ShapeDecoration &&
+      (a == null || b == null)) {
+    return ShapeDecoration.lerp(from, to, t);
+  }
+  if (from is! BoxDecoration || to is! BoxDecoration) {
     return Decoration.lerp(a, b, t);
   }
-  if (t == 0) return a;
-  if (t == 1) return b;
-  final BoxDecoration? result = BoxDecoration.lerp(a, b, t);
+  final BoxDecoration? result = BoxDecoration.lerp(from, to, t);
   if (result == null) return null;
   return result.copyWith(
-    color: lerpColorPremultiplied(a.color, b.color, t),
-    border: _lerpBorder(a.border, b.border, t),
-    boxShadow: _lerpShadows(a.boxShadow, b.boxShadow, t),
+    color: lerpColorPremultiplied(from.color, to.color, t),
+    border: _lerpBorder(from.border, to.border, t),
+    boxShadow: _lerpShadows(from.boxShadow, to.boxShadow, t),
   );
 }
 
+/// Returns [decoration] with every color made transparent, or null when it
+/// cannot be faded that way.
+Decoration? _transparent(Decoration? decoration) {
+  if (decoration is BoxDecoration) {
+    return BoxDecoration(
+      color: decoration.color?.withAlpha(0),
+      border: _transparentBorder(decoration.border),
+      borderRadius: decoration.borderRadius,
+      boxShadow: decoration.boxShadow?.map(_transparentShadow).toList(),
+      gradient: decoration.gradient?.scale(0),
+      backgroundBlendMode: decoration.backgroundBlendMode,
+      shape: decoration.shape,
+    );
+  }
+  if (decoration is ShapeDecoration) {
+    final ShapeBorder shape = decoration.shape;
+    if (shape is! OutlinedBorder) return null;
+    return ShapeDecoration(
+      color: decoration.color?.withAlpha(0),
+      gradient: decoration.gradient?.scale(0),
+      shadows: decoration.shadows?.map(_transparentShadow).toList(),
+      shape: shape.copyWith(side: _transparentSide(shape.side)),
+    );
+  }
+  return null;
+}
+
+BoxBorder? _transparentBorder(BoxBorder? border) => switch (border) {
+  final Border border => Border(
+    top: _transparentSide(border.top),
+    right: _transparentSide(border.right),
+    bottom: _transparentSide(border.bottom),
+    left: _transparentSide(border.left),
+  ),
+  final BorderDirectional border => BorderDirectional(
+    top: _transparentSide(border.top),
+    start: _transparentSide(border.start),
+    end: _transparentSide(border.end),
+    bottom: _transparentSide(border.bottom),
+  ),
+  _ => null,
+};
+
+// The width starts at zero so the layout inset grows continuously.
+BorderSide _transparentSide(BorderSide side) =>
+    side.copyWith(color: side.color.withAlpha(0), width: 0);
+
+BoxShadow _transparentShadow(BoxShadow shadow) => BoxShadow(
+  color: shadow.color.withAlpha(0),
+  offset: shadow.offset,
+  blurRadius: shadow.blurRadius,
+  spreadRadius: shadow.spreadRadius,
+  blurStyle: shadow.blurStyle,
+);
+
 BoxBorder? _lerpBorder(BoxBorder? a, BoxBorder? b, double t) {
+  a ??= _transparentBorder(b);
+  b ??= _transparentBorder(a);
   if (a is Border && b is Border) {
     return Border(
       top: _lerpSide(a.top, b.top, t),
@@ -91,6 +158,8 @@ List<BoxShadow>? _lerpShadows(
   List<BoxShadow>? b,
   double t,
 ) {
+  a ??= b?.map(_transparentShadow).toList();
+  b ??= a?.map(_transparentShadow).toList();
   if (a == null || b == null || a.length != b.length) return null;
   return <BoxShadow>[
     for (int index = 0; index < a.length; index += 1)

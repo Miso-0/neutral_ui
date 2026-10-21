@@ -1,15 +1,16 @@
-import 'package:flutter/widgets.dart';
-
 import '../foundation/animated_icon_theme.dart';
 import '../foundation/animated_surface.dart';
 import '../foundation/decoration_override.dart';
 import '../foundation/glyphs.dart';
 import '../foundation/interaction_detector.dart';
 import '../foundation/interaction_state.dart';
+import '../foundation/motion.dart';
 import '../foundation/state_property.dart';
 import '../foundation/style_resolution.dart';
 import '../foundation/tap_target.dart';
 import '../styles/button_style.dart';
+
+import 'package:flutter/widgets.dart';
 
 /// The unpainted, interactive foundation for buttons styled by [ButtonStyle].
 ///
@@ -137,6 +138,14 @@ abstract class ButtonStyleButton extends StatefulWidget {
   @protected
   bool? get virtualFocused => null;
 
+  /// Whether the button reacts to input.
+  ///
+  /// A button that does not keeps its enabled appearance but takes no focus,
+  /// recognizes no gestures, shows no hover or press and uses the basic cursor,
+  /// as for a chip that only displays information.
+  @protected
+  bool get interactive => true;
+
   /// Alternative primary content displayed when [selected] is true.
   @protected
   Widget? get selectedChild => null;
@@ -204,8 +213,9 @@ class _ButtonStyleButtonState extends State<ButtonStyleButton> {
         enabled: widget.enabled,
         isSelected: widget.selected ?? widget.expanded,
         isFocused: widget.virtualFocused,
-        onTap: widget.onPressed,
-        onLongPress: widget.onLongPress,
+        canRequestFocus: widget.interactive,
+        onTap: widget.interactive ? widget.onPressed : null,
+        onLongPress: widget.interactive ? widget.onLongPress : null,
         onHover: widget.onHover,
         onFocusChange: widget.onFocusChange,
         focusNode: widget.focusNode,
@@ -213,14 +223,22 @@ class _ButtonStyleButtonState extends State<ButtonStyleButton> {
         statesController: widget.statesController,
         enableFeedback: enableFeedback,
         mouseCursor: StateProperty<MouseCursor?>.resolveWith(
-          (InteractionState state) => resolveStateful<ButtonStyle, MouseCursor>(
-            state,
-            layers,
-            (ButtonStyle style) => style.mouseCursor,
-          ),
+          (InteractionState state) => widget.interactive
+              ? resolveStateful<ButtonStyle, MouseCursor>(
+                  state,
+                  layers,
+                  (ButtonStyle style) => style.mouseCursor,
+                )
+              : SystemMouseCursors.basic,
         ),
         builder: (BuildContext context, InteractionState state) {
-          return _buildStyledContent(context, state, layers);
+          return _buildStyledContent(
+            context,
+            widget.interactive
+                ? state
+                : state.copyWith(isHovered: false, isPressed: false),
+            layers,
+          );
         },
       ),
     );
@@ -231,12 +249,14 @@ class _ButtonStyleButtonState extends State<ButtonStyleButton> {
     InteractionState state,
     List<ButtonStyle?> layers,
   ) {
-    final Duration duration =
-        resolvePlain<ButtonStyle, Duration>(
-          layers,
-          (ButtonStyle style) => style.animationDuration,
-        ) ??
-        const Duration(milliseconds: 200);
+    final Duration duration = reducedMotionDuration(
+      context,
+      resolvePlain<ButtonStyle, Duration>(
+            layers,
+            (ButtonStyle style) => style.animationDuration,
+          ) ??
+          const Duration(milliseconds: 200),
+    );
     final Curve curve =
         resolvePlain<ButtonStyle, Curve>(
           layers,
@@ -329,7 +349,7 @@ class _ButtonStyleButtonState extends State<ButtonStyleButton> {
           padding: padding,
           decoration: decoration,
           foregroundDecoration: foregroundDecoration,
-          clipBehavior: decoration == null ? Clip.none : clipBehavior,
+          clipBehavior: clipBehavior,
           child: Align(
             alignment: alignment,
             widthFactor: 1,

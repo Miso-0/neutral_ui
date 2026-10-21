@@ -1,5 +1,4 @@
-import 'package:flutter/widgets.dart';
-
+import '../foundation/interaction_detector.dart';
 import '../foundation/motion.dart';
 import '../overlay/overlay_behavior.dart';
 import '../overlay/overlay_insets.dart';
@@ -7,6 +6,8 @@ import '../styles/menu_style.dart';
 import '../styles/popup_menu_style.dart';
 import 'menu_layout.dart';
 import 'menu_panel.dart';
+
+import 'package:flutter/widgets.dart';
 
 // RawMenuAnchor gives all nested anchors the root controller's tap group.
 // The global route also checks panels outside the anchor's render subtree.
@@ -53,6 +54,7 @@ mixin MenuHost<W extends StatefulWidget> on State<W>, TickerProvider {
     debugLabel: 'NeutralUI menu',
   );
   MenuStyle _panelStyle = const MenuStyle();
+  final ValueNotifier<bool> _pointerIdle = ValueNotifier<bool>(true);
   bool _closing = false;
   bool _opening = false;
   int _generation = 0;
@@ -301,6 +303,11 @@ mixin MenuHost<W extends StatefulWidget> on State<W>, TickerProvider {
     }
   }
 
+  /// Records keyboard navigation that happened outside the panel's own
+  /// shortcuts, such as arrows in an editable field, so row hover under a
+  /// resting pointer is hidden until the pointer moves.
+  void menuKeyboardNavigated() => _pointerIdle.value = true;
+
   /// Builds an anchor and a menu panel within the selected overlay.
   Widget buildMenuHost({
     required MenuStyle style,
@@ -327,6 +334,7 @@ mixin MenuHost<W extends StatefulWidget> on State<W>, TickerProvider {
       onOpenRequested: _openRequested,
       onCloseRequested: _closeRequested,
       onOpen: () {
+        _pointerIdle.value = true;
         _registerPointerRoute();
         if (mounted) setState(() {});
         onMenuOpened();
@@ -377,39 +385,46 @@ mixin MenuHost<W extends StatefulWidget> on State<W>, TickerProvider {
             ),
             child: IgnorePointer(
               ignoring: _closing,
-              child: ExcludeSemantics(
-                excluding: _closing,
-                child: AnimatedBuilder(
-                  animation: _transition,
-                  builder: (BuildContext context, Widget? panel) =>
-                      style.transitionBuilder?.call(
-                        context,
-                        _curvedTransition,
-                        panel!,
-                      ) ??
-                      overlayTransition(
-                        context,
-                        _curvedTransition,
-                        panel!,
-                        alignment: switch (_panelSide) {
-                          AxisDirection.down => Alignment.topCenter,
-                          AxisDirection.up => Alignment.bottomCenter,
-                          AxisDirection.right => Alignment.centerLeft,
-                          AxisDirection.left => Alignment.centerRight,
-                        },
+              // Rows keep their look while the panel exits, instead of fading
+              // as IgnorePointer ends their hover.
+              child: InteractionBoundary(
+                inherit: false,
+                frozen: _closing,
+                child: ExcludeSemantics(
+                  excluding: _closing,
+                  child: AnimatedBuilder(
+                    animation: _transition,
+                    builder: (BuildContext context, Widget? panel) =>
+                        style.transitionBuilder?.call(
+                          context,
+                          _curvedTransition,
+                          panel!,
+                        ) ??
+                        overlayTransition(
+                          context,
+                          _curvedTransition,
+                          panel!,
+                          alignment: switch (_panelSide) {
+                            AxisDirection.down => Alignment.topCenter,
+                            AxisDirection.up => Alignment.bottomCenter,
+                            AxisDirection.right => Alignment.centerLeft,
+                            AxisDirection.left => Alignment.centerRight,
+                          },
+                        ),
+                    child: RepaintBoundary(
+                      child: MenuPanel(
+                        key: _panelKey,
+                        info: info,
+                        style: style,
+                        focusScopeNode: _menuScope,
+                        onClose: closeMenu,
+                        semanticLabel: semanticLabel,
+                        textField: textField,
+                        onNavigate: onNavigate,
+                        closing: _closing,
+                        pointerIdle: _pointerIdle,
+                        children: children,
                       ),
-                  child: RepaintBoundary(
-                    child: MenuPanel(
-                      key: _panelKey,
-                      info: info,
-                      style: style,
-                      focusScopeNode: _menuScope,
-                      onClose: closeMenu,
-                      semanticLabel: semanticLabel,
-                      textField: textField,
-                      onNavigate: onNavigate,
-                      closing: _closing,
-                      children: children,
                     ),
                   ),
                 ),
@@ -432,6 +447,7 @@ mixin MenuHost<W extends StatefulWidget> on State<W>, TickerProvider {
     _curvedTransition.dispose();
     _transition.dispose();
     _menuScope.dispose();
+    _pointerIdle.dispose();
     if (_ownsFocus) _anchorFocusNode.dispose();
     super.dispose();
   }

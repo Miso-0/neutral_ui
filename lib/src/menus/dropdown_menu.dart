@@ -1,10 +1,10 @@
-import 'package:flutter/widgets.dart';
-
+import '../foundation/animated_icon_theme.dart';
 import '../foundation/animated_surface.dart';
 import '../foundation/decoration_override.dart';
 import '../foundation/glyphs.dart';
 import '../foundation/interaction_detector.dart';
 import '../foundation/interaction_state.dart';
+import '../foundation/motion.dart';
 import '../foundation/style_resolution.dart';
 import '../foundation/tap_target.dart';
 import '../styles/button_style.dart';
@@ -16,6 +16,9 @@ import 'key_activators.dart';
 import 'menu_host.dart';
 import 'menu_item_button.dart';
 import 'menu_panel.dart';
+
+import 'package:flutter/widgets.dart';
+
 import 'selection_indicator.dart';
 
 /// Filters the available entries in response to an editable query.
@@ -613,7 +616,7 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
       if (widget.searchBuilder != null) _refreshSearchEntries();
       _search();
     });
-    _scrollToHighlight();
+    _scrollToHighlight(minimal: true);
   }
 
   void _search() {
@@ -664,19 +667,23 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
     final int next = previous < 0
         ? (delta > 0 ? 0 : entries.length - 1)
         : (previous + delta) % entries.length;
+    menuKeyboardNavigated();
     setState(() {
       _highlighted = entries[next];
       _filterActive = false;
       _searchActive = false;
       if (!widget._multiple) _writeText(_highlighted!.label ?? '');
     });
-    _scrollToHighlight();
+    _scrollToHighlight(minimal: true);
   }
 
-  void _scrollToHighlight() {
+  void _scrollToHighlight({bool minimal = false}) {
     final DropdownMenuEntry<T>? entry = _highlighted;
     if (entry != null) {
-      ensureMenuItemVisible(_entryKeys.putIfAbsent(entry, GlobalKey.new));
+      ensureMenuItemVisible(
+        _entryKeys.putIfAbsent(entry, GlobalKey.new),
+        minimal: minimal,
+      );
     }
   }
 
@@ -804,6 +811,8 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
             statesController: _fieldStates,
             focusNode: anchorFocusNode,
             isExpanded: menuOpen,
+            // While open, the highlighted row carries the focus indication.
+            isFocused: menuOpen ? false : null,
             leading: leading,
             trailing: trailing,
             child: _textBox(_fieldLabel(layers, state), layers, state),
@@ -951,25 +960,35 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[indicator, ?entry.leadingIcon],
           );
-    return ExcludeFocus(
+    final bool enabled = widget.enabled && entry.enabled;
+    return MenuRowHover(
       key: _entryKeys.putIfAbsent(entry, GlobalKey.new),
-      child: MenuItemButton(
-        onPressed: widget.enabled && entry.enabled
-            ? () => _select(entry)
-            : null,
-        style: layeredButtonStyle(<ButtonStyle?>[
-          ButtonStyle(decoration: decorationLayer(entry.decoration)),
-          entry.style,
-          widget.style?.itemStyle,
-          theme.itemStyle,
-        ]),
-        isSelected: selected,
-        isChecked: widget._multiple ? selected : null,
-        isFocused: entry == _highlighted,
-        statesController: controller,
-        leading: leading,
-        trailing: entry.trailingIcon,
-        child: entry.labelWidget ?? Text(entry.label ?? ''),
+      // The row under a moving pointer becomes the highlighted row without
+      // scrolling or changing the text, so Enter selects what is lit.
+      onPointerMove: enabled && !menuClosing
+          ? () {
+              if (_highlighted != entry) setState(() => _highlighted = entry);
+            }
+          : null,
+      child: ExcludeFocus(
+        child: MenuItemButton(
+          onPressed: widget.enabled && entry.enabled
+              ? () => _select(entry)
+              : null,
+          style: layeredButtonStyle(<ButtonStyle?>[
+            ButtonStyle(decoration: decorationLayer(entry.decoration)),
+            entry.style,
+            widget.style?.itemStyle,
+            theme.itemStyle,
+          ]),
+          isSelected: selected,
+          isChecked: widget._multiple ? selected : null,
+          isFocused: entry == _highlighted,
+          statesController: controller,
+          leading: leading,
+          trailing: entry.trailingIcon,
+          child: entry.labelWidget ?? Text(entry.label ?? ''),
+        ),
       ),
     );
   }
@@ -1124,6 +1143,11 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
         layers,
         state,
       );
+      final Duration duration = reducedMotionDuration(
+        context,
+        surface.animationDuration ?? const Duration(milliseconds: 200),
+      );
+      final Curve curve = surface.animationCurve ?? Curves.easeInOut;
       // TextFieldTapRegion's group, made opaque so taps on unpainted padding,
       // gaps or icons still toggle the menu.
       return TapRegion(
@@ -1147,17 +1171,15 @@ class _DropdownMenuState<T> extends State<DropdownMenu<T>>
           child: ConstrainedBox(
             constraints: constraints,
             child: AnimatedSurface(
-              duration:
-                  surface.animationDuration ??
-                  const Duration(milliseconds: 200),
-              curve: surface.animationCurve ?? Curves.easeInOut,
+              duration: duration,
+              curve: curve,
               decoration: decoration,
               foregroundDecoration: foreground,
               padding: surface.padding?.resolve(state),
-              clipBehavior: decoration == null
-                  ? Clip.none
-                  : surface.clipBehavior ?? Clip.none,
-              child: IconTheme(
+              clipBehavior: surface.clipBehavior ?? Clip.none,
+              child: AnimatedIconTheme(
+                duration: duration,
+                curve: curve,
                 data:
                     surface.iconTheme?.resolve(state) ?? const IconThemeData(),
                 child: Row(

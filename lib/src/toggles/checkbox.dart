@@ -151,6 +151,7 @@ class _CheckboxState extends State<Checkbox>
                 return AnimatedSurface(
                   duration: interactionDuration,
                   curve: interactionCurve,
+                  transitionKey: interactionKey(state),
                   width: size?.width,
                   height: size?.height,
                   decoration: decorationToken(
