@@ -2,7 +2,7 @@
 
 NeutralUI is a headless Flutter design system with no third-party runtime dependencies. It supplies controlled values, pointer and keyboard interaction, semantics, layout slots, and composable themes. Your application supplies its visual language. The library uses Flutter's widgets layer without importing Material or Cupertino.
 
-[Package](https://pub.dev/packages/neutral_ui) | [API reference](https://pub.dev/documentation/neutral_ui/latest/) | [Source](https://github.com/Miso-0/pure_ui) | [Issues](https://github.com/Miso-0/pure_ui/issues) | [Changelog](CHANGELOG.md)
+[Live demo](https://flutter-neutral-ui.web.app/) | [Package](https://pub.dev/packages/neutral_ui) | [API reference](https://pub.dev/documentation/neutral_ui/latest/) | [Source](https://github.com/Miso-0/pure_ui) | [Issues](https://github.com/Miso-0/pure_ui/issues) | [Changelog](CHANGELOG.md)
 
 Requires Flutter 3.47 or newer and Dart 3.13.4 or newer, below Dart 4.0.0. The release is validated with Flutter 3.47.5 and Dart 3.13.4.
 
@@ -12,6 +12,14 @@ Requires Flutter 3.47 or newer and Dart 3.13.4 or newer, below Dart 4.0.0. The r
 - Tabs, navigation controls, expansion tiles, and date, date range, and time pickers.
 - Tables with sorting, selection, expandable rows, groups and footer rows.
 - Shared interaction state, component themes, overlay placement, localization hooks, and reduced-motion behavior.
+
+## Live component library
+
+**[Explore NeutralUI Components](https://flutter-neutral-ui.web.app/)** with 64 interactive examples across 12 categories. Try each control, inspect its Dart source, and copy the complete example with its styles and local state into your own app. Search across components, switch to RTL, or try reduced motion on desktop and mobile.
+
+[![NeutralUI component library showing a live calendar picker and its copyable Dart source](doc/images/component-library.png)](https://flutter-neutral-ui.web.app/#/pickers)
+
+[Buttons](https://flutter-neutral-ui.web.app/#/buttons) | [Menus](https://flutter-neutral-ui.web.app/#/menus) | [Text input](https://flutter-neutral-ui.web.app/#/input) | [Dates and time](https://flutter-neutral-ui.web.app/#/pickers) | [Tables](https://flutter-neutral-ui.web.app/#/tables)
 
 ## Get started
 
@@ -300,7 +308,7 @@ No panel visuals are supplied, and menu glyphs follow the default glyph rules ab
 
 ## Run the component library
 
-The repository includes a runnable [component library](https://github.com/Miso-0/pure_ui/tree/main/example) with macOS and web runners. From a checkout of the repository:
+Try the [hosted component library](https://flutter-neutral-ui.web.app/) or run the [example source](https://github.com/Miso-0/pure_ui/tree/main/example) locally with its macOS and web runners. From a checkout of the repository:
 
 ```sh
 cd example

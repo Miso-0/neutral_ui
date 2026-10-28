@@ -60,6 +60,19 @@ flutter build web --release --base-href /components/
 
 Share hash routes such as `/components/#/pickers`. Hash navigation needs no server-side route rewrites. Preserve the generated assets directory: it contains the example source files and fonts.
 
+### Firebase Hosting
+
+The repository root contains `firebase.json` and `.firebaserc` for the `flutter-neutral-ui` Firebase project and Hosting site. The public URL is [flutter-neutral-ui.web.app](https://flutter-neutral-ui.web.app/), with shareable category links such as [Dates and time](https://flutter-neutral-ui.web.app/#/pickers).
+
+Install the [Firebase CLI](https://firebase.google.com/docs/cli) and run `firebase login` once if your profile is not already signed in. From the repository root, build the app and deploy only Hosting:
+
+```sh
+(cd example && flutter pub get && flutter build web --release)
+firebase deploy --only hosting --project flutter-neutral-ui
+```
+
+Hosting publishes `example/build/web/`. The configuration revalidates cached files, including the app scripts and copied Dart sources, so a new release keeps previews and snippets in sync. Category links use hash routes and need no rewrite rules. For a local Hosting preview after building, run `firebase emulators:start --only hosting --project flutter-neutral-ui` from the repository root.
+
 Also run `flutter analyze` and `flutter test` at the repository root. For a manual fidelity check, copy the calendar example into a fresh `NeutralApp` with an empty theme, compare the result, and check phone width, RTL, reduced motion, search and clipboard behavior in Chrome.
 
 JetBrains Mono Regular comes from [JetBrains/JetBrainsMono](https://github.com/JetBrains/JetBrainsMono) under the bundled [SIL Open Font License](assets/fonts/OFL.txt).
