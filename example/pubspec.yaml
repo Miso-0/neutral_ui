@@ -1,5 +1,5 @@
 name: neutral_ui_example
-description: A visual theme gallery for NeutralUI headless Flutter controls.
+description: A copyable component library for NeutralUI headless Flutter controls.
 publish_to: none
 version: 1.0.0+1
 
@@ -21,3 +21,20 @@ dev_dependencies:
 flutter:
   assets:
     - assets/decoration_pattern.png
+    - lib/examples/buttons/
+    - lib/examples/toggles/
+    - lib/examples/lists/
+    - lib/examples/sliders/
+    - lib/examples/menus/
+    - lib/examples/input/
+    - lib/examples/pickers/
+    - lib/examples/feedback/
+    - lib/examples/chips/
+    - lib/examples/navigation/
+    - lib/examples/tables/
+    - lib/examples/foundations/
+    - assets/fonts/OFL.txt
+  fonts:
+    - family: JetBrainsMono
+      fonts:
+        - asset: assets/fonts/JetBrainsMono-Regular.ttf

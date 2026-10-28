@@ -1,162 +1,127 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:neutral_ui/neutral_ui.dart';
-import 'package:neutral_ui_example/main.dart';
-import 'package:neutral_ui_example/sections/table_section.dart';
+import 'package:neutral_ui_example/examples/tables/grouped_workstreams_example.dart';
+import 'package:neutral_ui_example/examples/tables/project_table_example.dart';
 
 void main() {
-  testWidgets('table gallery renders the project and grouped examples', (
-    WidgetTester tester,
-  ) async {
-    await _pumpGallery(tester);
-    expect(find.text('14 / Tables'), findsOneWidget);
-    final Finder projects = find.byKey(
-      const ValueKey<String>('table-projects'),
-    );
-    final Finder groups = find.byKey(const ValueKey<String>('table-groups'));
-    await tester.ensureVisible(projects);
-    await tester.pumpAndSettle();
-
-    expect(tester.widget<DataTable>(projects).columns, hasLength(4));
-    for (final String header in <String>[
-      'Project',
-      'Owner',
-      'Status',
-      'Budget',
-    ]) {
-      expect(
-        find.descendant(of: projects, matching: find.text(header)),
-        findsOneWidget,
-      );
-    }
-    for (final String project in <String>[
-      'atlas',
-      'beacon',
-      'canopy',
-      'delta',
-    ]) {
-      expect(_projectRow(project), findsOneWidget);
-    }
-    expect(find.text('No projects selected'), findsOneWidget);
-    expect(tester.widget<DataTable>(groups).groups, hasLength(2));
-    expect(find.text('Product / 2 workstreams'), findsOneWidget);
-    expect(find.text('Operations / 2 workstreams'), findsOneWidget);
-    expect(find.text('Portfolio total'), findsOneWidget);
-    expect(find.text('\$148,000'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
-
   testWidgets(
-    'project selection and expansion follow the project after sorting',
+    'portfolio renders columns, totals and explicit selection controls',
     (WidgetTester tester) async {
-      await _pumpGallery(tester);
-      final Finder atlas = _projectRow('atlas');
-      final Finder checkbox = find.descendant(
-        of: atlas,
-        matching: find.byType(Checkbox),
-      );
-      await _tap(tester, checkbox);
-      expect(find.text('1 project selected'), findsOneWidget);
-      expect(tester.widget<Checkbox>(checkbox).value, isTrue);
-
-      await _tap(
-        tester,
-        find.descendant(
-          of: atlas,
-          matching: find.byWidgetPredicate(
-            (Widget widget) =>
-                widget is Semantics && widget.properties.label == 'Expand',
-          ),
-        ),
-      );
-      final Finder details = find.byKey(
-        const ValueKey<String>('table-details-atlas'),
-      );
-      expect(details, findsOneWidget);
-      expect(
-        tester.getTopLeft(atlas).dy,
-        lessThan(tester.getTopLeft(_projectRow('delta')).dy),
-      );
-
-      await _tap(
-        tester,
-        find.byKey(const ValueKey<String>('table-sort-project')),
-      );
-      expect(
-        tester.getTopLeft(_projectRow('delta')).dy,
-        lessThan(tester.getTopLeft(atlas).dy),
-      );
-      expect(tester.widget<Checkbox>(checkbox).value, isTrue);
-      expect(
-        tester
-            .widget<Checkbox>(
-              find.descendant(
-                of: _projectRow('delta'),
-                matching: find.byType(Checkbox),
-              ),
-            )
-            .value,
-        isFalse,
-      );
-      expect(details, findsOneWidget);
-      expect(find.text('1 project selected'), findsOneWidget);
-
-      await _tap(
-        tester,
-        find.byKey(const ValueKey<String>('table-sort-budget')),
-      );
-      _expectProjectOrder(tester, <String>[
-        'delta',
-        'beacon',
-        'atlas',
-        'canopy',
-      ]);
-      expect(tester.widget<Checkbox>(checkbox).value, isTrue);
-      expect(details, findsOneWidget);
-
-      await _tap(tester, checkbox);
+      await _pump(tester, const ProjectTableExample());
+      final DataTable table = tester.widget<DataTable>(find.byType(DataTable));
+      expect(table.columns, hasLength(4));
+      expect(table.style, isNotNull);
+      for (final String header in <String>[
+        'Project',
+        'Owner',
+        'Status',
+        'Budget',
+      ]) {
+        expect(find.text(header), findsOneWidget);
+      }
+      expect(find.byType(Checkbox), findsNWidgets(5));
+      expect(find.text('Portfolio total'), findsOneWidget);
+      expect(find.text(r'$148,000'), findsOneWidget);
       expect(find.text('No projects selected'), findsOneWidget);
-      expect(tester.widget<Checkbox>(checkbox).value, isFalse);
-      await _tap(
-        tester,
-        find.descendant(
-          of: atlas,
-          matching: find.byWidgetPredicate(
-            (Widget widget) =>
-                widget is Semantics && widget.properties.label == 'Collapse',
-          ),
-        ),
-      );
-      expect(details, findsNothing);
       expect(tester.takeException(), isNull);
     },
   );
 
-  testWidgets('workstream groups and nested tasks expand independently', (
+  testWidgets('selection and expansion follow a project through sorting', (
     WidgetTester tester,
   ) async {
-    await _pumpGallery(tester);
+    await _pump(tester, const ProjectTableExample());
+    final Finder atlas = _row('Atlas website');
+    final Finder checkbox = find.descendant(
+      of: atlas,
+      matching: find.byType(Checkbox),
+    );
+    await _tap(tester, checkbox);
+    expect(find.text('1 project selected'), findsOneWidget);
+    expect(tester.widget<Checkbox>(checkbox).value, isTrue);
+    await _tap(tester, _expansion(atlas, 'Expand'));
+    final Finder details = find.text(
+      'A refreshed home for the brand, from discovery to launch.',
+    );
+    expect(details, findsOneWidget);
+    _expectOrder(tester, <String>[
+      'Atlas website',
+      'Beacon mobile',
+      'Canopy platform',
+      'Delta research',
+    ]);
+
+    await _tap(tester, find.text('Project'));
+    _expectOrder(tester, <String>[
+      'Delta research',
+      'Canopy platform',
+      'Beacon mobile',
+      'Atlas website',
+    ]);
+    expect(tester.widget<Checkbox>(checkbox).value, isTrue);
+    expect(details, findsOneWidget);
+    expect(
+      tester
+          .widget<Checkbox>(
+            find.descendant(
+              of: _row('Delta research'),
+              matching: find.byType(Checkbox),
+            ),
+          )
+          .value,
+      isFalse,
+    );
+
+    await _tap(tester, find.text('Budget'));
+    _expectOrder(tester, <String>[
+      'Delta research',
+      'Beacon mobile',
+      'Atlas website',
+      'Canopy platform',
+    ]);
+    expect(tester.widget<Checkbox>(checkbox).value, isTrue);
+    expect(details, findsOneWidget);
+    await _tap(tester, checkbox);
+    expect(find.text('No projects selected'), findsOneWidget);
+    await _tap(tester, _expansion(atlas, 'Collapse'));
+    expect(details, findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('select all and clear selection update portfolio state', (
+    WidgetTester tester,
+  ) async {
+    await _pump(tester, const ProjectTableExample());
+    await _tap(tester, find.byType(Checkbox).first);
+    expect(find.text('4 projects selected'), findsOneWidget);
+    for (final Checkbox checkbox in tester.widgetList<Checkbox>(
+      find.byType(Checkbox),
+    )) {
+      expect(checkbox.value, isTrue);
+    }
+    await _tap(tester, find.text('Clear selection'));
+    expect(find.text('No projects selected'), findsOneWidget);
+    expect(tester.widget<Checkbox>(find.byType(Checkbox).first).value, isFalse);
+  });
+
+  testWidgets('groups and nested tasks expand independently', (
+    WidgetTester tester,
+  ) async {
+    await _pump(tester, const GroupedWorkstreamsExample());
     expect(find.text('Design system'), findsOneWidget);
     expect(find.text('Team onboarding'), findsNothing);
     expect(find.text('Token audit'), findsNothing);
-
     await _tap(tester, find.text('Product / 2 workstreams'));
     expect(find.text('Design system'), findsNothing);
     expect(find.text('Website launch'), findsNothing);
     await _tap(tester, find.text('Operations / 2 workstreams'));
     expect(find.text('Team onboarding'), findsOneWidget);
     expect(find.text('Quarterly planning'), findsOneWidget);
-    expect(find.text('Design system'), findsNothing);
-
     await _tap(tester, find.text('Product / 2 workstreams'));
-    final Finder designSystem = find
-        .ancestor(of: find.text('Design system'), matching: find.byType(Table))
-        .first;
-    await _tap(tester, _expandControl(designSystem));
+    await _tap(tester, _expansion(_row('Design system'), 'Expand'));
     expect(find.text('Token audit'), findsOneWidget);
     expect(find.text('Component QA'), findsOneWidget);
-    expect(find.text('Team onboarding'), findsOneWidget);
-
     await _tap(tester, find.text('Product / 2 workstreams'));
     expect(find.text('Token audit'), findsNothing);
     expect(find.text('Team onboarding'), findsOneWidget);
@@ -165,76 +130,68 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('table examples scroll horizontally on a narrow screen', (
-    WidgetTester tester,
-  ) async {
-    tester.view.physicalSize = const Size(390, 844);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-    await tester.pumpWidget(
-      const NeutralApp(
-        color: Color(0xFFF4F7F3),
-        home: SingleChildScrollView(
-          child: Padding(padding: EdgeInsets.all(16), child: TableSection()),
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    for (final String key in <String>['table-projects', 'table-groups']) {
-      final Finder table = find.byKey(ValueKey<String>(key));
-      final Finder horizontal = find.ancestor(
-        of: table,
-        matching: find.byWidgetPredicate(
-          (Widget widget) =>
-              widget is SingleChildScrollView &&
-              widget.scrollDirection == Axis.horizontal,
-        ),
+  for (final Widget example in <Widget>[
+    const ProjectTableExample(),
+    const GroupedWorkstreamsExample(),
+  ]) {
+    testWidgets('${example.runtimeType} scrolls horizontally at phone width', (
+      WidgetTester tester,
+    ) async {
+      await _pump(tester, example, width: 390);
+      final Finder horizontal = find.byWidgetPredicate(
+        (Widget widget) =>
+            widget is SingleChildScrollView &&
+            widget.scrollDirection == Axis.horizontal,
       );
-      final Finder scrollable = find.descendant(
-        of: horizontal,
-        matching: find.byType(Scrollable),
+      final ScrollableState state = tester.state<ScrollableState>(
+        find.descendant(of: horizontal, matching: find.byType(Scrollable)),
       );
-      final ScrollableState state = tester.state<ScrollableState>(scrollable);
       expect(state.position.maxScrollExtent, greaterThan(0));
-      await tester.ensureVisible(horizontal);
-      await tester.pumpAndSettle();
-      final double before = state.position.pixels;
       await tester.drag(horizontal, const Offset(-240, 0));
       await tester.pumpAndSettle();
-      expect(state.position.pixels, greaterThan(before));
-    }
-    expect(tester.takeException(), isNull);
-  });
+      expect(state.position.pixels, greaterThan(0));
+      expect(tester.takeException(), isNull);
+    });
+  }
 }
 
-Finder _projectRow(String id) =>
-    find.byKey(ValueKey<String>('table-project-$id'));
+Finder _row(String name) =>
+    find.ancestor(of: find.text(name), matching: find.byType(Table)).first;
 
-Finder _expandControl(Finder row) => find.descendant(
+Finder _expansion(Finder row, String label) => find.descendant(
   of: row,
   matching: find.byWidgetPredicate(
-    (Widget widget) =>
-        widget is Semantics && widget.properties.label == 'Expand',
+    (Widget widget) => widget is Semantics && widget.properties.label == label,
   ),
 );
 
-void _expectProjectOrder(WidgetTester tester, List<String> ids) {
-  for (int i = 1; i < ids.length; i++) {
+void _expectOrder(WidgetTester tester, List<String> names) {
+  for (int i = 1; i < names.length; i++) {
     expect(
-      tester.getTopLeft(_projectRow(ids[i - 1])).dy,
-      lessThan(tester.getTopLeft(_projectRow(ids[i])).dy),
+      tester.getTopLeft(find.text(names[i - 1])).dy,
+      lessThan(tester.getTopLeft(find.text(names[i])).dy),
     );
   }
 }
 
-Future<void> _pumpGallery(WidgetTester tester) async {
-  tester.view.physicalSize = const Size(1280, 1100);
+Future<void> _pump(
+  WidgetTester tester,
+  Widget example, {
+  double width = 1280,
+}) async {
+  tester.view.physicalSize = Size(width, 1100);
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
-  await tester.pumpWidget(const GalleryApp());
+  await tester.pumpWidget(
+    NeutralApp(
+      color: const Color(0xFFF4F7F3),
+      theme: const ThemeData(),
+      home: SingleChildScrollView(
+        child: Padding(padding: const EdgeInsets.all(16), child: example),
+      ),
+    ),
+  );
   await tester.pumpAndSettle();
 }
 

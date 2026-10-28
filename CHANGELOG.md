@@ -1,5 +1,7 @@
 ## 0.12.0
 
+- Turn the example into a Flutter web component library with category routes, search, live previews and exact, self-contained source copying.
+
 - Add widgets-only `DataTable`, `DataTableColumn`, `DataTableRow` and `DataTableGroup` with NeutralUI controls, inherited styles, keyboard interaction, spanning groups/details and aligned intrinsic columns.
 - Add gallery table examples with sorting, selection that follows projects through sorting, expandable details, footer totals and collapsible groups.
 - Show visible focus like CSS `:focus-visible`: only the control with primary focus shows it, and only after keyboard input, under directional navigation or with `FocusHighlightStrategy.alwaysTraditional`. Focus moved in code during mouse use, such as menus opening and closing, tabs, navigation and calendars, no longer draws keyboard rings.

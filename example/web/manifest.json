@@ -1,12 +1,12 @@
 {
-    "name": "NeutralUI Gallery",
+    "name": "NeutralUI Components",
     "short_name": "NeutralUI",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#F4F7F3",
     "theme_color": "#087F6D",
-    "description": "A theme gallery for NeutralUI headless Flutter controls.",
-    "orientation": "portrait-primary",
+    "description": "Live NeutralUI Flutter components with complete, copyable examples.",
+    "orientation": "any",
     "prefer_related_applications": false,
     "icons": [
         {

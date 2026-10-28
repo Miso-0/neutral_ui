@@ -298,9 +298,9 @@ Option rows resolve each token per state in this order: entry style, inline `sty
 
 No panel visuals are supplied, and menu glyphs follow the default glyph rules above. An editable field must have a cursor color: `DropdownStyle.cursorColor` falls back to the ambient text color, then opaque black. Text fields have the same final cursor fallback. Glyphs use the icon theme's color. Trigger and option semantics expose button, text field, expanded, selected, checked and enabled states as appropriate. Menu-specific `SemanticsRole` values are omitted because Flutter's widgets layer does not export those types.
 
-## Run the gallery
+## Run the component library
 
-The repository includes a runnable [example gallery](https://github.com/Miso-0/pure_ui/tree/main/example) with macOS and web runners. From a checkout of the repository:
+The repository includes a runnable [component library](https://github.com/Miso-0/pure_ui/tree/main/example) with macOS and web runners. From a checkout of the repository:
 
 ```sh
 cd example
@@ -310,7 +310,7 @@ flutter run -d chrome
 flutter run -d macos
 ```
 
-The NeutralApp gallery demonstrates a central visual theme, local component themes, inline `copyWith`, direct decorations with an asset image, loading, selection, RadioGroup, RTL, reduced motion, sliders, searchable and multi-select dropdowns, popup menus, and a live interaction-state readout. It also includes feedback surfaces, text input and search, date and time pickers, chips, tabs, navigation, progress controls, and interactive tables. Its green palette belongs to the example application; the package does not impose it.
+The example offers shareable category URLs such as `/#/pickers`, live search, RTL and reduced-motion controls. Each preview runs with an empty NeutralUI theme. The Copy button copies the exact Dart source file that renders it, including its styles and local state, so it can be pasted into a fresh `NeutralApp`. Its green palette belongs to the example snippets; the package does not impose it.
 
 To verify a checkout, run `flutter analyze` and `flutter test` at the repository root. In `example`, run `flutter analyze` and `flutter test`; `flutter build web` and `flutter build macos` validate the bundled runners on supported development hosts. See the [example README](https://github.com/Miso-0/pure_ui/blob/main/example/README.md) for its source layout.
 

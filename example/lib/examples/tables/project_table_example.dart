@@ -41,22 +41,57 @@ const DataTableStyle _tableStyle = DataTableStyle(
     fontWeight: FontWeight.w600,
   ),
   sortIconColor: _accent,
+  rowExpandIcon: ChevronGlyph(direction: GlyphDirection.end, size: 16),
+  rowCollapseIcon: ChevronGlyph(direction: GlyphDirection.down, size: 16),
+  groupExpandIcon: ChevronGlyph(direction: GlyphDirection.end, size: 16),
+  groupCollapseIcon: ChevronGlyph(direction: GlyphDirection.down, size: 16),
 );
 
-/// Interactive table examples using the gallery's shared control themes.
-class TableSection extends StatefulWidget {
-  /// Creates the gallery's table section.
-  const TableSection({super.key});
+ToggleStyle _checkboxStyle() => ToggleStyle(
+  size: const StateProperty<Size?>.all(Size(22, 22)),
+  padding: const EdgeInsets.all(4),
+  decoration: StateProperty<Decoration?>.resolveWith(
+    (InteractionState state) => BoxDecoration(
+      color: state.isSelected ? _accent : _white,
+      border: Border.all(color: state.isSelected ? _accent : _line),
+      borderRadius: BorderRadius.circular(6),
+      boxShadow: state.isFocused
+          ? const <BoxShadow>[
+              BoxShadow(color: Color(0x66087F6D), spreadRadius: 3),
+            ]
+          : null,
+    ),
+  ),
+  indicator: const StateProperty<Widget?>.all(
+    IconTheme(
+      data: IconThemeData(color: _white),
+      child: CheckGlyph(size: 12),
+    ),
+  ),
+  indeterminateIndicator: const StateProperty<Widget?>.all(
+    SizedBox(width: 10, height: 2, child: ColoredBox(color: _white)),
+  ),
+);
+
+const ButtonStyle _clearStyle = ButtonStyle(
+  padding: StateProperty<EdgeInsetsGeometry?>.all(EdgeInsets.all(10)),
+  textStyle: StateProperty<TextStyle?>.all(
+    TextStyle(color: _accent, fontSize: 13),
+  ),
+);
+
+/// A sortable portfolio with stable selection, expandable details and totals.
+class ProjectTableExample extends StatefulWidget {
+  /// Creates the example.
+  const ProjectTableExample({super.key});
 
   @override
-  State<TableSection> createState() => _TableSectionState();
+  State<ProjectTableExample> createState() => _ProjectTableExampleState();
 }
 
-class _TableSectionState extends State<TableSection> {
+class _ProjectTableExampleState extends State<ProjectTableExample> {
   final Set<String> _selectedProjectIds = <String>{};
   final Set<String> _expandedProjectIds = <String>{};
-  final Set<String> _expandedWorkstreams = <String>{};
-  final Set<int> _collapsedGroups = <int>{1};
   int _sortColumn = 0;
   bool _sortAscending = true;
 
@@ -166,25 +201,22 @@ class _TableSectionState extends State<TableSection> {
     return _scrollableTable(
       minWidth: 780,
       child: DataTable(
-        key: const ValueKey<String>('table-projects'),
+        style: _tableStyle,
         rowDivider: const BorderSide(color: _line),
         columns: const <DataTableColumn>[
           DataTableColumn(
-            header: Text(
-              'Project',
-              key: ValueKey<String>('table-sort-project'),
-            ),
+            header: Text('Project'),
             width: FlexColumnWidth(2),
             sortable: true,
           ),
           DataTableColumn(
-            header: Text('Owner', key: ValueKey<String>('table-sort-owner')),
+            header: Text('Owner'),
             width: FlexColumnWidth(1.2),
             sortable: true,
           ),
           DataTableColumn(header: Text('Status'), width: FixedColumnWidth(134)),
           DataTableColumn(
-            header: Text('Budget', key: ValueKey<String>('table-sort-budget')),
+            header: Text('Budget'),
             width: FixedColumnWidth(112),
             sortable: true,
             cellAlignment: AlignmentDirectional.centerEnd,
@@ -194,7 +226,6 @@ class _TableSectionState extends State<TableSection> {
         rows: <DataTableRow>[
           for (final _Project project in projects)
             DataTableRow(
-              key: ValueKey<String>('table-project-${project.id}'),
               cells: <Widget>[
                 Text(
                   project.name,
@@ -207,6 +238,17 @@ class _TableSectionState extends State<TableSection> {
             ),
         ],
         showCheckboxes: true,
+        checkboxBuilder:
+            (
+              BuildContext context,
+              bool? value,
+              ValueChanged<bool?>? onChanged,
+            ) => Checkbox(
+              value: value,
+              tristate: true,
+              onChanged: onChanged,
+              style: _checkboxStyle(),
+            ),
         selectedRows: <int>{
           for (int i = 0; i < projects.length; i++)
             if (_selectedProjectIds.contains(projects[i].id)) i,
@@ -236,7 +278,6 @@ class _TableSectionState extends State<TableSection> {
             (BuildContext context, DataTableRow row, int index) {
               final _Project project = projects[index];
               return Column(
-                key: ValueKey<String>('table-details-${project.id}'),
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
@@ -272,112 +313,15 @@ class _TableSectionState extends State<TableSection> {
     );
   }
 
-  Widget _groupedTable() => _scrollableTable(
-    minWidth: 620,
-    child: DataTable(
-      key: const ValueKey<String>('table-groups'),
-      rowDivider: const BorderSide(color: _line),
-      columns: const <DataTableColumn>[
-        DataTableColumn(header: Text('Workstream'), width: FlexColumnWidth(2)),
-        DataTableColumn(header: Text('Tasks'), width: FixedColumnWidth(100)),
-        DataTableColumn(header: Text('Progress'), width: FlexColumnWidth()),
-      ],
-      rows: const <DataTableRow>[
-        DataTableRow(
-          cells: <Widget>[
-            Text('Design system'),
-            Text('12'),
-            Text('8 of 12 complete'),
-          ],
-          children: <DataTableRow>[
-            DataTableRow(
-              cells: <Widget>[Text('Token audit'), Text('4'), Text('Complete')],
-            ),
-            DataTableRow(
-              cells: <Widget>[
-                Text('Component QA'),
-                Text('8'),
-                Text('4 of 8 complete'),
-              ],
-            ),
-          ],
-        ),
-        DataTableRow(
-          cells: <Widget>[
-            Text('Website launch'),
-            Text('8'),
-            Text('6 of 8 complete'),
-          ],
-        ),
-        DataTableRow(
-          cells: <Widget>[
-            Text('Team onboarding'),
-            Text('6'),
-            Text('3 of 6 complete'),
-          ],
-        ),
-        DataTableRow(
-          cells: <Widget>[
-            Text('Quarterly planning'),
-            Text('4'),
-            Text('Not started'),
-          ],
-        ),
-      ],
-      groups: const <DataTableGroup>[
-        DataTableGroup(
-          key: ValueKey<String>('table-group-product'),
-          header: Text('Product / 2 workstreams'),
-          startIndex: 0,
-          endIndex: 1,
-          collapsible: true,
-        ),
-        DataTableGroup(
-          key: ValueKey<String>('table-group-operations'),
-          header: Text('Operations / 2 workstreams'),
-          startIndex: 2,
-          endIndex: 3,
-          collapsible: true,
-        ),
-      ],
-      collapsedGroups: Set<int>.of(_collapsedGroups),
-      onGroupToggled: (int group) =>
-          setState(() => _toggle(_collapsedGroups, group)),
-      expandedRows: Set<String>.of(_expandedWorkstreams),
-      onRowExpanded: (String path) =>
-          setState(() => _toggle(_expandedWorkstreams, path)),
-    ),
-  );
-
   @override
-  Widget build(BuildContext context) => DataTableTheme(
-    data: _tableStyle,
-    child: Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(26),
-      decoration: BoxDecoration(
-        color: _white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _line),
-      ),
+  Widget build(BuildContext context) => DefaultTextStyle(
+    style: const TextStyle(color: Color(0xFF142C2A), fontSize: 14),
+    child: IconTheme(
+      data: const IconThemeData(color: _accent, size: 16),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          const Text(
-            '14 / Tables',
-            style: TextStyle(fontSize: 21, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            'Sort, select and expand rows. Scroll horizontally on smaller screens.',
-            style: TextStyle(color: _muted, fontSize: 13),
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            'Project portfolio',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 12),
           _projectTable(),
           const SizedBox(height: 12),
           Wrap(
@@ -386,14 +330,13 @@ class _TableSectionState extends State<TableSection> {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: <Widget>[
               Text(
-                key: const ValueKey<String>('table-selection-status'),
                 _selectedProjectIds.isEmpty
                     ? 'No projects selected'
                     : '${_selectedProjectIds.length} ${_selectedProjectIds.length == 1 ? 'project' : 'projects'} selected',
                 style: const TextStyle(color: _muted, fontSize: 12),
               ),
               TextButton(
-                key: const ValueKey<String>('table-clear-selection'),
+                style: _clearStyle,
                 onPressed: _selectedProjectIds.isEmpty
                     ? null
                     : () => setState(_selectedProjectIds.clear),
@@ -401,18 +344,6 @@ class _TableSectionState extends State<TableSection> {
               ),
             ],
           ),
-          const SizedBox(height: 28),
-          const Text(
-            'Grouped workstreams',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            'Open a group or expand Design system to see its nested tasks.',
-            style: TextStyle(color: _muted, fontSize: 12),
-          ),
-          const SizedBox(height: 12),
-          _groupedTable(),
         ],
       ),
     ),
